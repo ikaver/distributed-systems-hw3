@@ -1,0 +1,30 @@
+System administrator:
+
+	1. Create config.txt
+	2. Run python script that creates master nodes and participants (input = config.txt)
+	3. Run script that prints information of the system (input = config.txt or master ip and port number). 
+		Operations:
+			list-jobs : Returns list of jobs with job ids
+			get-job-info <JOB_ID> : Gives list of mappers/reducers associated to each job.
+			kill-job <JOB_ID> : Kills the job and returns the mappers and reducers to the "available" pool.
+			kill-system
+
+Application programmer:
+
+	1. Create mapper task 
+
+		We need to create a Mapper Interface
+	
+	2. Create reduce task 
+
+		We need to create a Reducer Interface
+
+	3. Run bundle creator script 
+
+		We need to create a bundle creator script (What if it has additional dependencies? What is the entry point of the program? Do we need to use some kind of reflection here?)
+
+		python bundle_creator.py <BUNDLE_JAR> <MAPPER CLASS PATH> <REDUCER CLASS PATH>
+
+	4. Run work creator script
+		python run-mr.py <configuration-file-path>
+
