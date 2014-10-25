@@ -1,0 +1,1 @@
+- Where does sorting happen? Do mappers sort their output for reducers to merge, or do reducers receive unsorted input?

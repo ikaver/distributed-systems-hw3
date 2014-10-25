@@ -1,0 +1,30 @@
+{
+	"config" : {
+		"master" : {
+			"ip" : <IP>,
+			"port" : <PORT>
+		},
+		"participants" : {
+			"machines" : [
+				{
+					"id" : ID,
+	 				"ip" : <IP>,
+					"port" : <PORT>,
+					"work-info" : {
+						"mappers" : <NUM_MAPPERS>
+						"reducers" : <NUM_REDUCERS>
+					}
+				},
+				{
+					"id" : ID,
+	 				"ip" : <IP>,
+					"port" : <PORT>,
+					"work-info" : {
+						"mappers" : <NUM_MAPPERS>
+						"reducers" : <NUM_REDUCERS>
+					}
+				}
+			]
+		},
+	}
+}
