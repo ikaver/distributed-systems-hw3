@@ -5,7 +5,8 @@
 			<PATH1>, <PATH2>
 		],
 		"output-file-path" : <PATH>,
-		"num_mappers" : <NUM_MAPPERS>,
-		"num_reducers" : <NUM_REDUCERS>
+		"num-mappers" : <NUM_MAPPERS>,
+		"num-reducers" : <NUM_REDUCERS>,
+		"record-size" : <SIZE>
 	}
 }
