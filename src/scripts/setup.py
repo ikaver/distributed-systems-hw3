@@ -15,6 +15,7 @@ def copy_files(remote, username, password, paths):
 
   sftp = ssh.open_sftp()
 
+  # Currently, the files are assumed to be copied inside /tmp".
   for path in paths:
     destination = "/tmp";
     if (not path[0].startswith("/")):
