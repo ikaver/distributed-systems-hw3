@@ -1,8 +1,8 @@
-package com.ikaver.aagarwal.hw3.jobcreator;
+package com.ikaver.aagarwal.hw3.mrclient.joblauncher;
 
 import com.beust.jcommander.Parameter;
 
-public class JobCreatorSettings {
+public class JobLauncherSettings {
 
   @Parameter(names = "-f", description = "Configuration file path",
       required = true)

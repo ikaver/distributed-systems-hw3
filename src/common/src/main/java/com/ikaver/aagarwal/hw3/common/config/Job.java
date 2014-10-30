@@ -1,4 +1,4 @@
-package com.ikaver.aagarwal.hw3.common;
+package com.ikaver.aagarwal.hw3.common.config;
 
 public class Job {
   

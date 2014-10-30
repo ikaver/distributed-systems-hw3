@@ -1,14 +1,17 @@
-package com.ikaver.aagarwal.hw3.jobcreator;
+package com.ikaver.aagarwal.hw3.mrclient.joblauncher;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import com.ikaver.aagarwal.hw3.common.config.Job;
 
-public class JobCreator {
+public class JobLauncher {
   
-  
+  public void launchJob(Job job) {
+
+  }
   
   public static void main(String [] args) {
-    JobCreatorSettings settings = new JobCreatorSettings();
+    JobLauncherSettings settings = new JobLauncherSettings();
     JCommander argsParser = new JCommander(settings);
     try {
       argsParser.parse(args);
