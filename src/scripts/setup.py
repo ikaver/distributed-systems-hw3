@@ -2,10 +2,10 @@ import argparse;
 import getpass;
 import paramiko;
 
-def copy_files(remote, username, password, source_paths):
+def copy_files(remote, username, password, paths):
   """ Copies a bunch of files from host to the remote machine. 
-   Parameter source_paths is the location of the files on the 'local' host.
-   The files are copied at the same path inside the /tmp of the remote host.""" 
+   Parameter paths is a tuple of the location of the files on the 'local' host and the
+   location of the file on the remote host. Each path is absolute.""" 
 
   ssh = paramiko.SSHClient();
 
@@ -15,8 +15,12 @@ def copy_files(remote, username, password, source_paths):
 
   sftp = ssh.open_sftp()
 
-  for path in source_paths:
-    sftp.put(path, path);
+  for path in paths:
+    destination = "/tmp";
+    if (not path[0].startswith("/")):
+      destination += "/";
+
+    sftp.put(path[0], destination + path[1]);
 
   sftp.close();
 
@@ -45,25 +49,29 @@ def set_up_args():
 
 def copy_fs_master_binary(args, username, password):
   print "Copying binary files to the FS master: {0}".format(args.fs_master_ip);
-  copy_files(args.fs_master_ip, username, password, [args.fs_master_binary_path]);
+  copy_files(args.fs_master_ip, username, password, [(args.fs_master_binary_path,
+     args.fs_master_binary_path)]);
 
 def copy_fs_slave_binary(args, username, password):
   slave_ips = open(args.fs_slave_ips, 'r');
   for ip in slave_ips:
     ip = ip.strip();
     print "Copying binary files to the FS slaves: {0}".format(ip);
-    copy_files(ip, username, password, [args.fs_slave_binary_path]);
+    copy_files(ip, username, password, [(args.fs_slave_binary_path,
+      args.fs_slave_binary_path)]);
 
 def copy_mr_master_binary(args, username, password):
   print "Copying binary files to the MR master: {0}".format(args.mr_master_ip);
-  copy_files(args.mr_master_ip, username, password, [args.mr_master_binary_path]);
+  copy_files(args.mr_master_ip, username, password, [(args.mr_master_binary_path,
+      args.mr_master_binary_path)]);
 
 def copy_mr_slave_binary(args, username, password):
   slave_ips = open(args.mr_slave_ips, 'r');
   for ip in slave_ips:
     ip = ip.strip();
     print "Copying binary files to the MR slaves: {0}".format(ip);
-    copy_files(ip, username, password, [args.mr_slave_binary_path]);
+    copy_files(ip, username, password, [(args.mr_slave_binary_path,
+       args.mr_slave_binary_path)]);
 
 def main():
   args = set_up_args();
@@ -76,6 +84,8 @@ def main():
   copy_mr_slave_binary(args, username, password);
   
   print "** Copied relevant binaries **";
+
+  
 
 if __name__ == "__main__":
    main(); 
