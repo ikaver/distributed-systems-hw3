@@ -1,9 +1,10 @@
 {
 	"config" : {
+		"job-name" : <NAME>
+		"master-ip" : <IP>,
+		"master-port" : <PORT>,
 		"bundle-path" : <PATH>,
-		"input-files" : [
-			<PATH1>, <PATH2>
-		],
+		"input-file-path" : <PATH>,
 		"output-file-path" : <PATH>,
 		"num-mappers" : <NUM_MAPPERS>,
 		"num-reducers" : <NUM_REDUCERS>,
