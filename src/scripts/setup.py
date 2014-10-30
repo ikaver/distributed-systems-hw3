@@ -2,10 +2,13 @@ import argparse;
 import getpass;
 import paramiko;
 
-def copy_files(remote, username, password, paths):
+def get_file_name(path):
+  return path.split("/")[-1];
+
+def copy_files(remote, username, password, source_paths, rwd):
   """ Copies a bunch of files from host to the remote machine. 
-   Parameter paths is a tuple of the location of the files on the 'local' host and the
-   location of the file on the remote host. Each path is absolute.""" 
+      The files are copied inside the directory pointed by the rwd (which
+      is an abbreviation for remote working directory)"""
 
   ssh = paramiko.SSHClient();
 
@@ -15,13 +18,21 @@ def copy_files(remote, username, password, paths):
 
   sftp = ssh.open_sftp()
 
-  # Currently, the files are assumed to be copied inside /tmp".
-  for path in paths:
-    destination = "/tmp";
-    if (not path[0].startswith("/")):
+  # Create the remote directory, if it doesn't exist.
+  try:
+    sftp.mkdir(rwd);
+  except IOError:  
+    print "Working directory exists. Skipping..";
+
+  for source_path in source_paths:
+    destination = rwd;
+
+    if (not source_path.startswith("/")):
       destination += "/";
 
-    sftp.put(path[0], destination + path[1]);
+    destination = destination + get_file_name(source_path);
+    print "Destination file path: {0}".format(destination);
+    sftp.put(source_path, destination);
 
   sftp.close();
 
@@ -46,33 +57,31 @@ def set_up_args():
       help='File containing list of IPs for running fs slave instances.');
   parser.add_argument("--mr_slave_binary_path", type=str);
   parser.add_argument("--fs_slave_binary_path", type=str);
+  parser.add_argument("--rwd", type=str, help='Remote server working directory i.e.'
+     + 'the directory into which the files have to be copied.');
   return parser.parse_args();
 
 def copy_fs_master_binary(args, username, password):
   print "Copying binary files to the FS master: {0}".format(args.fs_master_ip);
-  copy_files(args.fs_master_ip, username, password, [(args.fs_master_binary_path,
-     args.fs_master_binary_path)]);
+  copy_files(args.fs_master_ip, username, password, [args.fs_master_binary_path], args.rwd);
 
 def copy_fs_slave_binary(args, username, password):
   slave_ips = open(args.fs_slave_ips, 'r');
   for ip in slave_ips:
     ip = ip.strip();
     print "Copying binary files to the FS slaves: {0}".format(ip);
-    copy_files(ip, username, password, [(args.fs_slave_binary_path,
-      args.fs_slave_binary_path)]);
+    copy_files(ip, username, password, [args.fs_slave_binary_path], args.rwd);
 
 def copy_mr_master_binary(args, username, password):
   print "Copying binary files to the MR master: {0}".format(args.mr_master_ip);
-  copy_files(args.mr_master_ip, username, password, [(args.mr_master_binary_path,
-      args.mr_master_binary_path)]);
+  copy_files(args.mr_master_ip, username, password, [args.mr_master_binary_path], args.rwd);
 
 def copy_mr_slave_binary(args, username, password):
   slave_ips = open(args.mr_slave_ips, 'r');
   for ip in slave_ips:
     ip = ip.strip();
     print "Copying binary files to the MR slaves: {0}".format(ip);
-    copy_files(ip, username, password, [(args.mr_slave_binary_path,
-       args.mr_slave_binary_path)]);
+    copy_files(ip, username, password, [args.mr_slave_binary_path], args.rwd);
 
 def main():
   args = set_up_args();
@@ -85,8 +94,6 @@ def main():
   copy_mr_slave_binary(args, username, password);
   
   print "** Copied relevant binaries **";
-
-  
 
 if __name__ == "__main__":
    main(); 
