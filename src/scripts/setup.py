@@ -10,6 +10,9 @@ def copy_files(remote, username, password, source_paths, rwd):
       The files are copied inside the directory pointed by the rwd (which
       is an abbreviation for remote working directory)"""
 
+  # Remote this.
+  source_paths.append('run.py');
+
   ssh = paramiko.SSHClient();
 
   ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy());
@@ -63,26 +66,72 @@ def set_up_args():
 
 def copy_fs_master_binary(args, username, password):
   print "Copying binary files to the FS master: {0}".format(args.fs_master_ip);
-  copy_files(args.fs_master_ip, username, password, [args.fs_master_binary_path], args.rwd);
+  copy_files(args.fs_master_ip, username, password, [args.fs_master_binary_path,
+      'fs_run_master.sh'], args.rwd);
+
+def get_ips_from_file(filename):
+  ips = [];
+  f = open(filename, 'r');
+
+  for ip in f:
+   ips.append(ip.strip());
+  
+  return ips;
 
 def copy_fs_slave_binary(args, username, password):
-  slave_ips = open(args.fs_slave_ips, 'r');
+  slave_ips = get_ips_from_file(args.fs_slave_ips);
   for ip in slave_ips:
-    ip = ip.strip();
     print "Copying binary files to the FS slaves: {0}".format(ip);
-    copy_files(ip, username, password, [args.fs_slave_binary_path], args.rwd);
+    copy_files(ip, username, password, [args.fs_slave_binary_path,
+        'fs_run_slave.sh'], args.rwd);
 
 def copy_mr_master_binary(args, username, password):
   print "Copying binary files to the MR master: {0}".format(args.mr_master_ip);
-  copy_files(args.mr_master_ip, username, password, [args.mr_master_binary_path], args.rwd);
+  copy_files(args.mr_master_ip, username, password, [args.mr_master_binary_path,
+       'mr_run_master.sh'], args.rwd);
 
 def copy_mr_slave_binary(args, username, password):
-  slave_ips = open(args.mr_slave_ips, 'r');
+  slave_ips = get_ips_from_file(args.mr_slave_ips);
   for ip in slave_ips:
     ip = ip.strip();
     print "Copying binary files to the MR slaves: {0}".format(ip);
-    copy_files(ip, username, password, [args.mr_slave_binary_path], args.rwd);
+    copy_files(ip, username, password, [args.mr_slave_binary_path,
+        'mr_run_slave.sh'], args.rwd);
 
+def setup(rwd, setupfile, remote, username, password):
+  """Makes an ssh connection and runs the setup script on the remote
+     host."""
+  ssh = paramiko.SSHClient();
+
+  ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy());
+ 
+  ssh.connect(remote, username=username, password=password);
+ 
+  # Change to a new directory and run the shell script.
+  cmd = 'cd {0}; sh {1}'.format(rwd, setupfile);
+  
+  print "Running command {0} on the remote server.".format(cmd);
+ 
+  ssh.exec_command(cmd); 
+  
+  ssh.close(); 
+
+def setup_fs_master(args, username, password):
+  setup(args.rwd, 'fs_run_master.sh', args.fs_master_ip, username, password);
+
+def setup_fs_slaves(args, username, password):
+  ips = get_ips_from_file(args.fs_slave_ips);
+  for ip in ips:  
+    setup(args.rwd, 'fs_run_slaves.sh', ip, username, password);
+
+def setup_mr_master(args, username, password):
+  setup(args.rwd, 'mr_run_master.sh', args.mr_master_ip, username, password);
+
+def setup_mr_slaves(args, username, password):
+  ips = get_ips_from_file(args.mr_slave_ips);
+  for ip in ips:
+    setup(args.rwd, 'mr_run_slaves.sh', ip, username, password);
+ 
 def main():
   args = set_up_args();
    
@@ -92,6 +141,12 @@ def main():
   copy_fs_slave_binary(args, username, password);
   copy_mr_master_binary(args, username, password);
   copy_mr_slave_binary(args, username, password);
+  
+  setup_fs_master(args, username, password);
+  setup_fs_slaves(args, username, password);
+  
+  setup_mr_master(args, username, password);
+  setup_mr_slaves(args, username, password);
   
   print "** Copied relevant binaries **";
 
