@@ -1,12 +1,50 @@
 package com.ikaver.aagarwal.hw3.common.config;
 
+/***
+ * Simple class that describes the progress of a job in the MR system.
+ */
 public class JobInfo {
   
   private final int jobID;
+  private final String jobName;
+  private final int numMappers;
+  private final int numReducers;
   
-  public JobInfo(int jobID) {
+  private final int numMappersCompleted;
+  private final int numReducersCompleted;
+  
+  public JobInfo(int jobID, String jobName, int numMappers, int numReducers,
+      int numMappersCompleted, int numReducersCompleted) {
     this.jobID = jobID;
+    this.jobName = jobName;
+    this.numMappers = numMappers;
+    this.numReducers = numReducers;
+    this.numMappersCompleted = numMappersCompleted;
+    this.numReducersCompleted = numReducersCompleted;
   }
   
+  public int getJobID() {
+    return jobID;
+  }
 
+  public String getJobName() {
+    return jobName;
+  }
+
+  public int getNumMappers() {
+    return numMappers;
+  }
+
+  public int getNumReducers() {
+    return numReducers;
+  }
+
+  public int getNumMappersCompleted() {
+    return numMappersCompleted;
+  }
+
+  public int getNumReducersCompleted() {
+    return numReducersCompleted;
+  }  
+ 
 }
