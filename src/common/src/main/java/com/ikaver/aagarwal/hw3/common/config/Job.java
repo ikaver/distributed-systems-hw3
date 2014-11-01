@@ -109,4 +109,13 @@ public class Job {
   public void setMasterPort(int masterPort) {
     this.masterPort = masterPort;
   }
+  
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append(String.format("[Name : %s ", this.getJobName()));
+    builder.append(String.format("Input file: %s ", this.getInputFilePath()));
+    builder.append(String.format("Output file: %s ]", this.getOutputFilePath()));
+    return builder.toString();
+  }
 }

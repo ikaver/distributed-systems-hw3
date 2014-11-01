@@ -55,6 +55,7 @@ public class JobLauncher {
     Injector injector = Guice.createInjector(new JobLauncherModule());
     String filePath = settings.getConfigurationFilePath();
     Job job = JobFromJSONCreator.createJobFromJSONFile(new File(filePath));
+    System.out.println("Got job: " + job);
     JobLauncher launcher = injector.getInstance(JobLauncher.class);
     JobInfo info = launcher.launchJob(job);
     System.out.println("Got job info: " + info);

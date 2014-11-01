@@ -4,6 +4,8 @@
 		"master-ip" : <IP>,
 		"master-port" : <PORT>,
 		"bundle-path" : <PATH>,
+		"map-class" : <CLASSNAME>,
+		"reduce-class" : <CLASSNAME>,
 		"input-file-path" : <PATH>,
 		"output-file-path" : <PATH>,
 		"num-mappers" : <NUM_MAPPERS>,
