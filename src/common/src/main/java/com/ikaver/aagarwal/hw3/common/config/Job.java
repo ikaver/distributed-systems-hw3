@@ -9,9 +9,8 @@ public class Job {
   private int recordSize;
   
   private byte [] jarFile;
-  private Class mapperClass;
-  private Class combinerClass;
-  private Class reducerClass;
+  private String mapperClass;
+  private String reducerClass;
   
   private int numMappers;
   private int numReducers;
@@ -43,15 +42,11 @@ public class Job {
     return jarFile;
   }
   
-  public Class getMapperClass() {
+  public String getMapperClass() {
     return mapperClass;
   }
   
-  public Class getCombinerClass() {
-    return combinerClass;
-  }
-  
-  public Class getReducerClass() {
+  public String getReducerClass() {
     return reducerClass;
   }
   
@@ -91,15 +86,11 @@ public class Job {
     this.jarFile = jarFile;
   }
   
-  public void setMapperClass(Class mapperClass) {
+  public void setMapperClass(String mapperClass) {
     this.mapperClass = mapperClass;
   }
   
-  public void setCombinerClass(Class combinerClass) {
-    this.combinerClass = combinerClass;
-  }
-  
-  public void setReducerClass(Class reducerClass) {
+  public void setReducerClass(String reducerClass) {
     this.reducerClass = reducerClass;
   }
   
