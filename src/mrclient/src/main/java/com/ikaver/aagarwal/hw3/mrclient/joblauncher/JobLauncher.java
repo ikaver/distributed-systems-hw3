@@ -1,7 +1,6 @@
 package com.ikaver.aagarwal.hw3.mrclient.joblauncher;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.rmi.RemoteException;
