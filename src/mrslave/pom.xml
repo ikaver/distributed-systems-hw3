@@ -78,7 +78,7 @@
           <configuration>
             <archive>
               <manifest>
-                <mainClass>com.ikaver.aagarwal.hw3.mrslave.main.TaskManager</mainClass>
+                <mainClass>com.ikaver.aagarwal.hw3.mrslave.runner.MRTaskManagerEntryPoint</mainClass>
               </manifest>
             </archive>
             <descriptorRefs>

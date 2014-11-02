@@ -3,6 +3,7 @@ package com.ikaver.aagarwal.hw3.mrslave.runner;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
 
 import org.apache.log4j.Logger;
 
@@ -26,7 +27,9 @@ public class MRTaskManagerEntryPoint {
 		JCommander cmd = new JCommander(settings);
 		cmd.parse(args);
 
+		LocateRegistry.createRegistry(settings.getPort());
 		Naming.rebind(String.format("//:%d/" + Definitions.MR_TASK_MANAGER, settings.getPort()), manager);
-		LOGGER.info("MR Task manager is now running.");
+
+		LOGGER.info(String.format("MR Task manager is now running at port %d", settings.getPort()));
 	}
 }

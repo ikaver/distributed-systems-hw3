@@ -3,8 +3,8 @@ package com.ikaver.aagarwal.hw3.mrslave.runner;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 
 import org.apache.log4j.Logger;
 
@@ -21,8 +21,13 @@ import com.ikaver.aagarwal.hw3.common.slave.IMRTaskManager;
  * 2. Periodically updates master with the status of the map reduce
  *   job assigned to it.
  */
-public class MRTaskManager implements IMRTaskManager {
+public class MRTaskManager extends UnicastRemoteObject implements IMRTaskManager  {
 
+	protected MRTaskManager() throws RemoteException {
+		super();
+	}
+
+	private static final long serialVersionUID = 1674990898801584371L;
 	private static final Logger LOGGER = Logger.getLogger(MRTaskManager.class);
 
 	// TODO(ankit): Return a failure error code.

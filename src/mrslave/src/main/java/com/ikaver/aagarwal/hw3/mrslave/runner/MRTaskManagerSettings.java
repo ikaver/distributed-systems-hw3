@@ -11,9 +11,9 @@ public class MRTaskManagerSettings {
 	@Parameter(names = "-port",
 	    description = "Port at which the mr task remote object is bound", required = true)
 
-	private String port;
+	private int port;
 
-	public String getPort() {
+	public int getPort() {
 		return this.port;
 	}
 
