@@ -30,6 +30,12 @@ public class MRTaskManager extends UnicastRemoteObject implements IMRTaskManager
 	private static final long serialVersionUID = 1674990898801584371L;
 	private static final Logger LOGGER = Logger.getLogger(MRTaskManager.class);
 
+	/**
+	 * Following is the sequence of operations which should be executed by the doMap function.
+	 * 1. Fetch data from DFS and copy to the local disk.
+	 * 2. Copy the jars from the DFS to the local disk.
+	 * 3. Pass the local path from (1) and (2) to the mapper task.
+	 */
 	// TODO(ankit): Return a failure error code.
 	@SuppressWarnings("resource")
 	public void doMap(MRMapTaskInput input) {
