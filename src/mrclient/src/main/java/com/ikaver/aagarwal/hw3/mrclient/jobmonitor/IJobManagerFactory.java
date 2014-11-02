@@ -1,6 +1,5 @@
-package com.ikaver.aagarwal.hw3.mrclient.joblauncher;
+package com.ikaver.aagarwal.hw3.mrclient.jobmonitor;
 
-import com.ikaver.aagarwal.hw3.common.config.Job;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
 
 /**
@@ -9,6 +8,6 @@ import com.ikaver.aagarwal.hw3.common.master.IJobManager;
  */
 public interface IJobManagerFactory {
 
-  public IJobManager jobManagerFromJob(Job job);
+  public IJobManager getJobManager(String masterIP, int masterPort);
   
 }

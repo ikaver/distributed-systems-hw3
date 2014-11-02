@@ -7,4 +7,7 @@ public class Definitions {
   public static final String MR_TASK_MANAGER = "TaskManager";
 
   public static final String MR_MAP_RUNNER = "MrMapRunner";
+  
+  public static final String MASTER_IP_ANNOTATION = "MasterIP";
+  public static final String MASTER_PORT_ANNOTATION = "MasterPort";
 }

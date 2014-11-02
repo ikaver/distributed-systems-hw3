@@ -1,4 +1,4 @@
-package com.ikaver.aagarwal.hw3.mrclient.joblauncher;
+package com.ikaver.aagarwal.hw3.mrclient.jobmonitor;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
@@ -8,7 +8,6 @@ import java.rmi.RemoteException;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import com.ikaver.aagarwal.hw3.common.config.Job;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
 
@@ -16,12 +15,12 @@ public class JobManagerFactoryImpl implements IJobManagerFactory {
   
   private static final Logger LOG = LogManager.getLogger(JobManagerFactoryImpl.class);
 
-  public IJobManager jobManagerFromJob(Job job) {
-    if(job == null) return null;
+  public IJobManager getJobManager(String masterIP, int masterPort) {
+    if(masterIP == null) return null;
     String url = String.format(
         "//%s:%d/%s", 
-        job.getMasterIP(), 
-        job.getMasterPort(),
+        masterIP, 
+        masterPort,
         Definitions.JOB_MANAGER_SERVICE
     );
     try {
