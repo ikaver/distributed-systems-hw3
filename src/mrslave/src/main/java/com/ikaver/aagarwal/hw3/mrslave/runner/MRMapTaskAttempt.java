@@ -1,11 +1,11 @@
 package com.ikaver.aagarwal.hw3.mrslave.runner;
 
 import java.io.IOException;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 
 import com.ikaver.aagarwal.hw3.common.config.MRMapTaskInput;
+import com.ikaver.aagarwal.hw3.common.util.SocketUtil;
 
 /**
  * Forks a new instance of a map task and has all the necessary information
@@ -20,19 +20,17 @@ public class MRMapTaskAttempt {
 	 */
 	public static int startMapTask(MRMapTaskInput input) {
 
-		Random random = new Random();
-		random.setSeed(System.currentTimeMillis());
-
-		int port = random.nextInt();
+		int port = SocketUtil.findFreePort();
 
 		// TODO(ankit): Remove this!
-		ProcessBuilder builder = new ProcessBuilder("java -jar "
-				+ "/tmp/mrmap-1.0-SNAPSHOT-jar-with-dependencies.jar -port " + random.nextInt());
+		ProcessBuilder builder = new ProcessBuilder("java", "-jar"
+				,"/tmp/mrmap-1.0-SNAPSHOT-jar-with-dependencies.jar", "-port", port + "");
 
 		try {
 			builder.start();
 		} catch (IOException e) {
 			LOGGER.fatal("Error starting map task attempt at port: " + port);
+			e.printStackTrace();
 			return -1;
 		}
 		return port;

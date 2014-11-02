@@ -34,6 +34,7 @@ public class MRTaskManager extends UnicastRemoteObject implements IMRTaskManager
 	@SuppressWarnings("resource")
 	public void doMap(MRMapTaskInput input) {
 		int port = MRMapTaskAttempt.startMapTask(input);
+		LOGGER.info(String.format("Starting map runner at port: %d", port));
 		try {
 			IMapInstanceRunner runner =
 					(IMapInstanceRunner) Naming.lookup(String.format("//%s:%d/%s",
