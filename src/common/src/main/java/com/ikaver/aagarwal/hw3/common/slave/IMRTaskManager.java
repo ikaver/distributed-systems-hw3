@@ -10,4 +10,5 @@ public interface IMRTaskManager extends Remote {
 	public void doMap(MRMapTaskInput input) throws RemoteException;
 	
 	public void doReduce() throws RemoteException;
+	
 }
