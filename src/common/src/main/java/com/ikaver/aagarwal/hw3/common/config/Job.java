@@ -1,7 +1,11 @@
 package com.ikaver.aagarwal.hw3.common.config;
 
-public class Job {
+import java.io.Serializable;
+
+public class Job implements Serializable {
   
+  private static final long serialVersionUID = 7232089871060033956L;
+
   private String jobName;
   
   private String inputFilePath;

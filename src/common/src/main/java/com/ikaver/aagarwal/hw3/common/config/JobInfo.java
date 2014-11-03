@@ -1,10 +1,13 @@
 package com.ikaver.aagarwal.hw3.common.config;
 
+import java.io.Serializable;
+
 /***
  * Simple class that describes the progress of a job in the MR system.
  */
-public class JobInfo {
-  
+public class JobInfo implements Serializable {
+
+  private static final long serialVersionUID = 5024005953254650962L;
   private final int jobID;
   private final String jobName;
   private final int numMappers;
