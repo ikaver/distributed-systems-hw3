@@ -8,6 +8,8 @@ import com.ikaver.aagarwal.hw3.common.config.JobInfo;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
 
 public class JobManagerImpl implements IJobManager {
+  
+  private JobsState jobsState;
 
   public JobInfo createJob(Job job) throws RemoteException {
     // TODO Auto-generated method stub
