@@ -1,4 +1,4 @@
-package com.ikaver.aagarwal.hw3.common.config;
+package com.ikaver.aagarwal.hw3.common.util;
 
 public class SocketAddress {
   

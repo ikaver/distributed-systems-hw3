@@ -3,7 +3,7 @@ package com.ikaver.aagarwal.hw3.mrmaster.jobmanager;
 import java.util.Map;
 
 import com.ikaver.aagarwal.hw3.common.config.JobInfo;
-import com.ikaver.aagarwal.hw3.common.config.SocketAddress;
+import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 
 public class JobsState {
   
