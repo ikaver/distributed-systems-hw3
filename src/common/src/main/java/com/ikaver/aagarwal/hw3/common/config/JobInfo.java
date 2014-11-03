@@ -12,10 +12,10 @@ public class JobInfo implements Serializable {
   private final String jobName;
   private final int numMappers;
   private final int numReducers;
-  
+
   private final int numMappersCompleted;
   private final int numReducersCompleted;
-  
+
   public JobInfo(int jobID, String jobName, int numMappers, int numReducers,
       int numMappersCompleted, int numReducersCompleted) {
     this.jobID = jobID;
@@ -25,7 +25,7 @@ public class JobInfo implements Serializable {
     this.numMappersCompleted = numMappersCompleted;
     this.numReducersCompleted = numReducersCompleted;
   }
-  
+
   public JobInfo(int jobID, Job job) {
     this.jobID = jobID;
     this.jobName = job.getJobName();
@@ -34,7 +34,7 @@ public class JobInfo implements Serializable {
     this.numMappersCompleted = 0;
     this.numReducersCompleted = 0;
   }
-  
+
   public int getJobID() {
     return jobID;
   }
@@ -58,5 +58,13 @@ public class JobInfo implements Serializable {
   public int getNumReducersCompleted() {
     return numReducersCompleted;
   }  
- 
+
+  @Override
+  public String toString() {
+    return String.format(
+        "[(Job ID: %d), (Job name: %s), (Mappers completed: %d), (Reducers completed: %d)]",
+        this.jobID, this.jobName, this.numMappersCompleted, this.numReducersCompleted
+    );
+  }
+
 }
