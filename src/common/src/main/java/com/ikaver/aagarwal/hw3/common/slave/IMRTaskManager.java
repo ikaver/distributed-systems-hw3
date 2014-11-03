@@ -11,4 +11,6 @@ public interface IMRTaskManager extends Remote {
 	
 	public void doReduce() throws RemoteException;
 	
+	//TODO: state query methods, and other stuff
+	
 }
