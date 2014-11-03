@@ -1,5 +1,6 @@
 package com.ikaver.aagarwal.hw3.mrmaster.jobmanager;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,8 +11,9 @@ import com.ikaver.aagarwal.hw3.common.config.Job;
 import com.ikaver.aagarwal.hw3.common.config.JobInfo;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
 
-public class JobManagerMockImpl implements IJobManager {
+public class JobManagerMockImpl implements IJobManager, Serializable {
   
+  private static final long serialVersionUID = 4767647085934965467L;
   private Map<Integer, JobInfo> jobIDToJobInfo;
   private int currentId;
   
