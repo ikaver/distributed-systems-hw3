@@ -28,8 +28,8 @@ public class MRMasterEntryPoint {
     }
     catch (ParameterException ex) {
       argsParser.usage();
+      System.exit(-1);
     }
-    
     
     
     //Create RMI Registry
@@ -43,8 +43,7 @@ public class MRMasterEntryPoint {
     Injector injector = Guice.createInjector(new MRMasterModule());
     IJobManager jobManager = injector.getInstance(IJobManager.class);
     
-    System.out.println("Got job manager: " + jobManager);
-    
+    //Start MR Master services
     try {
       Naming.rebind(String.format("//:%d/%s", port, 
           Definitions.JOB_MANAGER_SERVICE), jobManager);
