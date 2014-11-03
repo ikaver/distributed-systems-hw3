@@ -12,7 +12,8 @@ import com.ikaver.aagarwal.hw3.common.config.JobInfo;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
 
 public class JobManagerMockImpl extends UnicastRemoteObject implements IJobManager {
-  
+
+  private static final long serialVersionUID = 1419606847713584442L;
   private Map<Integer, JobInfo> jobIDToJobInfo;
   private int currentId;
   
