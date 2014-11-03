@@ -21,14 +21,13 @@ public class MRMasterEntryPoint {
   public static void main(String [] args) {
     MRMasterSettings settings = new MRMasterSettings();
     JCommander argsParser = new JCommander(settings);
-    int port = -1;
+    int port = 3000;
     try {
       argsParser.parse(args);
       port = settings.getPort();
     }
     catch (ParameterException ex) {
       argsParser.usage();
-      System.exit(-1);
     }
     
     
@@ -44,6 +43,8 @@ public class MRMasterEntryPoint {
     Injector injector = Guice.createInjector(new MRMasterModule());
     IJobManager jobManager = injector.getInstance(IJobManager.class);
     
+    System.out.println("Got job manager: " + jobManager);
+    
     try {
       Naming.rebind(String.format("//:%d/%s", port, 
           Definitions.JOB_MANAGER_SERVICE), jobManager);
@@ -52,6 +53,7 @@ public class MRMasterEntryPoint {
     } catch (MalformedURLException e) {
       LOG.fatal("Failed to create job manager service", e);
     }
+    while(true);
   }
 
 }

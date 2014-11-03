@@ -78,7 +78,7 @@
           <configuration>
             <archive>
               <manifest>
-                <mainClass>com.ikaver.aagarwal.hw3.mrclient.joblauncher.JobLauncher</mainClass>
+                <mainClass>com.ikaver.aagarwal.hw3.mrclient.jobmonitor.JobMonitorEntryPoint</mainClass>
               </manifest>
             </archive>
             <descriptorRefs>
