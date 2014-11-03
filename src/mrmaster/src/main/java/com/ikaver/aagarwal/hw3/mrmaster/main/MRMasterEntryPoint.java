@@ -28,7 +28,6 @@ public class MRMasterEntryPoint {
     }
     catch (ParameterException ex) {
       argsParser.usage();
-      System.exit(-1);
     }
     
     
@@ -52,7 +51,6 @@ public class MRMasterEntryPoint {
     } catch (MalformedURLException e) {
       LOG.fatal("Failed to create job manager service", e);
     }
-    while(true);
   }
 
 }
