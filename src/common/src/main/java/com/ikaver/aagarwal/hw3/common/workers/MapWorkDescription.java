@@ -8,6 +8,7 @@ public class MapWorkDescription implements Serializable {
   
   private final int jobID;
   private final MapperChunk chunk;
+  
   // Path of the jar file on DFS which contains user
   // written mapper and reducer classes.
   private final String jarPath;
