@@ -4,7 +4,9 @@ public class Definitions {
 
   public static final String JOB_MANAGER_SERVICE = "JobManager";
   
-  public static final String MR_TASK_MANAGER = "TaskManager";
+  public static final String MR_NODE_MANAGER_SERVICE = "NodeManager";
+  
+  public static final String DATA_NODE_SERVICE = "DataNode";
 
   public static final String MR_MAP_RUNNER = "MrMapRunner";
   
