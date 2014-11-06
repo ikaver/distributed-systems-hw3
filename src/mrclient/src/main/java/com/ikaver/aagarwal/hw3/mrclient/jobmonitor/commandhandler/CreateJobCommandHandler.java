@@ -7,7 +7,7 @@ import java.io.UnsupportedEncodingException;
 import org.apache.log4j.Logger;
 
 import com.ikaver.aagarwal.hw3.common.commandhandler.ICommandHandler;
-import com.ikaver.aagarwal.hw3.common.config.Job;
+import com.ikaver.aagarwal.hw3.common.config.JobConfig;
 import com.ikaver.aagarwal.hw3.common.config.JobFromJSONCreator;
 import com.ikaver.aagarwal.hw3.mrclient.jobmonitor.JobMonitor;
 
@@ -25,7 +25,7 @@ public class CreateJobCommandHandler implements ICommandHandler {
     String filePath = args[1];
     if(filePath == null) return false;
     
-    Job job = null;
+    JobConfig job = null;
     try {
       job = JobFromJSONCreator.createJobFromJSONFile(new File(filePath));
     } catch (UnsupportedEncodingException e) {

@@ -3,7 +3,7 @@
 		"job-name" : "MyJob",
 		"master-ip" : "127.0.0.1",
 		"master-port" : 3005,
-		"bundle-path" : "../../../config/sample-job.txt",
+		"bundle-path" : "/Users/Kaver/Desktop/sample.jar",
 		"map-class" : "com.ikaver.aagarwal.hw3.common.example.MyMap.class",
 		"reduce-class" : "com.ikaver.aagarwal.hw3.common.example.MyReduce.class",
 		"input-file-path" : "~/Desktop/sampleinput.txt",

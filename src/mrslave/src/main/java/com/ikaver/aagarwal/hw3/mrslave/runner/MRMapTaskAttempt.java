@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import com.ikaver.aagarwal.hw3.common.config.MRMapTaskInput;
 import com.ikaver.aagarwal.hw3.common.util.SocketUtil;
+import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 
 /**
  * Forks a new instance of a map task and has all the necessary information
@@ -18,7 +18,7 @@ public class MRMapTaskAttempt {
 	 * Returns the port at which the remote object for task attempt
 	 * is bound.
 	 */
-	public static int startMapTask(MRMapTaskInput input) {
+	public static int startMapTask(MapWorkDescription input) {
 
 		int port = SocketUtil.findFreePort();
 

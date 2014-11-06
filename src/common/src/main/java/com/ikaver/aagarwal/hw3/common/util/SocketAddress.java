@@ -1,6 +1,10 @@
 package com.ikaver.aagarwal.hw3.common.util;
 
-public class SocketAddress {
+import java.io.Serializable;
+
+public class SocketAddress implements Serializable {
+  
+  private static final long serialVersionUID = 5627039049875852720L;
   
   private final String hostname;
   private final int port;

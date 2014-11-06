@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import com.ikaver.aagarwal.hw3.common.config.Job;
+import com.ikaver.aagarwal.hw3.common.config.JobConfig;
 import com.ikaver.aagarwal.hw3.common.config.JobInfo;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
@@ -29,7 +29,7 @@ public class JobMonitor {
     this.masterPort = masterPort;
   }
 
-  public JobInfo createJob(Job job) {
+  public JobInfo createJob(JobConfig job) {
     IJobManager manager = this.factory.getJobManager(masterIP, masterPort);
     if(manager == null) return null;
 

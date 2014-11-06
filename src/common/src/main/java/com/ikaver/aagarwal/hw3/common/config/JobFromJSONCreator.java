@@ -23,7 +23,7 @@ public class JobFromJSONCreator {
   private static final String NUM_REDUCERS = "num-reducers";
   private static final String RECORD_SIZE = "record-size";
 
-  public static Job createJobFromJSONFile(File jsonFile) throws IOException, UnsupportedEncodingException {
+  public static JobConfig createJobFromJSONFile(File jsonFile) throws IOException, UnsupportedEncodingException {
     FileInputStream fis = new FileInputStream(jsonFile);
     byte[] data = new byte[(int)jsonFile.length()];
     fis.read(data);
@@ -32,7 +32,7 @@ public class JobFromJSONCreator {
     return createJobFromJSON(json);
   }
   
-  public static Job createJobFromJSON(String json) throws FileNotFoundException, IOException {
+  public static JobConfig createJobFromJSON(String json) throws FileNotFoundException, IOException {
     if(json == null) return null;
     JSONObject obj = new JSONObject(json);
     JSONObject config = obj.getJSONObject(CONFIG_OBJECT);
@@ -48,7 +48,7 @@ public class JobFromJSONCreator {
     int numReducers = config.getInt(NUM_REDUCERS);
     int recordSize = config.getInt(RECORD_SIZE);
         
-    Job job = new Job();
+    JobConfig job = new JobConfig();
     
     File bundleFile = new File(bundlePath);
     FileInputStream fis = new FileInputStream(bundlePath);

@@ -8,10 +8,11 @@ import java.rmi.server.UnicastRemoteObject;
 
 import org.apache.log4j.Logger;
 
-import com.ikaver.aagarwal.hw3.common.config.MRMapTaskInput;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.mrmap.IMapInstanceRunner;
-import com.ikaver.aagarwal.hw3.common.slave.IMRTaskManager;
+import com.ikaver.aagarwal.hw3.common.slave.IMRNodeManager;
+import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
+import com.ikaver.aagarwal.hw3.common.workers.ReduceWorkDescription;
 
 /**
  * A task manager manages a "slave" node. Following are the responsibilities of
@@ -21,7 +22,7 @@ import com.ikaver.aagarwal.hw3.common.slave.IMRTaskManager;
  * 2. Periodically updates master with the status of the map reduce
  *   job assigned to it.
  */
-public class MRTaskManager extends UnicastRemoteObject implements IMRTaskManager  {
+public class MRTaskManager extends UnicastRemoteObject implements IMRNodeManager  {
 
 	protected MRTaskManager() throws RemoteException {
 		super();
@@ -38,7 +39,7 @@ public class MRTaskManager extends UnicastRemoteObject implements IMRTaskManager
 	 */
 	// TODO(ankit): Return a failure error code.
 	@SuppressWarnings("resource")
-	public void doMap(MRMapTaskInput input) {
+	public void doMap(MapWorkDescription input) {
 		int port = MRMapTaskAttempt.startMapTask(input);
 		LOGGER.info(String.format("Starting map runner at port: %d", port));
 		try {
@@ -60,8 +61,7 @@ public class MRTaskManager extends UnicastRemoteObject implements IMRTaskManager
 		
 	}
 
-	public void doReduce() throws RemoteException {
-		// TODO Auto-generated method stub
-		
+	public void doReduce(ReduceWorkDescription input) throws RemoteException {
+		throw new UnsupportedOperationException("Not yet implemented :(");
 	}
 }

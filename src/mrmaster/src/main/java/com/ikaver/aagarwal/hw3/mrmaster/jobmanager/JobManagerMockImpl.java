@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ikaver.aagarwal.hw3.common.config.Job;
+import com.ikaver.aagarwal.hw3.common.config.JobConfig;
 import com.ikaver.aagarwal.hw3.common.config.JobInfo;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
 
@@ -23,7 +23,7 @@ public class JobManagerMockImpl extends UnicastRemoteObject implements IJobManag
     this.currentId = 0;
   }
 
-  public JobInfo createJob(Job job) throws RemoteException {
+  public JobInfo createJob(JobConfig job) throws RemoteException {
     JobInfo jobInfo = new JobInfo(this.getNewID(), job);
     jobIDToJobInfo.put(jobInfo.getJobID(), jobInfo);
     return jobInfo;

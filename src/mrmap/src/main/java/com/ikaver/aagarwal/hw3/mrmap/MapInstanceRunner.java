@@ -9,9 +9,9 @@ import java.rmi.server.UnicastRemoteObject;
 
 import org.apache.log4j.Logger;
 
-import com.ikaver.aagarwal.hw3.common.config.MRMapTaskInput;
 import com.ikaver.aagarwal.hw3.common.mrmap.IMapInstanceRunner;
 import com.ikaver.aagarwal.hw3.common.workers.IMapper;
+import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 
 
 public class MapInstanceRunner extends UnicastRemoteObject
@@ -25,7 +25,7 @@ public class MapInstanceRunner extends UnicastRemoteObject
 		super();
 	}
 
-	public void runMapInstance(MRMapTaskInput input) {
+	public void runMapInstance(MapWorkDescription input) {
 		try {
 	  		  File file = new File(input.getJarPath());
 	  		  ClassLoader loader = new URLClassLoader(new URL[] {file.toURI().toURL()});

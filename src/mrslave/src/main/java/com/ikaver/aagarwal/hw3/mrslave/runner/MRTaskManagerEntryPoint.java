@@ -8,8 +8,8 @@ import java.rmi.registry.LocateRegistry;
 import org.apache.log4j.Logger;
 
 import com.beust.jcommander.JCommander;
-import com.ikaver.aagarwal.hw3.common.config.MRMapTaskInput;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
+import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 
 /**
  * Entry point for task runner.
@@ -31,8 +31,8 @@ public class MRTaskManagerEntryPoint {
 		LocateRegistry.createRegistry(settings.getPort());
 		Naming.rebind(String.format("//:%d/" + Definitions.MR_TASK_MANAGER, settings.getPort()), manager);
 		
-		MRMapTaskInput input = new  MRMapTaskInput(
-				"/home/ankit/git/distributed-systems-hw3/src/common/target/common-1.0-SNAPSHOT-jar-with-dependencies.jar",
+		MapWorkDescription input = new  MapWorkDescription(
+				0, null, "/home/ankit/git/distributed-systems-hw3/src/common/target/common-1.0-SNAPSHOT-jar-with-dependencies.jar",
 				"com.ikaver.aagarwal.hw3.common.examples.WordCountMapper");
 
 		manager.doMap(input);

@@ -2,7 +2,7 @@ package com.ikaver.aagarwal.hw3.common.config;
 
 import java.io.Serializable;
 
-public class Job implements Serializable {
+public class JobConfig implements Serializable {
   
   private static final long serialVersionUID = 7232089871060033956L;
 
@@ -22,7 +22,7 @@ public class Job implements Serializable {
   private String masterIP;
   private int masterPort;
   
-  public Job() {
+  public JobConfig() {
     
   }
   

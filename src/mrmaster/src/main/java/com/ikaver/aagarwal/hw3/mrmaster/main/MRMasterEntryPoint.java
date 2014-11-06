@@ -21,13 +21,14 @@ public class MRMasterEntryPoint {
   public static void main(String [] args) {
     MRMasterSettings settings = new MRMasterSettings();
     JCommander argsParser = new JCommander(settings);
-    int port = 3000;
+    int port = -1;
     try {
       argsParser.parse(args);
       port = settings.getPort();
     }
     catch (ParameterException ex) {
       argsParser.usage();
+      System.exit(-1);
     }
     
     

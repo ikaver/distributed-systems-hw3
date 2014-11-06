@@ -26,7 +26,7 @@ public class JobInfo implements Serializable {
     this.numReducersCompleted = numReducersCompleted;
   }
 
-  public JobInfo(int jobID, Job job) {
+  public JobInfo(int jobID, JobConfig job) {
     this.jobID = jobID;
     this.jobName = job.getJobName();
     this.numMappers = job.getNumMappers();
