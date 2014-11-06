@@ -16,17 +16,19 @@ public interface IMRNodeManager extends Remote {
 	/**
 	 * Run some map task.
 	 * @param input
+	 * @return boolean indicating if the map task was successfully launched.
 	 * @throws RemoteException
 	 */
-	public void doMap(MapWorkDescription input) throws RemoteException;
+	public boolean doMap(MapWorkDescription input) throws RemoteException;
 
 	/**
 	 * Run some reduce task.
 	 * 
 	 * @param input
+	 * @return boolean indicating if the map task was successfully launched.
 	 * @throws RemoteException
 	 */
-	public void doReduce(ReduceWorkDescription input) throws RemoteException;
+	public boolean doReduce(ReduceWorkDescription input) throws RemoteException;
 
 	/**
 	 * 
