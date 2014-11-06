@@ -53,10 +53,10 @@ public class MapInstanceRunner extends UnicastRemoteObject
 	}
 
 	public WorkerState getMapperState() {
-		return WorkerState.FINISHED;
+    throw new UnsupportedOperationException("Not yet implemented :(");
 	}
 
 	public String getMapOutputFilePath() {
-		return null;
+    throw new UnsupportedOperationException("Not yet implemented :(");
 	}
 }

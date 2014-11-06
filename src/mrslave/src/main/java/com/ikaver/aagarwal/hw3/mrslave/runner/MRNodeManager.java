@@ -42,10 +42,11 @@ public class MRNodeManager extends UnicastRemoteObject implements IMRNodeManager
 	 * 1. Fetch data from DFS and copy to the local disk.
 	 * 2. Copy the jars from the DFS to the local disk.
 	 * 3. Pass the local path from (1) and (2) to the mapper task.
+	 * @return 
 	 */
 	// TODO(ankit): Return a failure error code.
 	@SuppressWarnings("resource")
-	public void doMap(MapWorkDescription input) {
+	public boolean doMap(MapWorkDescription input) {
 		int port = MRMapTaskAttempt.startMapTask(input);
 		LOGGER.info(String.format("Starting map runner at port: %d", port));
 		try {
@@ -61,13 +62,16 @@ public class MRNodeManager extends UnicastRemoteObject implements IMRNodeManager
 			runner.die();
 
 		} catch (MalformedURLException e) {
+		  return false;
 		} catch (RemoteException e) {
+		  return false;
 		} catch (NotBoundException e) {
+		  return false;
 		}
-		
+    return true;
 	}
 
-	public void doReduce(ReduceWorkDescription input) throws RemoteException {
+	public boolean doReduce(ReduceWorkDescription input) throws RemoteException {
 		throw new UnsupportedOperationException("Not yet implemented :(");
 	}
 
