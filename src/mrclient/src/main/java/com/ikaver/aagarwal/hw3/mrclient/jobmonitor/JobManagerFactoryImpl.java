@@ -28,7 +28,7 @@ public class JobManagerFactoryImpl implements IJobManagerFactory {
     } catch (MalformedURLException e) {
       LOG.info("Bad URL", e);
     } catch (RemoteException e) {
-      LOG.info("Remote connection refused to url "+ url + e);
+      LOG.info("Remote connection refused to url "+ url, e);
     } catch (NotBoundException e) {
       LOG.info("Not bound", e);
     }
