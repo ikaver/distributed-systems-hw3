@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import com.ikaver.aagarwal.hw3.common.mrmap.IMapInstanceRunner;
 import com.ikaver.aagarwal.hw3.common.workers.IMapper;
 import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
+import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 
 
 public class MapInstanceRunner extends UnicastRemoteObject
@@ -49,5 +50,13 @@ public class MapInstanceRunner extends UnicastRemoteObject
 	 */
 	public void die() {
 		System.exit(1);
+	}
+
+	public WorkerState getMapperState() {
+		return WorkerState.FINISHED;
+	}
+
+	public String getMapOutputFilePath() {
+		return null;
 	}
 }
