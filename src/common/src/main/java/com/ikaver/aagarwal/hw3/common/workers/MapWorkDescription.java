@@ -18,9 +18,9 @@ public class MapWorkDescription implements Serializable {
   
   public MapWorkDescription(int jobID, MapperChunk chunk, String jarPath,
       String mapperClass) {
-    if(chunk == null) throw new NullPointerException("Chunk cannot be null");
-    if(jarPath == null) throw new NullPointerException("Jar path cannot be null");
-    if(mapperClass == null) throw new NullPointerException("Mapper class cannot be null");
+    if(chunk == null) throw new IllegalArgumentException("Chunk cannot be null");
+    if(jarPath == null) throw new IllegalArgumentException("Jar path cannot be null");
+    if(mapperClass == null) throw new IllegalArgumentException("Mapper class cannot be null");
     this.jobID = jobID;
     this.chunk = chunk;
     this.jarPath = jarPath;

@@ -20,11 +20,11 @@ public class ReduceWorkDescription implements Serializable {
       List<MapperChunk> chunks,
       String outputFilePath) {
     if(inputSources == null) 
-      throw new NullPointerException("Input sources cannot be null");
+      throw new IllegalArgumentException("Input sources cannot be null");
     if(chunks == null) 
-      throw new NullPointerException("Chunks cannot be null");
+      throw new IllegalArgumentException("Chunks cannot be null");
     if(outputFilePath == null) 
-      throw new NullPointerException("Output file path cannot be null");
+      throw new IllegalArgumentException("Output file path cannot be null");
     if(inputSources.size() != chunks.size()) 
       throw new IllegalArgumentException("Amount of input sources must be equal to amount of chunks");
     this.jobID = jobID;
