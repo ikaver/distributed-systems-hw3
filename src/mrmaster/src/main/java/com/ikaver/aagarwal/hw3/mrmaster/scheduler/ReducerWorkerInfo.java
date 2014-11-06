@@ -1,6 +1,7 @@
 package com.ikaver.aagarwal.hw3.mrmaster.scheduler;
 
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
+import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 
 public class ReducerWorkerInfo extends WorkerInfo {
 
@@ -8,8 +9,9 @@ public class ReducerWorkerInfo extends WorkerInfo {
   
   private final int reducerID;
 
-  public ReducerWorkerInfo(int jobID, SocketAddress nodeManagerAddr, int reducerID) {
-    super(jobID, nodeManagerAddr);
+  public ReducerWorkerInfo(int jobID, SocketAddress nodeManagerAddr, 
+      WorkerState state, int reducerID) {
+    super(jobID, nodeManagerAddr, state);
     this.reducerID = reducerID;
   }
 
