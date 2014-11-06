@@ -1,7 +1,11 @@
 package com.ikaver.aagarwal.hw3.common.nodemanager;
 
-public class NodeState {
-  
+import java.io.Serializable;
+
+public class NodeState implements Serializable {
+
+  private static final long serialVersionUID = 2295885179322002521L;
+
   private final int numMappers;
   private final int numReducers;
   

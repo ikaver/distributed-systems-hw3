@@ -15,15 +15,15 @@ import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
  * Entry point for task runner.
  *
  */
-public class MRTaskManagerEntryPoint {
+public class MRNodeManagerEntryPoint {
 	
-	private static final Logger LOGGER = Logger.getLogger(MRTaskManagerEntryPoint.class);
+	private static final Logger LOGGER = Logger.getLogger(MRNodeManagerEntryPoint.class);
 
 	public static void main(String args[]) throws RemoteException, MalformedURLException {
 
-		MRTaskManager manager = new MRTaskManager();
+		MRNodeManager manager = new MRNodeManager();
 		
-		MRTaskManagerSettings settings = new MRTaskManagerSettings();
+		MRNodeManagerSettings settings = new MRNodeManagerSettings();
 
 		JCommander cmd = new JCommander(settings);
 		cmd.parse(args);

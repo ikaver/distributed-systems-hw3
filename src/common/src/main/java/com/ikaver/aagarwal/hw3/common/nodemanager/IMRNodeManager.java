@@ -18,7 +18,8 @@ public interface IMRNodeManager extends Remote {
 	
 	public <K extends Serializable & Comparable<K>, V extends Serializable> 
 	List<MapperOutput<K, V>> dataForJob(int jobID, MapperChunk chunk, int reducerID);
-		
+	
+	public NodeState getNodeState();
 	//TODO: state query methods, and other stuff
 	
 }
