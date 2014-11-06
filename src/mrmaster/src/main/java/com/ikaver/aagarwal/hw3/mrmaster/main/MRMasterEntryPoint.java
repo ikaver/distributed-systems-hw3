@@ -12,6 +12,7 @@ import com.beust.jcommander.ParameterException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
+import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
 
 public class MRMasterEntryPoint {
@@ -42,15 +43,18 @@ public class MRMasterEntryPoint {
     
     Injector injector = Guice.createInjector(new MRMasterModule());
     IJobManager jobManager = injector.getInstance(IJobManager.class);
+    IDFS dfs = injector.getInstance(IDFS.class);
     
     //Start MR Master services
     try {
       Naming.rebind(String.format("//:%d/%s", port, 
           Definitions.JOB_MANAGER_SERVICE), jobManager);
+      Naming.rebind(String.format("//:%d/%s", port, 
+          Definitions.DFS_SERVICE), dfs);
     } catch (RemoteException e) {
-      LOG.fatal("Failed to create job manager service", e);
+      LOG.fatal("Failed to create master services", e);
     } catch (MalformedURLException e) {
-      LOG.fatal("Failed to create job manager service", e);
+      LOG.fatal("Failed to create master services", e);
     }
   }
 

@@ -1,10 +1,12 @@
 package com.ikaver.aagarwal.hw3.common.dfs;
 
 import java.io.IOException;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
 
-public interface IDataNode {
+public interface IDataNode extends Remote {
   
-  public byte [] getFile(String filePath) throws IOException;
-  public void saveFile(String filePath, byte [] file) throws IOException;
+  public byte [] getFile(String filePath) throws IOException, RemoteException;
+  public void saveFile(String filePath, byte [] file) throws IOException, RemoteException;
 
 }
