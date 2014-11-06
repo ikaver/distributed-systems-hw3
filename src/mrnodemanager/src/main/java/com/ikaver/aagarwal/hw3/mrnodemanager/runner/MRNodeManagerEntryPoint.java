@@ -1,4 +1,4 @@
-package com.ikaver.aagarwal.hw3.mrslave.runner;
+package com.ikaver.aagarwal.hw3.mrnodemanager.runner;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;

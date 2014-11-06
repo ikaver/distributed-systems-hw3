@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.ikaver.aagarwal.hw3</groupId>
-	<artifactId>mrslave</artifactId>
+	<artifactId>mrnodemanager</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>mrslave</name>
+	<name>mrnodemanager</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -73,7 +73,7 @@
           <configuration>
             <archive>
               <manifest>
-                <mainClass>com.ikaver.aagarwal.hw3.mrslave.runner.MRTaskManagerEntryPoint</mainClass>
+                <mainClass>com.ikaver.aagarwal.hw3.mrnodemanager.runner.MRNodeManagerEntryPoint</mainClass>
               </manifest>
             </archive>
             <descriptorRefs>
