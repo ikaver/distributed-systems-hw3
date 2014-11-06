@@ -18,6 +18,7 @@ import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.MapperChunk;
 import com.ikaver.aagarwal.hw3.common.workers.MapperOutput;
 import com.ikaver.aagarwal.hw3.common.workers.ReduceWorkDescription;
+import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 
 /**
  * A task manager manages a "slave" node. Following are the responsibilities of
@@ -76,6 +77,14 @@ public class MRNodeManager extends UnicastRemoteObject implements IMRNodeManager
   }
 
   public NodeState getNodeState() {
+    throw new UnsupportedOperationException("Not yet implemented :(");
+  }
+
+  public WorkerState getMapperState(int jobId, int partitionId) {
+    throw new UnsupportedOperationException("Not yet implemented :(");
+  }
+
+  public WorkerState getReducerState(int jobId, int reducerId) {
     throw new UnsupportedOperationException("Not yet implemented :(");
   }
 }
