@@ -8,29 +8,29 @@ import java.util.List;
 import java.util.Map;
 
 import com.ikaver.aagarwal.hw3.common.config.JobConfig;
-import com.ikaver.aagarwal.hw3.common.config.JobInfo;
+import com.ikaver.aagarwal.hw3.common.config.JobInfoForClient;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
 
 public class JobManagerMockImpl extends UnicastRemoteObject implements IJobManager {
 
   private static final long serialVersionUID = 1419606847713584442L;
-  private Map<Integer, JobInfo> jobIDToJobInfo;
+  private Map<Integer, JobInfoForClient> jobIDToJobInfo;
   private int currentId;
   
   public JobManagerMockImpl() throws RemoteException {
     super();
-    this.jobIDToJobInfo = new HashMap<Integer, JobInfo>();
+    this.jobIDToJobInfo = new HashMap<Integer, JobInfoForClient>();
     this.currentId = 0;
   }
 
-  public JobInfo createJob(JobConfig job) throws RemoteException {
-    JobInfo jobInfo = new JobInfo(this.getNewID(), job);
+  public JobInfoForClient createJob(JobConfig job) throws RemoteException {
+    JobInfoForClient jobInfo = new JobInfoForClient(this.getNewID(), job);
     jobIDToJobInfo.put(jobInfo.getJobID(), jobInfo);
     return jobInfo;
   }
 
-  public List<JobInfo> listJobs() throws RemoteException {
-    return new ArrayList<JobInfo>(this.jobIDToJobInfo.values());
+  public List<JobInfoForClient> listJobs() throws RemoteException {
+    return new ArrayList<JobInfoForClient>(this.jobIDToJobInfo.values());
   }
 
   public boolean terminate(int jobID) throws RemoteException {
@@ -39,7 +39,7 @@ public class JobManagerMockImpl extends UnicastRemoteObject implements IJobManag
     return success;
   }
 
-  public JobInfo getJobInfo(int jobID) throws RemoteException {
+  public JobInfoForClient getJobInfo(int jobID) throws RemoteException {
     return this.jobIDToJobInfo.get(jobID);
   }
 

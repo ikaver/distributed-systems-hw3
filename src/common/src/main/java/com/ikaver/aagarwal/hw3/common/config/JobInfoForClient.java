@@ -5,7 +5,7 @@ import java.io.Serializable;
 /***
  * Simple class that describes the progress of a job in the MR system.
  */
-public class JobInfo implements Serializable {
+public class JobInfoForClient implements Serializable {
 
   private static final long serialVersionUID = 5024005953254650962L;
   private final int jobID;
@@ -16,7 +16,7 @@ public class JobInfo implements Serializable {
   private final int numMappersCompleted;
   private final int numReducersCompleted;
 
-  public JobInfo(int jobID, String jobName, int numMappers, int numReducers,
+  public JobInfoForClient(int jobID, String jobName, int numMappers, int numReducers,
       int numMappersCompleted, int numReducersCompleted) {
     this.jobID = jobID;
     this.jobName = jobName;
@@ -26,7 +26,7 @@ public class JobInfo implements Serializable {
     this.numReducersCompleted = numReducersCompleted;
   }
 
-  public JobInfo(int jobID, JobConfig job) {
+  public JobInfoForClient(int jobID, JobConfig job) {
     this.jobID = jobID;
     this.jobName = job.getJobName();
     this.numMappers = job.getNumMappers();

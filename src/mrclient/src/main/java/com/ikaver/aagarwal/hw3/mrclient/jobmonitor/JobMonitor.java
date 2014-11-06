@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.ikaver.aagarwal.hw3.common.config.JobConfig;
-import com.ikaver.aagarwal.hw3.common.config.JobInfo;
+import com.ikaver.aagarwal.hw3.common.config.JobInfoForClient;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
 
@@ -29,11 +29,11 @@ public class JobMonitor {
     this.masterPort = masterPort;
   }
 
-  public JobInfo createJob(JobConfig job) {
+  public JobInfoForClient createJob(JobConfig job) {
     IJobManager manager = this.factory.getJobManager(masterIP, masterPort);
     if(manager == null) return null;
 
-    JobInfo info = null;
+    JobInfoForClient info = null;
     try {
       info = manager.createJob(job);
     } catch (RemoteException e) {
@@ -42,11 +42,11 @@ public class JobMonitor {
     return info;
   }
 
-  public List<JobInfo> listJobs() {
+  public List<JobInfoForClient> listJobs() {
     IJobManager manager = this.factory.getJobManager(masterIP, masterPort);
     if(manager == null) return null;
 
-    List<JobInfo> jobs = null;
+    List<JobInfoForClient> jobs = null;
     try {
       jobs = manager.listJobs();
     } catch (RemoteException e) {
@@ -68,11 +68,11 @@ public class JobMonitor {
     return success;
   }
 
-  public JobInfo getJobInfo(int jobID) {
+  public JobInfoForClient getJobInfo(int jobID) {
     IJobManager manager = this.factory.getJobManager(masterIP, masterPort);
     if(manager == null) return null;
 
-    JobInfo info = null;
+    JobInfoForClient info = null;
     try {
       info = manager.getJobInfo(jobID);
     } catch (RemoteException e) {

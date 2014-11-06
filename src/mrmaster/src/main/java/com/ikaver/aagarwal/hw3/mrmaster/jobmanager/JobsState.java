@@ -1,32 +1,39 @@
 package com.ikaver.aagarwal.hw3.mrmaster.jobmanager;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-import com.ikaver.aagarwal.hw3.common.config.JobInfo;
-import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
+import com.ikaver.aagarwal.hw3.mrmaster.scheduler.MapperWorkerInfo;
+import com.ikaver.aagarwal.hw3.mrmaster.scheduler.ReducerWorkerInfo;
 
 public class JobsState {
+
+  private Map<Integer, Set<MapperWorkerInfo>> jobIDToMappers;
+  private Map<Integer, Set<ReducerWorkerInfo>> jobIDToReducers;
   
-  //map Job id --> Host of task manager of job
-  //map Job id --> Job state
-  
-  private Map<Integer, SocketAddress> jobIDToSlave;
-  private Map<Integer, JobInfo> jobIDToJobInfo;
-  
-  public JobInfo getJobInfo(int jobID) {
-    return jobIDToJobInfo.get(jobID);
+  public Set<MapperWorkerInfo> getMappersOfJob(int jobID) {
+    return jobIDToMappers.get(jobID);
   }
   
-  public SocketAddress getRemoteHostOfJob(int jobID) {
-    return jobIDToSlave.get(jobID);
+  public Set<ReducerWorkerInfo> getReducersOfJob(int jobID) {
+    return jobIDToReducers.get(jobID);
   }
   
-  public void setJobInfo(JobInfo info) {
-    this.jobIDToJobInfo.put(info.getJobID(), info);
+  public void addMapperToJob(int jobID, MapperWorkerInfo info) {
+    if(!jobIDToMappers.containsKey(jobID)) {
+      jobIDToMappers.put(jobID, new HashSet<MapperWorkerInfo>());
+    }
+    Set<MapperWorkerInfo> workerInfo = jobIDToMappers.get(jobID);
+    workerInfo.add(info);
   }
   
-  public void setRemoteHostOfJob(JobInfo info, SocketAddress host) {
-    this.jobIDToSlave.put(info.getJobID(), host);
+  public void addReducerToJob(int jobID, ReducerWorkerInfo info) {
+    if(!jobIDToReducers.containsKey(jobID)) {
+      jobIDToReducers.put(jobID, new HashSet<ReducerWorkerInfo>());
+    }
+    Set<ReducerWorkerInfo> workerInfo = jobIDToReducers.get(jobID);
+    workerInfo.add(info);
   }
 
 }

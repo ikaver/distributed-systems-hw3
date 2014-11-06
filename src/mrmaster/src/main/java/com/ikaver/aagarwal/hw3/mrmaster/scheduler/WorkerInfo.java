@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 
-public class WorkerInfo implements Serializable {
+public abstract class WorkerInfo implements Serializable {
   
   private static final long serialVersionUID = -3325713750653604642L;
   

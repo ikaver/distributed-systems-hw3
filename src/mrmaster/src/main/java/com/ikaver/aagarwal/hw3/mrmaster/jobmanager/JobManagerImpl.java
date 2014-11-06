@@ -4,19 +4,19 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import com.ikaver.aagarwal.hw3.common.config.JobConfig;
-import com.ikaver.aagarwal.hw3.common.config.JobInfo;
+import com.ikaver.aagarwal.hw3.common.config.JobInfoForClient;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
 
 public class JobManagerImpl implements IJobManager {
   
   private JobsState jobsState;
 
-  public JobInfo createJob(JobConfig job) throws RemoteException {
+  public JobInfoForClient createJob(JobConfig job) throws RemoteException {
     // TODO Auto-generated method stub
     return null;
   }
 
-  public List<JobInfo> listJobs() throws RemoteException {
+  public List<JobInfoForClient> listJobs() throws RemoteException {
     // TODO Auto-generated method stub
     return null;
   }
@@ -26,7 +26,7 @@ public class JobManagerImpl implements IJobManager {
     return false;
   }
 
-  public JobInfo getJobInfo(int jobID) throws RemoteException {
+  public JobInfoForClient getJobInfo(int jobID) throws RemoteException {
     // TODO Auto-generated method stub
     return null;
   }

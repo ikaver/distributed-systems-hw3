@@ -3,7 +3,7 @@ package com.ikaver.aagarwal.hw3.mrclient.jobmonitor.commandhandler;
 import java.util.List;
 
 import com.ikaver.aagarwal.hw3.common.commandhandler.ICommandHandler;
-import com.ikaver.aagarwal.hw3.common.config.JobInfo;
+import com.ikaver.aagarwal.hw3.common.config.JobInfoForClient;
 import com.ikaver.aagarwal.hw3.mrclient.jobmonitor.JobMonitor;
 
 public class ListJobsCommandHandler implements ICommandHandler {
@@ -15,7 +15,7 @@ public class ListJobsCommandHandler implements ICommandHandler {
   }
 
   public boolean handleCommand(String[] args) {
-    List<JobInfo> jobInfo = monitor.listJobs();
+    List<JobInfoForClient> jobInfo = monitor.listJobs();
     if(jobInfo == null) {
       System.out.println("Failed to get list of jobs...");
     }
@@ -23,7 +23,7 @@ public class ListJobsCommandHandler implements ICommandHandler {
       System.out.println("No jobs currently running...");
     }
     else {
-      for(JobInfo info : jobInfo) {
+      for(JobInfoForClient info : jobInfo) {
         System.out.println(info);
       }
     }

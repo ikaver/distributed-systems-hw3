@@ -1,7 +1,7 @@
 package com.ikaver.aagarwal.hw3.mrclient.jobmonitor.commandhandler;
 
 import com.ikaver.aagarwal.hw3.common.commandhandler.ICommandHandler;
-import com.ikaver.aagarwal.hw3.common.config.JobInfo;
+import com.ikaver.aagarwal.hw3.common.config.JobInfoForClient;
 import com.ikaver.aagarwal.hw3.mrclient.jobmonitor.JobMonitor;
 
 public class JobInfoCommandHandler implements ICommandHandler {
@@ -23,7 +23,7 @@ public class JobInfoCommandHandler implements ICommandHandler {
       System.out.println("Expected integer job ID.");
       return true;
     }
-    JobInfo info = monitor.getJobInfo(jobID);
+    JobInfoForClient info = monitor.getJobInfo(jobID);
     if(info != null) {
       System.out.printf("Job status: %s", info);
     }
