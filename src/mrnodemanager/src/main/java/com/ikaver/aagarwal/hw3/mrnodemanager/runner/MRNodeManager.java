@@ -54,7 +54,7 @@ public class MRNodeManager extends UnicastRemoteObject implements IMRNodeManager
 					(IMapInstanceRunner) Naming.lookup(String.format("//%s:%d/%s",
 					"localhost",
 					port,
-					Definitions.MR_MAP_RUNNER));
+					Definitions.MR_MAP_RUNNER_SERVICE));
 
 			runner.runMapInstance(input);
 			

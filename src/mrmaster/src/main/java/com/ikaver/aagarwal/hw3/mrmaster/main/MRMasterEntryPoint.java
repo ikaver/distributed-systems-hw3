@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 
@@ -14,6 +15,7 @@ import com.google.inject.Injector;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
+import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 
 public class MRMasterEntryPoint {
   
@@ -40,7 +42,11 @@ public class MRMasterEntryPoint {
       LOG.warn("RMI was already running...");
     }
     
-    Injector injector = Guice.createInjector(new MRMasterModule());
+    //TODO: get nodes somehow
+    HashSet<SocketAddress> nodes = new HashSet<SocketAddress>();
+    
+    
+    Injector injector = Guice.createInjector(new MRMasterModule(nodes));
     IJobManager jobManager = injector.getInstance(IJobManager.class);
     IDFS dfs = injector.getInstance(IDFS.class);
     
