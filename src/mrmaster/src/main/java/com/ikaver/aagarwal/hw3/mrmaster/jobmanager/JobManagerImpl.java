@@ -3,6 +3,7 @@ package com.ikaver.aagarwal.hw3.mrmaster.jobmanager;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import com.google.inject.Inject;
 import com.ikaver.aagarwal.hw3.common.config.JobConfig;
 import com.ikaver.aagarwal.hw3.common.config.JobInfoForClient;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
@@ -13,6 +14,7 @@ public class JobManagerImpl implements IJobManager {
   private IMRScheduler scheduler;
   private JobsState jobsState;
   
+  @Inject
   public JobManagerImpl(IMRScheduler scheduler, JobsState state) {
     this.scheduler = scheduler;
     this.jobsState = state;
