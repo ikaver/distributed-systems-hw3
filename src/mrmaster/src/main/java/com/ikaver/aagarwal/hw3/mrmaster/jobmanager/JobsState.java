@@ -1,50 +1,28 @@
 package com.ikaver.aagarwal.hw3.mrmaster.jobmanager;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import com.ikaver.aagarwal.hw3.mrmaster.scheduler.MapperWorkerInfo;
-import com.ikaver.aagarwal.hw3.mrmaster.scheduler.ReducerWorkerInfo;
 
 public class JobsState {
 
-  private Map<Integer, Set<MapperWorkerInfo>> jobIDToMappers;
-  private Map<Integer, Set<ReducerWorkerInfo>> jobIDToReducers;
+  private Map<Integer, RunningJob> jobIDToJob;
   
-  public Set<MapperWorkerInfo> getMappersOfJob(int jobID) {
-    return jobIDToMappers.get(jobID);
+  public RunningJob getJob(int jobID) {
+    return this.jobIDToJob.get(jobID);
   }
   
-  public Set<ReducerWorkerInfo> getReducersOfJob(int jobID) {
-    return jobIDToReducers.get(jobID);
-  }
-  
-  public void addMapperToJob(int jobID, MapperWorkerInfo info) {
-    if(!jobIDToMappers.containsKey(jobID)) {
-      jobIDToMappers.put(jobID, new HashSet<MapperWorkerInfo>());
-    }
-    Set<MapperWorkerInfo> workerInfo = jobIDToMappers.get(jobID);
-    workerInfo.add(info);
-  }
-  
-  public void addReducerToJob(int jobID, ReducerWorkerInfo info) {
-    if(!jobIDToReducers.containsKey(jobID)) {
-      jobIDToReducers.put(jobID, new HashSet<ReducerWorkerInfo>());
-    }
-    Set<ReducerWorkerInfo> workerInfo = jobIDToReducers.get(jobID);
-    workerInfo.add(info);
+  public void addJob(int jobID) {
+    RunningJob newJob = new RunningJob(jobID);
+    jobIDToJob.put(jobID, newJob);
   }
   
   public void onJobFinished(int jobID) {
-    jobIDToMappers.remove(jobID);
-    jobIDToReducers.remove(jobID);
+    jobIDToJob.remove(jobID);
   }
   
-  public Set<Integer> currentlyRunningJobs() {
-    Set<Integer> jobIDs = this.jobIDToMappers.keySet();
-    jobIDs.addAll(jobIDToReducers.keySet());
-    return jobIDs;
+  public List<RunningJob> currentlyRunningJobs() {
+    return new ArrayList<RunningJob>(jobIDToJob.values());
   }
 
 }
