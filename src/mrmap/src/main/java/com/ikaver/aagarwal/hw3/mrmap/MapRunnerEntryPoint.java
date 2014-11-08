@@ -21,7 +21,7 @@ public class MapRunnerEntryPoint {
 		LocateRegistry.createRegistry(settings.getPort());
 
 		Naming.rebind(
-				String.format("//:%d/" + Definitions.MR_MAP_RUNNER,
+				String.format("//:%d/" + Definitions.MR_MAP_RUNNER_SERVICE,
 						settings.getPort()), runner);
 	}
 }
