@@ -49,17 +49,11 @@ public class JobFromJSONCreator {
     int recordSize = config.getInt(RECORD_SIZE);
         
     JobConfig job = new JobConfig();
-    
-    File bundleFile = new File(bundlePath);
-    FileInputStream fis = new FileInputStream(bundlePath);
-    byte[] data = new byte[(int)bundleFile.length()];
-    fis.read(data);
-    fis.close();
         
     job.setJobName(jobName);
     job.setMasterIP(masterIP);
     job.setMasterPort(masterPort);
-    job.setJarFile(data);
+    job.setJarFilePath(bundlePath);
     job.setMapperClass(mapperClass);
     job.setReducerClass(reducerClass);
     job.setInputFilePath(inputFilePath);
