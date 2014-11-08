@@ -1,2 +1,2 @@
-Sample usage of setup.py
-python setup.py --fs_master_binary_path=fs_master --fs_master_ip="ghc20.ghc.andrew.cmu.edu" --mr_master_binary_path=mr_master --mr_master_ip="ghc20.ghc.andrew.cmu.edu"  --fs_slave_binary_path=fs_slave --mr_slave_binary_path=mr_slave --mr_slave_ips=data/mr_slaves.txt --fs_slave_ips=data/fs_slaves.txt --rwd=/tmp/test1
+# Sample usage of the script.
+python setup.py --master_binary_path="master.blah"  --master_ip=ghc34.ghc.andrew.cmu.edu  --slave_binary_path=slave.blah --slave_ips=data/slaves.txt --rwd=/tmp/test1  --port 12

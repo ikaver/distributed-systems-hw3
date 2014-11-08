@@ -5,7 +5,7 @@ import paramiko;
 def get_file_name(path):
   return path.split("/")[-1];
 
-def copy_files(remote, username, password, source_paths, rwd):
+def copy_files(remote, username, password, source_paths, rwd, dfs_dir):
   """ Copies a bunch of files from host to the remote machine. 
       The files are copied inside the directory pointed by the rwd (which
       is an abbreviation for remote working directory)"""
@@ -25,6 +25,7 @@ def copy_files(remote, username, password, source_paths, rwd):
   # Create the remote directory, if it doesn't exist.
   try:
     sftp.mkdir(rwd);
+    sftp.mkdir(dfs_dir);
   except IOError:  
     print "Working directory exists. Skipping..";
 
@@ -59,16 +60,10 @@ def set_up_args():
   parser.add_argument("--slave_binary_path", type=str);
   # Ports at which the service runs. Assumed to be same for all master and slaves
   parser.add_argument("--port", type=int);
+  parser.add_argument("--dfs_base_path", type=str, default='/tmp/mrikav-ank-dfs/');
   parser.add_argument("--rwd", type=str, help='Remote server working directory i.e.'
      + 'the directory into which the files have to be copied.');
   return parser.parse_args();
-
-def copy_fs_master_binary(args, username, password):
-  print "Copying binary files to the FS master: {0}".format(args.fs_master_ip);
-  # Copy file corresponding to the slave ips, along with the master binary. This file
-  # is required during the bootup time of master, so that it knows the candidate pool.
-  copy_files(args.fs_master_ip, username, password, [args.fs_master_binary_path,
-      'fs_run_master.sh', args.slave_ips], args.rwd);
 
 def get_ips_from_file(filename):
   ips = [];
@@ -82,7 +77,7 @@ def get_ips_from_file(filename):
 def copy_master_binary(args, username, password):
   print "Copying binary files to the MR master: {0}".format(args.master_ip);
   copy_files(args.master_ip, username, password, [args.master_binary_path,
-       'run_master.sh'], args.rwd);
+       'run_master.sh'], args.rwd, args.dfs_base_path);
 
 def copy_slave_binary(args, username, password):
   slave_ips = get_ips_from_file(args.slave_ips);
@@ -90,7 +85,7 @@ def copy_slave_binary(args, username, password):
     ip = ip.strip();
     print "Copying binary files to the MR slaves: {0}".format(ip);
     copy_files(ip, username, password, [args.slave_binary_path,
-        'run_slave.sh'], args.rwd);
+        'run_slave.sh'], args.rwd, args.dfs_base_path);
 
 def setup(rwd, setupfile, remote, username, password, fileArgs):
   """Makes an ssh connection and runs the setup script on the remote
