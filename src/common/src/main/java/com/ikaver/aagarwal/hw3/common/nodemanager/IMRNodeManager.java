@@ -29,6 +29,12 @@ public interface IMRNodeManager extends Remote {
 	 * @throws RemoteException
 	 */
 	public boolean doReduce(ReduceWorkDescription input) throws RemoteException;
+	
+	/**
+	 * Terminates all workers working for job with jobID (jobID).
+	 * @param jobID
+	 */
+	public boolean terminateWorkers(int jobID);
 
 	/**
 	 * 

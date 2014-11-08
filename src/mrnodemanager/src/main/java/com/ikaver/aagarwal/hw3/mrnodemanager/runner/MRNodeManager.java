@@ -91,4 +91,8 @@ public class MRNodeManager extends UnicastRemoteObject implements IMRNodeManager
   public WorkerState getReducerState(int jobId, int reducerId) {
     throw new UnsupportedOperationException("Not yet implemented :(");
   }
+
+  public boolean terminateWorkers(int jobID) {
+    throw new UnsupportedOperationException("Not yet implemented :(");
+  }
 }

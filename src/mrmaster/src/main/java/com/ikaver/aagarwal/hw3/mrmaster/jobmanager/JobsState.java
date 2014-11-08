@@ -12,9 +12,8 @@ public class JobsState {
     return this.jobIDToJob.get(jobID);
   }
   
-  public void addJob(int jobID) {
-    RunningJob newJob = new RunningJob(jobID);
-    jobIDToJob.put(jobID, newJob);
+  public void addJob(RunningJob job) {
+    jobIDToJob.put(job.getJobID(), job);
   }
   
   public void onJobFinished(int jobID) {
