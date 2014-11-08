@@ -15,6 +15,8 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.dfs.IDataNode;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
@@ -33,10 +35,11 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS {
   private int replicationFactor;
 
   @Inject
-  public DFSImpl(int replicationFactor, 
-      Map<String, Set<SocketAddress>> filePathToDataNodes,
-      Set<SocketAddress> dataNodes,
-      ReadWriteLock mapLock) throws RemoteException {
+  public DFSImpl(
+      @Named(Definitions.DFS_REPLICATION_FACTOR_ANNOTATION) Integer replicationFactor, 
+      @Named(Definitions.DFS_MAP_PATH_TO_FILE_ANNOTATION) Map<String, Set<SocketAddress>> filePathToDataNodes,
+      @Named(Definitions.DFS_DATA_NODES_ANNOTATION) Set<SocketAddress> dataNodes,
+      @Named(Definitions.DFS_MAP_LOCK_ANNOTATION) ReadWriteLock mapLock) throws RemoteException {
     super();
     this.filePathToDataNodes = filePathToDataNodes;
     this.replicationFactor = replicationFactor;
