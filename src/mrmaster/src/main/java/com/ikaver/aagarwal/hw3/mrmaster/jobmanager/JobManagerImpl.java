@@ -6,11 +6,18 @@ import java.util.List;
 import com.ikaver.aagarwal.hw3.common.config.JobConfig;
 import com.ikaver.aagarwal.hw3.common.config.JobInfoForClient;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
+import com.ikaver.aagarwal.hw3.mrmaster.scheduler.IMRScheduler;
 
 public class JobManagerImpl implements IJobManager {
   
+  private IMRScheduler scheduler;
   private JobsState jobsState;
-
+  
+  public JobManagerImpl(IMRScheduler scheduler, JobsState state) {
+    this.scheduler = scheduler;
+    this.jobsState = state;
+  }
+  
   public JobInfoForClient createJob(JobConfig job) throws RemoteException {
     // TODO Auto-generated method stub
     return null;
