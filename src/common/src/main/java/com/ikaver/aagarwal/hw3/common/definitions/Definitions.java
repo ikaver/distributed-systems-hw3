@@ -10,8 +10,7 @@ public class Definitions {
   public static final String MR_MAP_RUNNER_SERVICE = "MrMapRunner";
   
   //annotations
-  public static final String MASTER_IP_ANNOTATION = "MasterIP";
-  public static final String MASTER_PORT_ANNOTATION = "MasterPort";
+  public static final String MASTER_SOCKET_ADDR_ANNOTATION = "MasterSocketAddr";
   public static final String NODE_MANAGER_SET_ANNOTATION = "NodeManagerSet";
   
   public static final String DFS_REPLICATION_FACTOR_ANNOTATION = "DFSReplicationFactor";

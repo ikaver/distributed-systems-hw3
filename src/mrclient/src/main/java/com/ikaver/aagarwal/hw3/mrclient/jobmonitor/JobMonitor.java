@@ -11,26 +11,24 @@ import com.ikaver.aagarwal.hw3.common.config.JobConfig;
 import com.ikaver.aagarwal.hw3.common.config.JobInfoForClient;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
+import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 
 
 public class JobMonitor {
 
   private static final Logger LOG = Logger.getLogger(JobMonitor.class);
   private IJobManagerFactory factory;
-  private String masterIP;
-  private int masterPort;
+  private SocketAddress masterAddr;
 
   @Inject
   public JobMonitor(IJobManagerFactory factory,
-      @Named(Definitions.MASTER_IP_ANNOTATION) String masterIP, 
-      @Named(Definitions.MASTER_PORT_ANNOTATION) Integer masterPort) {
+      @Named(Definitions.MASTER_SOCKET_ADDR_ANNOTATION) SocketAddress masterAddr) { 
     this.factory = factory;
-    this.masterIP = masterIP;
-    this.masterPort = masterPort;
+    this.masterAddr = masterAddr;
   }
 
   public JobInfoForClient createJob(JobConfig job) {
-    IJobManager manager = this.factory.getJobManager(masterIP, masterPort);
+    IJobManager manager = this.factory.getJobManager(masterAddr);
     if(manager == null) return null;
 
     JobInfoForClient info = null;
@@ -43,7 +41,7 @@ public class JobMonitor {
   }
 
   public List<JobInfoForClient> listJobs() {
-    IJobManager manager = this.factory.getJobManager(masterIP, masterPort);
+    IJobManager manager = this.factory.getJobManager(masterAddr);
     if(manager == null) return null;
 
     List<JobInfoForClient> jobs = null;
@@ -56,7 +54,7 @@ public class JobMonitor {
   }
 
   public boolean terminate(int jobID) {
-    IJobManager manager = this.factory.getJobManager(masterIP, masterPort);
+    IJobManager manager = this.factory.getJobManager(masterAddr);
     if(manager == null) return false;
 
     boolean success = false;
@@ -69,7 +67,7 @@ public class JobMonitor {
   }
 
   public JobInfoForClient getJobInfo(int jobID) {
-    IJobManager manager = this.factory.getJobManager(masterIP, masterPort);
+    IJobManager manager = this.factory.getJobManager(masterAddr);
     if(manager == null) return null;
 
     JobInfoForClient info = null;

@@ -10,17 +10,18 @@ import org.apache.log4j.Logger;
 
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
+import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 
 public class JobManagerFactoryImpl implements IJobManagerFactory {
   
   private static final Logger LOG = LogManager.getLogger(JobManagerFactoryImpl.class);
 
-  public IJobManager getJobManager(String masterIP, int masterPort) {
-    if(masterIP == null) return null;
+  public IJobManager getJobManager(SocketAddress addr) {
+    if(addr == null) return null;
     String url = String.format(
         "//%s:%d/%s", 
-        masterIP, 
-        masterPort,
+        addr.getHostname(), 
+        addr.getPort(),
         Definitions.JOB_MANAGER_SERVICE
     );
     try {

@@ -4,6 +4,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 
 public class JobMonitorEntryPoint {
 
@@ -23,8 +24,8 @@ public class JobMonitorEntryPoint {
       //TODO: quit program here
     }
     
-    Injector injector = Guice.createInjector(
-        new JobMonitorModule(host, port));
+    SocketAddress masterAddr = new SocketAddress(host,port);
+    Injector injector = Guice.createInjector(new JobMonitorModule(masterAddr));
     JobMonitorController controller = injector.getInstance(JobMonitorController.class);
     controller.start();
   }
