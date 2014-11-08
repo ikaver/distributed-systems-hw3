@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -28,35 +29,57 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS {
 
   private Set<SocketAddress> dataNodes;
   private Map<String, Set<SocketAddress>> filePathToDataNodes;
+  private ReadWriteLock mapLock;
   private int replicationFactor;
 
   @Inject
   public DFSImpl(int replicationFactor, 
       Map<String, Set<SocketAddress>> filePathToDataNodes,
-      Set<SocketAddress> dataNodes) throws RemoteException {
+      Set<SocketAddress> dataNodes,
+      ReadWriteLock mapLock) throws RemoteException {
     super();
     this.filePathToDataNodes = filePathToDataNodes;
     this.replicationFactor = replicationFactor;
     this.dataNodes = dataNodes;
+    this.mapLock = mapLock;
   }
 
   public Set<SocketAddress> dataNodeForFile(String filePath) {
-    return this.filePathToDataNodes.get(filePath);
+    this.mapLock.readLock().lock();
+    Set<SocketAddress> dataNodes = this.filePathToDataNodes.get(filePath);
+    this.mapLock.readLock().unlock();
+    return dataNodes;
   }
 
   public boolean saveFile(String filePath, byte[] file) {
     boolean saveSuccessful = false;
     if(!this.filePathToDataNodes.containsKey(filePath)) {
-      Set<SocketAddress> dataNodesForFile = dataNodesForNewFile();
-      saveSuccessful = writeFileInDataNodes(filePath, file, dataNodesForFile);
-      if(saveSuccessful) {
-        this.filePathToDataNodes.put(filePath, new HashSet<SocketAddress>());
-      }
+      this.mapLock.writeLock().lock();
+      saveSuccessful = writeNewFile(filePath, file);
+      this.mapLock.writeLock().unlock();
     }
     else {
       LOG.warn("Tried to update file " + filePath + " this is not supported!");
+      this.mapLock.writeLock().lock();
       this.filePathToDataNodes.remove(filePath);
-      this.saveFile(filePath, file);
+      saveSuccessful = writeNewFile(filePath, file);
+      this.mapLock.writeLock().unlock();
+    }
+    return saveSuccessful;
+  }
+  
+  /**
+   * Writes the new file with path filePath and contents file.
+   * Assumes that you currently have the write lock.
+   * @param filePath
+   * @param file
+   * @return true iff write successful
+   */
+  private boolean writeNewFile(String filePath, byte [] file) {
+    Set<SocketAddress> dataNodesForFile = dataNodesForNewFile();
+    boolean saveSuccessful = writeFileInDataNodes(filePath, file, dataNodesForFile);
+    if(saveSuccessful) {
+      this.filePathToDataNodes.put(filePath, new HashSet<SocketAddress>());
     }
     return saveSuccessful;
   }

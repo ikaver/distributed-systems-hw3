@@ -32,7 +32,6 @@ public class MRMasterEntryPoint {
       System.exit(-1);
     }
     
-    
     //Create RMI Registry
     try { 
       LocateRegistry.createRegistry(port); 
