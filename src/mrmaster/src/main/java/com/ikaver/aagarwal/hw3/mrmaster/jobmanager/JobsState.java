@@ -35,5 +35,16 @@ public class JobsState {
     Set<ReducerWorkerInfo> workerInfo = jobIDToReducers.get(jobID);
     workerInfo.add(info);
   }
+  
+  public void onJobFinished(int jobID) {
+    jobIDToMappers.remove(jobID);
+    jobIDToReducers.remove(jobID);
+  }
+  
+  public Set<Integer> currentlyRunningJobs() {
+    Set<Integer> jobIDs = this.jobIDToMappers.keySet();
+    jobIDs.addAll(jobIDToReducers.keySet());
+    return jobIDs;
+  }
 
 }
