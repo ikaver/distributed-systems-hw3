@@ -53,11 +53,11 @@ public class MRMasterModule extends AbstractModule {
     JobsState jobsState = new JobsState();
     bind(JobsState.class).toInstance(jobsState);
     
-    /*
-    Map<String, Set<SocketAddress>> filePathToDataNodes,
-    Set<SocketAddress> dataNodes,
-    ReadWriteLock mapLock
-    */
+    //Scheduler setup
+    bind(new TypeLiteral<Set<SocketAddress>>(){})
+      .annotatedWith(Names.named(Definitions.NODE_MANAGER_SET_ANNOTATION))
+      .toInstance(nodes);   
+    
   }
 
 }

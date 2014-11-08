@@ -12,6 +12,7 @@ public class Definitions {
   //annotations
   public static final String MASTER_IP_ANNOTATION = "MasterIP";
   public static final String MASTER_PORT_ANNOTATION = "MasterPort";
+  public static final String NODE_MANAGER_SET_ANNOTATION = "NodeManagerSet";
   
   public static final String DFS_REPLICATION_FACTOR_ANNOTATION = "DFSReplicationFactor";
   public static final String DFS_MAP_PATH_TO_FILE_ANNOTATION = "DFSPathToFile";
