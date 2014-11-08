@@ -13,7 +13,9 @@ import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
 import com.ikaver.aagarwal.hw3.common.nodemanager.IMRNodeManager;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
+import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.IMRScheduler;
+import com.ikaver.aagarwal.hw3.mrmaster.scheduler.MapperWorkerInfo;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.NodeManagerFactory;
 
 public class JobManagerImpl implements IJobManager {
@@ -31,7 +33,7 @@ public class JobManagerImpl implements IJobManager {
   }
   
   public JobInfoForClient createJob(JobConfig job) throws RemoteException {
-    // TODO Auto-generated method stub
+ //   MapWorkDescription mapWord = new MapWorkDescription(jobID, chunk, job.getJarFile(), job.getMapperClass());
     return null;
   }
 
