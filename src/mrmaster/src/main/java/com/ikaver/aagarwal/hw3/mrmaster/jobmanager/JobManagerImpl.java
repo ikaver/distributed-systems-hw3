@@ -53,8 +53,8 @@ public class JobManagerImpl implements IJobManager {
     int numberOfRecordsPerMapper = (int) Math.ceil(numberOfRecordsInFile / (double)job.getNumMappers());
     int currentStartRecord = 0;
     int jobID = this.getNewJobID();
+    // create mappers work descriptions
     Set<MapWorkDescription> mappers = new HashSet<MapWorkDescription>();
-    Set<ReduceWorkDescription> reducers = new HashSet<ReduceWorkDescription>();
     List<MapperChunk> chunks = new ArrayList<MapperChunk>();
     for(int i = 0; i < job.getNumMappers(); ++i) {
       MapWorkDescription work = new MapWorkDescription(
@@ -72,8 +72,12 @@ public class JobManagerImpl implements IJobManager {
       mappers.add(work);
       currentStartRecord += numberOfRecordsPerMapper;
     }
+    //schedule the mappers
     Set<MapperWorkerInfo> mapWorkers = scheduler.runMappersForWork(mappers);
+    
+    //create reducers
     List<SocketAddress> mapperAddresses = new ArrayList<SocketAddress>();
+    Set<ReduceWorkDescription> reducers = new HashSet<ReduceWorkDescription>();
     for(MapperWorkerInfo mapWorker : mapWorkers) {
       mapperAddresses.add(mapWorker.getNodeManagerAddress());
     }
@@ -87,7 +91,10 @@ public class JobManagerImpl implements IJobManager {
       );
       reducers.add(work);
     }
+    //schedule the reducers
     Set<ReducerWorkerInfo> reduceWorkers = scheduler.runReducersForWork(reducers);
+    
+    //create the running job
     RunningJob runningJob = new RunningJob(jobID, job.getJobName());
     runningJob.getMappers().addAll(mapWorkers);
     runningJob.getReducers().addAll(reduceWorkers);

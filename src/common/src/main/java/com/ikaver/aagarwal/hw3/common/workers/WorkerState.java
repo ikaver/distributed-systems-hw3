@@ -2,6 +2,10 @@ package com.ikaver.aagarwal.hw3.common.workers;
 
 
 public enum WorkerState {
+  /**
+   * Failed to create a worker for this task
+   */
+  WORKER_NOT_ASSIGNED,
 	/**
 	 * Indicates that the worker is running and hasn't completed the task at hand.
 	 */
