@@ -49,6 +49,13 @@ public class IMRSchedulerImpl implements IMRScheduler {
           info.add(workerInfo);
         } catch (RemoteException e) {
           LOG.warn("Failed to launch mapper", e);
+          MapperWorkerInfo workerInfo = new MapperWorkerInfo(
+              workToDo.getJobID(),
+              null,
+              WorkerState.WORKER_NOT_ASSIGNED,
+              workToDo.getChunk()
+          );
+          info.add(workerInfo);
         }
       }
     }
@@ -75,6 +82,13 @@ public class IMRSchedulerImpl implements IMRScheduler {
           info.add(workerInfo);
         } catch (RemoteException e) {
           LOG.warn("Failed to launch reducer", e);
+          ReducerWorkerInfo workerInfo = new ReducerWorkerInfo(
+              workToDo.getJobID(),
+              null,
+              WorkerState.WORKER_NOT_ASSIGNED,
+              getNewReducerId()
+          );
+          info.add(workerInfo);
         }
       }
     }
