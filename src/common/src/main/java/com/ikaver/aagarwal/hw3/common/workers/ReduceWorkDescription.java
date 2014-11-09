@@ -17,7 +17,7 @@ public class ReduceWorkDescription implements Serializable {
 
   public ReduceWorkDescription(int jobID, int reducerID, 
       List<SocketAddress> inputSources, 
-      List<MapperChunk> chunks,
+      List<MapperChunk> chunks /* Get the partition id of each input source */,
       String outputFilePath) {
     if(inputSources == null) 
       throw new IllegalArgumentException("Input sources cannot be null");
