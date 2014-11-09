@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.rmi.RemoteException;
 
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.IDataNode;
@@ -24,6 +25,12 @@ public class DataNodeImpl implements IDataNode {
     FileOutputStream fos = new FileOutputStream(file);
     fos.write(data);
     fos.close();
+  }
+
+  public long sizeOfFileInBytes(String filePath) throws IOException,
+      RemoteException {
+    File file = new File(Definitions.BASE_DIRECTORY + filePath);
+    return file.length();
   }
 
 }
