@@ -40,5 +40,10 @@ public abstract class WorkerInfo implements Serializable {
     if(state == null) throw new IllegalArgumentException("Worker state cannot be null");
     this.state = state;
   }
+  
+  public void copy(WorkerInfo info) {
+    this.state = info.getState();
+    this.setSocketAddress(info.getNodeManagerAddress());
+  }
 
 }

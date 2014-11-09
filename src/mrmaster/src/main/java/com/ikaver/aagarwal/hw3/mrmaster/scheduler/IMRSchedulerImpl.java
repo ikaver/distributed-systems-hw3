@@ -44,7 +44,9 @@ public class IMRSchedulerImpl implements IMRScheduler {
               workToDo.getJobID(),
               worker.sa,
               WorkerState.RUNNING,
-              workToDo.getChunk()
+              workToDo.getChunk(),
+              workToDo.getJarPath(),
+              workToDo.getMapperClass()
           );
           info.add(workerInfo);
         } catch (RemoteException e) {
@@ -53,7 +55,9 @@ public class IMRSchedulerImpl implements IMRScheduler {
               workToDo.getJobID(),
               null,
               WorkerState.WORKER_NOT_ASSIGNED,
-              workToDo.getChunk()
+              workToDo.getChunk(),
+              workToDo.getJarPath(),
+              workToDo.getMapperClass()
           );
           info.add(workerInfo);
         }
@@ -77,7 +81,10 @@ public class IMRSchedulerImpl implements IMRScheduler {
               workToDo.getJobID(),
               worker.sa,
               WorkerState.RUNNING,
-              getNewReducerId()
+              getNewReducerId(),
+              workToDo.getInputSources(),
+              workToDo.getMapperChunks(),
+              workToDo.getOutputFilePath()
           );
           info.add(workerInfo);
         } catch (RemoteException e) {
@@ -86,7 +93,10 @@ public class IMRSchedulerImpl implements IMRScheduler {
               workToDo.getJobID(),
               null,
               WorkerState.WORKER_NOT_ASSIGNED,
-              getNewReducerId()
+              getNewReducerId(),
+              workToDo.getInputSources(),
+              workToDo.getMapperChunks(),
+              workToDo.getOutputFilePath()
           );
           info.add(workerInfo);
         }
