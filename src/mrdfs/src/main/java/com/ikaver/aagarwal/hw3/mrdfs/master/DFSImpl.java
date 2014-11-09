@@ -24,7 +24,6 @@ import com.ikaver.aagarwal.hw3.mrdfs.datanode.DataNodeFactory;
 
 public class DFSImpl extends UnicastRemoteObject implements IDFS {
   
- 
   private static final long serialVersionUID = 5494800394142393419L;
 
   private static final Logger LOG = LogManager.getLogger(DFSImpl.class);
@@ -54,6 +53,14 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS {
     return dataNodes;
   }
 
+  public boolean containsFile(String filePath) throws RemoteException {
+    boolean contains = false;
+    this.mapLock.readLock().lock();
+    contains = this.filePathToDataNodes.containsKey(filePath);
+    this.mapLock.readLock().unlock();
+    return contains;
+  }
+
   public boolean saveFile(String filePath, byte[] file) {
     boolean saveSuccessful = false;
     if(!this.filePathToDataNodes.containsKey(filePath)) {
@@ -69,6 +76,29 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS {
       this.mapLock.writeLock().unlock();
     }
     return saveSuccessful;
+  }
+  
+  public long sizeOfFileInBytes(String filePath) {
+    long size = -1;
+    this.mapLock.readLock().lock();
+    if(this.filePathToDataNodes.containsKey(filePath)) {
+      Set<SocketAddress> dataNodesAddr = this.filePathToDataNodes.get(filePath);
+      for(SocketAddress addr : dataNodesAddr) {
+        IDataNode dataNode = DataNodeFactory.dataNodeFromSocketAddress(addr);
+        if(dataNode != null) {
+          try {
+            size = dataNode.sizeOfFileInBytes(filePath);
+          } catch (RemoteException e) {
+            LOG.warn("Remote exception getting size of file", e);
+          } catch (IOException e) {
+            LOG.warn("IO exception getting size of file", e);
+          }
+          if(size >= 0) break;
+        }
+      }
+    }
+    this.mapLock.readLock().unlock();
+    return size;
   }
   
   /**
@@ -112,4 +142,5 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS {
     }
     return subset;
   }
+
 }

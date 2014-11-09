@@ -16,7 +16,7 @@ public class DFSFactory {
   
   private static final Logger LOG = LogManager.getLogger(DFSFactory.class);
 
-  public static IDFS dataNodeFromSocketAddress(SocketAddress addr) {
+  public static IDFS dfsFromSocketAddress(SocketAddress addr) {
     if(addr == null) return null;
     String url = String.format(
         "//%s:%d/%s", 
