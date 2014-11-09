@@ -2,6 +2,7 @@ package com.ikaver.aagarwal.hw3.mrmaster.jobmanager;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.MapperWorkerInfo;
@@ -14,12 +15,18 @@ public class RunningJob {
 
   private Set<MapperWorkerInfo> mappers;
   private Set<ReducerWorkerInfo> reducers;
+  private ExecutorService runningService;
 
-  public RunningJob(int jobID, String jobName) {
+  public RunningJob(int jobID, String jobName, ExecutorService service) {
     this.jobID = jobID;
     this.jobName = jobName;
     this.mappers = new HashSet<MapperWorkerInfo>();
     this.reducers = new HashSet<ReducerWorkerInfo>();
+    this.runningService = service;
+  }
+  
+  public void shutdown() {
+    runningService.shutdown();
   }
 
   public int getJobID() {

@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -21,6 +24,7 @@ import com.ikaver.aagarwal.hw3.common.workers.ReduceWorkDescription;
 import com.ikaver.aagarwal.hw3.mrmaster.jobmanager.jobvalidator.IJobValidator;
 import com.ikaver.aagarwal.hw3.mrmaster.jobtracker.IOnWorkCompletedHandler;
 import com.ikaver.aagarwal.hw3.mrmaster.jobtracker.IOnWorkerFailedHandler;
+import com.ikaver.aagarwal.hw3.mrmaster.jobtracker.JobTracker;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.IMRScheduler;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.MapperWorkerInfo;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.NodeManagerFactory;
@@ -67,9 +71,17 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
     Set<MapWorkDescription> mappers = new HashSet<MapWorkDescription>();
     List<MapperChunk> chunks = new ArrayList<MapperChunk>();
     for (int i = 0; i < job.getNumMappers(); ++i) {
-      MapWorkDescription work = new MapWorkDescription(jobID, new MapperChunk(
-          job.getInputFilePath(), i, currentStartRecord, job.getRecordSize(),
-          numberOfRecordsPerMapper), job.getJarFilePath(), job.getMapperClass());
+      MapWorkDescription work = new MapWorkDescription(
+          jobID, 
+          new MapperChunk(
+              job.getInputFilePath(), 
+              i, 
+              currentStartRecord, 
+              job.getRecordSize(),
+              numberOfRecordsPerMapper), 
+          job.getJarFilePath(), 
+          job.getMapperClass()
+      );
       chunks.add(work.getChunk());
       mappers.add(work);
       currentStartRecord += numberOfRecordsPerMapper;
@@ -84,10 +96,13 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
       mapperAddresses.add(mapWorker.getNodeManagerAddress());
     }
     for (int i = 0; i < job.getNumReducers(); ++i) {
-      ReduceWorkDescription work = new ReduceWorkDescription(jobID, i,
+      ReduceWorkDescription work = new ReduceWorkDescription(
+          jobID, 
+          i,
           mapperAddresses, /* input sources, socket addresses of mappers */
           chunks, /* Mapper chunks */
-          job.getOutputFilePath());
+          job.getOutputFilePath()
+      );
       reducers.add(work);
     }
     // schedule the reducers
@@ -95,7 +110,11 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
         .runReducersForWork(reducers);
 
     // create the running job
-    RunningJob runningJob = new RunningJob(jobID, job.getJobName());
+    ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    RunningJob runningJob = new RunningJob(jobID, job.getJobName(), scheduler);
+    JobTracker tracker = new JobTracker(runningJob, this, this);
+    scheduler.scheduleAtFixedRate(tracker, 0,
+        Definitions.TIME_TO_CHECK_FOR_NODE_MANAGER_STATE, TimeUnit.SECONDS);
     runningJob.getMappers().addAll(mapWorkers);
     runningJob.getReducers().addAll(reduceWorkers);
     jobsState.addJob(runningJob);
@@ -134,7 +153,7 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
     }
     return info;
   }
-
+  
   private JobInfoForClient jobInfoForClientFromRunningJob(RunningJob job) {
     return new JobInfoForClient(job.getJobID(), job.getJobName(),
         job.getAmountOfMappers(), job.getAmountOfReducers(),
