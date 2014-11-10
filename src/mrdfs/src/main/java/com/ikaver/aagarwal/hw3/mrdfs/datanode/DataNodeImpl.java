@@ -33,4 +33,8 @@ public class DataNodeImpl implements IDataNode {
     return file.length();
   }
 
+  public boolean createDirectory(String path) throws RemoteException {
+    throw new UnsupportedOperationException("Not yet implemented");
+  }
+
 }
