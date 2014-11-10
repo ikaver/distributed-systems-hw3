@@ -28,14 +28,14 @@ import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
  * 2. Periodically updates master with the status of the map reduce
  *   job assigned to it.
  */
-public class MRNodeManager extends UnicastRemoteObject implements IMRNodeManager  {
+public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeManager  {
 
-	protected MRNodeManager() throws RemoteException {
+	protected MRNodeManagerImpl() throws RemoteException {
 		super();
 	}
 
 	private static final long serialVersionUID = 1674990898801584371L;
-	private static final Logger LOGGER = Logger.getLogger(MRNodeManager.class);
+	private static final Logger LOGGER = Logger.getLogger(MRNodeManagerImpl.class);
 
 	/**
 	 * Following is the sequence of operations which should be executed by the doMap function.
@@ -94,5 +94,9 @@ public class MRNodeManager extends UnicastRemoteObject implements IMRNodeManager
 
   public boolean terminateWorkers(int jobID) {
     throw new UnsupportedOperationException("Not yet implemented :(");
+  }
+
+  public void startReducerWork(int jobID, int reducerID) {
+    throw new UnsupportedOperationException("Not yet implemented :(");    
   }
 }

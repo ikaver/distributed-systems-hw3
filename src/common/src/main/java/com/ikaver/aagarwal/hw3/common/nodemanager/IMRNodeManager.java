@@ -35,6 +35,13 @@ public interface IMRNodeManager extends Remote {
 	 * @param jobID
 	 */
 	public boolean terminateWorkers(int jobID);
+	
+	/**
+	 * Starts the work of the reducer. Should be called after all mappers finished.
+	 * @param jobID
+	 * @param reducerID
+	 */
+	public void startReducerWork(int jobID, int reducerID);
 
 	/**
 	 * 

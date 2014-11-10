@@ -9,7 +9,7 @@ public class MRNodeManagerModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    bind(IMRNodeManager.class).to(MRNodeManager.class);
+    bind(IMRNodeManager.class).to(MRNodeManagerImpl.class);
     bind(IDataNode.class).to(DataNodeImpl.class);
   }
   

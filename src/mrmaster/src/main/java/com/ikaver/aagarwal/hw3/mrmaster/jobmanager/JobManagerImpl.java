@@ -168,30 +168,30 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
    * IOnWorkCompletedHandler methods
    */
 
-  public void onMapperFinished(MapperWorkerInfo info) {
-    // TODO Auto-generated method stub
-
+  public void onMapperFinished(RunningJob job, MapperWorkerInfo info) {
+    job.getFinishedMappers().add(info);
   }
 
-  public void onReducerFinished(ReducerWorkerInfo info) {
-    // TODO Auto-generated method stub
-
+  public void onReducerFinished(RunningJob job, ReducerWorkerInfo info) {
+    job.getFinishedReducers().add(info);
   }
 
   public void onAllMappersFinished(RunningJob job) {
-    // TODO Auto-generated method stub
+    for(ReducerWorkerInfo info : job.getReducers()) {
+      IMRNodeManager nm = NodeManagerFactory.nodeManagerFromSocketAddress(info.getNodeManagerAddress());
+      nm.startReducerWork(job.getJobID(), info.getReducerID());
+    }
   }
 
   public void onAllReducersFinished(RunningJob job) {
-    // TODO Auto-generated method stub
-
+    job.shutdown();
   }
 
   /*
    * IOnWorkerFailedHandler methods
    */
 
-  public void onMapperFailed(MapperWorkerInfo info) {
+  public void onMapperFailed(RunningJob job, MapperWorkerInfo info) {
     MapWorkDescription newWork = new MapWorkDescription(info.getJobID(), 
         info.getChunk(), info.getJarFilePath(), info.getMapperClass());
     HashSet<MapWorkDescription> workSet = new HashSet<MapWorkDescription>();
@@ -202,7 +202,7 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
     }
   }
 
-  public void onReducerFailed(ReducerWorkerInfo info) {
+  public void onReducerFailed(RunningJob job, ReducerWorkerInfo info) {
     ReduceWorkDescription newWork = new ReduceWorkDescription(info.getJobID(), info.getReducerID(), 
         info.getInputSources(), info.getMapperChunks(), info.getOutputFilePath());
     HashSet<ReduceWorkDescription> workSet = new HashSet<ReduceWorkDescription>();

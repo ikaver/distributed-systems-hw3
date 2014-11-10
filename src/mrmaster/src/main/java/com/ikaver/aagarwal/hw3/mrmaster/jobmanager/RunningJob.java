@@ -12,7 +12,16 @@ public class RunningJob {
   
   private int jobID;
   private String jobName;
-
+  
+  /**
+   * Contains the mapper workers that have finished and have been committed
+   */
+  private Set<MapperWorkerInfo> finishedMappers;
+  /**
+   * Contains the reducer workers that have finished and have been committed
+   */
+  private Set<ReducerWorkerInfo> finishedReducers;
+    
   private Set<MapperWorkerInfo> mappers;
   private Set<ReducerWorkerInfo> reducers;
   private ExecutorService runningService;
@@ -22,13 +31,23 @@ public class RunningJob {
     this.jobName = jobName;
     this.mappers = new HashSet<MapperWorkerInfo>();
     this.reducers = new HashSet<ReducerWorkerInfo>();
+    this.finishedMappers = new HashSet<MapperWorkerInfo>();
+    this.finishedReducers = new HashSet<ReducerWorkerInfo>();
     this.runningService = service;
   }
   
+  public Set<MapperWorkerInfo> getFinishedMappers() {
+    return finishedMappers;
+  }
+
+  public Set<ReducerWorkerInfo> getFinishedReducers() {
+    return finishedReducers;
+  }
+
   public void shutdown() {
     runningService.shutdown();
   }
-
+  
   public int getJobID() {
     return jobID;
   }

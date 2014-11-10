@@ -6,8 +6,8 @@ import com.ikaver.aagarwal.hw3.mrmaster.scheduler.ReducerWorkerInfo;
 
 public interface IOnWorkCompletedHandler {
   
-  public void onMapperFinished(MapperWorkerInfo info);
-  public void onReducerFinished(ReducerWorkerInfo info);
+  public void onMapperFinished(RunningJob job, MapperWorkerInfo info);
+  public void onReducerFinished(RunningJob job, ReducerWorkerInfo info);
   public void onAllMappersFinished(RunningJob job);
   public void onAllReducersFinished(RunningJob job);
 
