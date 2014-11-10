@@ -78,10 +78,6 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS {
     return saveSuccessful;
   }
   
-  public boolean createDirectory(String path) throws RemoteException {
-    throw new UnsupportedOperationException("Not yet implemented :(");
-  }
-  
   public long sizeOfFileInBytes(String filePath) {
     long size = -1;
     this.mapLock.readLock().lock();
