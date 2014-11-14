@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,8 @@ import org.apache.log4j.Logger;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
+import com.ikaver.aagarwal.hw3.common.dfs.FileMetadata;
+import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.dfs.IDataNode;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
@@ -29,78 +32,66 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS {
   private static final Logger LOG = LogManager.getLogger(DFSImpl.class);
 
   private Set<SocketAddress> dataNodes;
-  private Map<String, Set<SocketAddress>> filePathToDataNodes;
+  private Map<String, FileMetadata> filePathToMetadata;
   private ReadWriteLock mapLock;
   private int replicationFactor;
-
+  
   @Inject
   public DFSImpl(
       @Named(Definitions.DFS_REPLICATION_FACTOR_ANNOTATION) Integer replicationFactor, 
-      @Named(Definitions.DFS_MAP_PATH_TO_FILE_ANNOTATION) Map<String, Set<SocketAddress>> filePathToDataNodes,
+      @Named(Definitions.DFS_MAP_FILE_TO_METADATA_ANNOTATION) Map<String, FileMetadata> fileToMetadata,
       @Named(Definitions.DFS_DATA_NODES_ANNOTATION) Set<SocketAddress> dataNodes,
       @Named(Definitions.DFS_MAP_LOCK_ANNOTATION) ReadWriteLock mapLock) throws RemoteException {
     super();
-    this.filePathToDataNodes = filePathToDataNodes;
+    this.filePathToMetadata = fileToMetadata;
     this.replicationFactor = replicationFactor;
     this.dataNodes = dataNodes;
     this.mapLock = mapLock;
   }
 
-  public Set<SocketAddress> dataNodeForFile(String filePath) {
+  public FileMetadata getMetadata(String file) throws RemoteException {
     this.mapLock.readLock().lock();
-    Set<SocketAddress> dataNodes = this.filePathToDataNodes.get(filePath);
+    FileMetadata metadata = this.filePathToMetadata.get(file);
+    if(metadata == null) LOG.warn("File metadata for file " + file + " is null");
     this.mapLock.readLock().unlock();
-    return dataNodes;
+    return metadata;
   }
-
+  
   public boolean containsFile(String filePath) throws RemoteException {
-    boolean contains = false;
-    this.mapLock.readLock().lock();
-    contains = this.filePathToDataNodes.containsKey(filePath);
-    this.mapLock.readLock().unlock();
-    return contains;
+    return getMetadata(filePath) != null;
   }
+  
 
-  public boolean saveFile(String filePath, byte[] file) {
-    boolean saveSuccessful = false;
-    if(!this.filePathToDataNodes.containsKey(filePath)) {
-      this.mapLock.writeLock().lock();
-      saveSuccessful = writeNewFile(filePath, file);
-      this.mapLock.writeLock().unlock();
+  public boolean createFile(String filePath, int recordSize, long totalFileSize)
+      throws RemoteException {
+    this.mapLock.readLock().lock();
+    boolean success = false;
+    if(this.filePathToMetadata.containsKey(filePath)) {
+      LOG.warn(filePath +  " already exists");
     }
     else {
-      LOG.warn("Tried to update file " + filePath + " this is not supported!");
-      this.mapLock.writeLock().lock();
-      this.filePathToDataNodes.remove(filePath);
-      saveSuccessful = writeNewFile(filePath, file);
-      this.mapLock.writeLock().unlock();
-    }
-    return saveSuccessful;
-  }
-  
-  public long sizeOfFileInBytes(String filePath) {
-    long size = -1;
-    this.mapLock.readLock().lock();
-    if(this.filePathToDataNodes.containsKey(filePath)) {
-      Set<SocketAddress> dataNodesAddr = this.filePathToDataNodes.get(filePath);
-      for(SocketAddress addr : dataNodesAddr) {
-        IDataNode dataNode = DataNodeFactory.dataNodeFromSocketAddress(addr);
-        if(dataNode != null) {
-          try {
-            size = dataNode.sizeOfFileInBytes(filePath);
-          } catch (RemoteException e) {
-            LOG.warn("Remote exception getting size of file", e);
-          } catch (IOException e) {
-            LOG.warn("IO exception getting size of file", e);
-          }
-          if(size >= 0) break;
-        }
-      }
+      int numChunks = FileUtil.numChunksForFile(Definitions.SIZE_OF_CHUNK, recordSize, totalFileSize);
+      Map<Integer, Set<SocketAddress>> numChunkToAddr = new HashMap<Integer, Set<SocketAddress>>();
+      FileMetadata metadata = new FileMetadata(filePath, numChunks, numChunkToAddr, recordSize, totalFileSize);
+      this.filePathToMetadata.put(filePath, metadata);
+      success = true;
     }
     this.mapLock.readLock().unlock();
-    return size;
+    return success;
   }
   
+  public boolean saveFile(String filePath, int numChunk, byte[] file)
+      throws RemoteException {
+    boolean success = false;
+    this.mapLock.writeLock().lock();
+    FileMetadata metadata = this.filePathToMetadata.get(filePath);
+    if(metadata != null) {
+      this.writeNewFile(metadata, numChunk, file);
+    }
+    this.mapLock.writeLock().unlock();
+    return success;
+  }
+
   /**
    * Writes the new file with path filePath and contents file.
    * Assumes that you currently have the write lock.
@@ -108,22 +99,22 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS {
    * @param file
    * @return true iff write successful
    */
-  private boolean writeNewFile(String filePath, byte [] file) {
+  private boolean writeNewFile(FileMetadata metadata, int numChunk, byte [] file) {
     Set<SocketAddress> dataNodesForFile = dataNodesForNewFile();
-    boolean saveSuccessful = writeFileInDataNodes(filePath, file, dataNodesForFile);
+    boolean saveSuccessful = writeFileInDataNodes(metadata, numChunk, file, dataNodesForFile);
     if(saveSuccessful) {
-      this.filePathToDataNodes.put(filePath, new HashSet<SocketAddress>());
+      metadata.getNumChunkToAddr().put(numChunk, dataNodesForFile);
     }
     return saveSuccessful;
   }
 
-  private boolean writeFileInDataNodes(String filePath, byte [] file, Set<SocketAddress> dataNodes) {
+  private boolean writeFileInDataNodes(FileMetadata metadata, int numChunk, byte [] file, Set<SocketAddress> dataNodes) {
     boolean savedAtLeastInOneDataNode = false;
     for(SocketAddress addr : dataNodes) {
       IDataNode dataNode = DataNodeFactory.dataNodeFromSocketAddress(addr);
       if(dataNode != null) {
         try {
-          dataNode.saveFile(filePath, file);
+          dataNode.saveFile(metadata.getFileName(), numChunk, file);
           savedAtLeastInOneDataNode = true;
         } catch (IOException e) {
           LOG.warn("Failed to write file on data node", e);

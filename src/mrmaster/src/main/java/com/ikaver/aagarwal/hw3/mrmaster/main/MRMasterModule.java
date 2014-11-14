@@ -40,7 +40,7 @@ public class MRMasterModule extends AbstractModule {
       .annotatedWith(Names.named(Definitions.DFS_MAP_LOCK_ANNOTATION))
       .toInstance(dfsLock);
     bind(new TypeLiteral<Map<String, Set<SocketAddress>>>(){})
-      .annotatedWith(Names.named(Definitions.DFS_MAP_PATH_TO_FILE_ANNOTATION))
+      .annotatedWith(Names.named(Definitions.DFS_MAP_FILE_TO_METADATA_ANNOTATION))
       .toInstance(dfsMap);
     bind(new TypeLiteral<Set<SocketAddress>>(){})
       .annotatedWith(Names.named(Definitions.DFS_DATA_NODES_ANNOTATION))

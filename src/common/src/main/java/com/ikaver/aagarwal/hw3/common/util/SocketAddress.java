@@ -21,5 +21,17 @@ public class SocketAddress implements Serializable {
   public int getPort() {
     return port;
   }
-
+  
+  @Override
+  public boolean equals(Object o) {
+    if(o == null) return false;
+    if(!(o instanceof SocketAddress)) return false;
+    SocketAddress other = (SocketAddress)o;
+    return getHostname().equals(other.getHostname()) && getPort() == other.getPort();
+  }
+  
+  @Override
+  public int hashCode() {
+    return 37 * getHostname().hashCode() +  new Integer(getPort()).hashCode();
+  }
 }

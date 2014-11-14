@@ -14,6 +14,7 @@ import com.google.inject.name.Named;
 import com.ikaver.aagarwal.hw3.common.config.JobConfig;
 import com.ikaver.aagarwal.hw3.common.config.JobInfoForClient;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
+import com.ikaver.aagarwal.hw3.common.dfs.FileMetadata;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
 import com.ikaver.aagarwal.hw3.common.nodemanager.IMRNodeManager;
@@ -58,9 +59,12 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
     if (job == null || !jobValidator.isJobValid(job))
       return null;
 
-    long sizeOfInputFile = this.dfs.sizeOfFileInBytes(job.getInputFilePath());
+    FileMetadata metadata = this.dfs.getMetadata(job.getInputFilePath());
+    long sizeOfInputFile = metadata.getSizeOfFile();
     if (sizeOfInputFile < 0)
       return null;
+    
+    //TODO: FIXME
     int numberOfRecordsInFile = (int) Math.ceil(sizeOfInputFile
         / (double) job.getRecordSize());
     int numberOfRecordsPerMapper = (int) Math.ceil(numberOfRecordsInFile

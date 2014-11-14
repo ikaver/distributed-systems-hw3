@@ -14,7 +14,7 @@ public class Definitions {
   public static final String NODE_MANAGER_SET_ANNOTATION = "NodeManagerSet";
   
   public static final String DFS_REPLICATION_FACTOR_ANNOTATION = "DFSReplicationFactor";
-  public static final String DFS_MAP_PATH_TO_FILE_ANNOTATION = "DFSPathToFile";
+  public static final String DFS_MAP_FILE_TO_METADATA_ANNOTATION = "DFSMapFileToMetadata";
   public static final String DFS_DATA_NODES_ANNOTATION = "DFSDataNodes";
   public static final String DFS_MAP_LOCK_ANNOTATION = "DFSMapLock";
   
@@ -24,5 +24,7 @@ public class Definitions {
   //DFS
   public static final String BASE_DIRECTORY = "/tmp/mrikav-ank-dfs/";
   public static final int REPLICATION_FACTOR = 3;
+  public static final int SIZE_OF_CHUNK = (1 << 26); //64MB
+
 
 }
