@@ -14,6 +14,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,12 +59,12 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 
 	@Inject
 	public MRNodeManagerImpl(
-			@Named(Definitions.MASTER_SOCKET_ADDR_ANNOTATION) SocketAddress masterAddress,
-			Map<MapWorkDescription, Integer> workInProgress)
+			@Named(Definitions.MASTER_SOCKET_ADDR_ANNOTATION) SocketAddress masterAddress)
 			throws RemoteException {
 		super();
 		this.masterAddress = masterAddress;
-		this.workInProgress = workInProgress;
+		// TODO(ankit): Guicify it.
+		this.workInProgress = new HashMap<MapWorkDescription, Integer> ();
 	}
 
 	private static final long serialVersionUID = 1674990898801584371L;

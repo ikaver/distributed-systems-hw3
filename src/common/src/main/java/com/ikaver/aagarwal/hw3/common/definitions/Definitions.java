@@ -33,5 +33,5 @@ public class Definitions {
   public static final int SIZE_OF_CHUNK = (1 << 26); //64MB
   public static final int NUM_DFS_READ_RETRIES = 3;
 
-
+  public static final int NODE_MANAGER_SERVICE_PORT = 3000;
 }
