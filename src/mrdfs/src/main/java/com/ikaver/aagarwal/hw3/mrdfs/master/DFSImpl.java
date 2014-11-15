@@ -16,6 +16,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.FileMetadata;
@@ -26,6 +27,7 @@ import com.ikaver.aagarwal.hw3.common.objects.KeyValuePair;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.mrdfs.datanode.DataNodeFactory;
 
+@Singleton
 public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFailureHandler {
   
   private static final long serialVersionUID = 5494800394142393419L;
