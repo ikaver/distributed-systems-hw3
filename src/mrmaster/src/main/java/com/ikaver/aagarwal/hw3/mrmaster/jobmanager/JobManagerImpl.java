@@ -15,6 +15,7 @@ import com.ikaver.aagarwal.hw3.common.config.JobConfig;
 import com.ikaver.aagarwal.hw3.common.config.JobInfoForClient;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.FileMetadata;
+import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
 import com.ikaver.aagarwal.hw3.common.nodemanager.IMRNodeManager;
@@ -64,31 +65,26 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
     if (sizeOfInputFile < 0)
       return null;
     
-    //TODO: FIXME
-    int numberOfRecordsInFile = (int) Math.ceil(sizeOfInputFile
-        / (double) job.getRecordSize());
-    int numberOfRecordsPerMapper = (int) Math.ceil(numberOfRecordsInFile
-        / (double) job.getNumMappers());
-    int currentStartRecord = 0;
+    int numMappers = metadata.getNumChunks();
+
     int jobID = this.getNewJobID();
     // create mappers work descriptions
     Set<MapWorkDescription> mappers = new HashSet<MapWorkDescription>();
     List<MapperChunk> chunks = new ArrayList<MapperChunk>();
-    for (int i = 0; i < job.getNumMappers(); ++i) {
+    for (int i = 0; i < numMappers; ++i) {
       MapWorkDescription work = new MapWorkDescription(
           jobID, 
           new MapperChunk(
-              job.getInputFilePath(), 
-              i, 
-              currentStartRecord, 
-              job.getRecordSize(),
-              numberOfRecordsPerMapper), 
+              job.getInputFilePath(),  //input file
+              i,                       //partition id
+              0,                       //start record
+              job.getRecordSize(),     //record size
+              (int)FileUtil.getTotalRecords(job.getRecordSize(), metadata.getSizeOfFile())), //records in chunk, 
           job.getJarFilePath(), 
           job.getMapperClass()
       );
       chunks.add(work.getChunk());
       mappers.add(work);
-      currentStartRecord += numberOfRecordsPerMapper;
     }
     // schedule the mappers
     Set<MapperWorkerInfo> mapWorkers = scheduler.runMappersForWork(mappers);
