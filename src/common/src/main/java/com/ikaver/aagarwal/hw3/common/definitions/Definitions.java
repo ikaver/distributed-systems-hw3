@@ -31,6 +31,7 @@ public class Definitions {
   public static final String BASE_DIRECTORY = "/tmp/mrikav-ank-dfs/";
   public static final int REPLICATION_FACTOR = 3;
   public static final int SIZE_OF_CHUNK = (1 << 26); //64MB
+  public static final int NUM_DFS_READ_RETRIES = 3;
 
 
 }

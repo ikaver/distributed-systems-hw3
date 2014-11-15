@@ -14,46 +14,45 @@ import com.google.inject.Injector;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.IDataNode;
 import com.ikaver.aagarwal.hw3.common.nodemanager.IMRNodeManager;
-import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
+import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 
 /**
  * Entry point for task runner.
- *
+ * 
  */
 public class MRNodeManagerEntryPoint {
-	
-	private static final Logger LOGGER = Logger.getLogger(MRNodeManagerEntryPoint.class);
 
-	public static void main(String args[]) throws RemoteException, MalformedURLException {
-		
+	private static final Logger LOGGER = Logger
+			.getLogger(MRNodeManagerEntryPoint.class);
+
+	public static void main(String args[]) throws RemoteException,
+			MalformedURLException {
+
 		MRNodeManagerSettings settings = new MRNodeManagerSettings();
-    int port = -1;
+		int port = -1;
 
 		JCommander cmd = new JCommander(settings);
-    try {
-      cmd.parse(args);
-      port = settings.getPort();
-    }
-    catch (ParameterException ex) {
-      cmd.usage();
-      System.exit(-1);
-    }
-    
-    
-    Injector injector = Guice.createInjector(new MRNodeManagerModule());
-    IMRNodeManager manager = injector.getInstance(IMRNodeManager.class);
-    IDataNode dataNode = injector.getInstance(IDataNode.class);
-    
+		try {
+			cmd.parse(args);
+			port = settings.getPort();
+		} catch (ParameterException ex) {
+			cmd.usage();
+			System.exit(-1);
+		}
+
+		SocketAddress addr = new SocketAddress(settings.getMasterIP(), settings.getMasterPort());
+		Injector injector = Guice.createInjector(new MRNodeManagerModule(addr));
+		IMRNodeManager manager = injector.getInstance(IMRNodeManager.class);
+		IDataNode dataNode = injector.getInstance(IDataNode.class);
+
 		LocateRegistry.createRegistry(settings.getPort());
-		Naming.rebind(String.format("//:%d/" + Definitions.MR_NODE_MANAGER_SERVICE, port), manager);
-    Naming.rebind(String.format("//:%d/" + Definitions.DATA_NODE_SERVICE, port), dataNode);
-		
-		//MapWorkDescription input = new  MapWorkDescription(
-		//		0, null, "/home/ankit/git/distributed-systems-hw3/src/common/target/common-1.0-SNAPSHOT-jar-with-dependencies.jar",
-		//		"com.ikaver.aagarwal.hw3.common.examples.WordCountMapper");
+		Naming.rebind(String.format("//:%d/"
+				+ Definitions.MR_NODE_MANAGER_SERVICE, port), manager);
+		Naming.rebind(
+				String.format("//:%d/" + Definitions.DATA_NODE_SERVICE, port),
+				dataNode);
 
-		//manager.doMap(input);
-
-		LOGGER.info(String.format("MR Task manager is now running at port %d", settings.getPort()));
+		LOGGER.info(String.format("MR Task manager is now running at port %d",
+				settings.getPort()));
 	}
 }
