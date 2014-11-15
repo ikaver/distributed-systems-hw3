@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ikaver.aagarwal.hw3.common.config.FinishedJob;
 import com.ikaver.aagarwal.hw3.common.config.JobConfig;
 import com.ikaver.aagarwal.hw3.common.config.JobInfoForClient;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
@@ -45,6 +46,10 @@ public class JobManagerMockImpl extends UnicastRemoteObject implements IJobManag
 
   private synchronized int getNewID() {
     return this.currentId++;
+  }
+
+  public List<FinishedJob> finishedJobs() throws RemoteException {
+    return new ArrayList<FinishedJob>();
   }
   
 }
