@@ -25,7 +25,7 @@ import com.ikaver.aagarwal.hw3.common.dfs.IDataNode;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.mrdfs.datanode.DataNodeFactory;
 
-public class DFSImpl extends UnicastRemoteObject implements IDFS {
+public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFailureHandler {
   
   private static final long serialVersionUID = 5494800394142393419L;
 
@@ -33,7 +33,8 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS {
 
   private Set<SocketAddress> dataNodes;
   private Map<String, FileMetadata> filePathToMetadata;
-  private ReadWriteLock mapLock;
+  private ReadWriteLock dataNodesLock;
+  private ReadWriteLock metadataLock;
   private int replicationFactor;
   
   @Inject
@@ -41,54 +42,57 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS {
       @Named(Definitions.DFS_REPLICATION_FACTOR_ANNOTATION) Integer replicationFactor, 
       @Named(Definitions.DFS_MAP_FILE_TO_METADATA_ANNOTATION) Map<String, FileMetadata> fileToMetadata,
       @Named(Definitions.DFS_DATA_NODES_ANNOTATION) Set<SocketAddress> dataNodes,
-      @Named(Definitions.DFS_MAP_LOCK_ANNOTATION) ReadWriteLock mapLock) throws RemoteException {
+      @Named(Definitions.DFS_DATA_NODES_SET_LOCK_ANNOTATION) ReadWriteLock dataNodesLock) throws RemoteException {
     super();
     this.filePathToMetadata = fileToMetadata;
     this.replicationFactor = replicationFactor;
     this.dataNodes = dataNodes;
-    this.mapLock = mapLock;
+    this.dataNodesLock = dataNodesLock;
   }
 
   public FileMetadata getMetadata(String file) throws RemoteException {
-    this.mapLock.readLock().lock();
+    this.metadataLock.readLock().lock();
     FileMetadata metadata = this.filePathToMetadata.get(file);
     if(metadata == null) LOG.warn("File metadata for file " + file + " is null");
-    this.mapLock.readLock().unlock();
+    this.metadataLock.readLock().unlock();
     return metadata;
   }
   
   public boolean containsFile(String filePath) throws RemoteException {
     return getMetadata(filePath) != null;
   }
-  
 
   public boolean createFile(String filePath, int recordSize, long totalFileSize)
       throws RemoteException {
-    this.mapLock.readLock().lock();
+    this.metadataLock.writeLock().lock();
+
     boolean success = false;
     if(this.filePathToMetadata.containsKey(filePath)) {
       LOG.warn(filePath +  " already exists");
     }
     else {
-      int numChunks = FileUtil.numChunksForFile(Definitions.SIZE_OF_CHUNK, recordSize, totalFileSize);
-      Map<Integer, Set<SocketAddress>> numChunkToAddr = new HashMap<Integer, Set<SocketAddress>>();
-      FileMetadata metadata = new FileMetadata(filePath, numChunks, numChunkToAddr, recordSize, totalFileSize);
+      int numChunks = FileUtil.numChunksForFile(Definitions.SIZE_OF_CHUNK,
+          recordSize, totalFileSize);
+      Map<Integer, Set<SocketAddress>> numChunkToAddr 
+        = new HashMap<Integer, Set<SocketAddress>>();
+      FileMetadata metadata = new FileMetadata(filePath, numChunks, 
+          numChunkToAddr, recordSize, totalFileSize);
       this.filePathToMetadata.put(filePath, metadata);
       success = true;
     }
-    this.mapLock.readLock().unlock();
+    this.metadataLock.writeLock().unlock();
     return success;
   }
   
   public boolean saveFile(String filePath, int numChunk, byte[] file)
       throws RemoteException {
+    this.metadataLock.readLock().lock();
     boolean success = false;
-    this.mapLock.writeLock().lock();
     FileMetadata metadata = this.filePathToMetadata.get(filePath);
+    this.metadataLock.readLock().unlock();
     if(metadata != null) {
       this.writeNewFile(metadata, numChunk, file);
     }
-    this.mapLock.writeLock().unlock();
     return success;
   }
 
@@ -101,7 +105,8 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS {
    */
   private boolean writeNewFile(FileMetadata metadata, int numChunk, byte [] file) {
     Set<SocketAddress> dataNodesForFile = dataNodesForNewFile();
-    boolean saveSuccessful = writeFileInDataNodes(metadata, numChunk, file, dataNodesForFile);
+    boolean saveSuccessful = writeFileInDataNodes(metadata, numChunk, file,
+        dataNodesForFile);
     if(saveSuccessful) {
       metadata.getNumChunkToAddr().put(numChunk, dataNodesForFile);
     }
@@ -125,13 +130,40 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS {
   }
 
   private Set<SocketAddress> dataNodesForNewFile() {
+    this.dataNodesLock.readLock().lock();
     List<SocketAddress> dataNodesList = new ArrayList<SocketAddress>(this.dataNodes);
+    this.dataNodesLock.readLock().unlock();
     Collections.shuffle(dataNodesList);
     Set<SocketAddress> subset = new HashSet<SocketAddress>();
     for(int i = 0; i < replicationFactor; ++i) {
       subset.add(dataNodesList.get(i));
     }
     return subset;
+  }
+
+  public void onDataNodeFailed(SocketAddress addr) {
+    this.dataNodesLock.readLock().lock();
+    List<SocketAddress> dataNodesList = new ArrayList<SocketAddress>(this.dataNodes);
+    this.dataNodesLock.readLock().unlock();
+    Collections.shuffle(dataNodesList);
+
+    Set<String> filesThatNeedToBeReplicated = new HashSet<String>();
+    this.dataNodesLock.writeLock().lock();
+    for(FileMetadata metadata : this.filePathToMetadata.values()) {
+      for(int numChunk : metadata.getNumChunkToAddr().keySet()) {
+        Set<SocketAddress> nodesForChunk = metadata.getNumChunkToAddr().get(numChunk);
+        if(nodesForChunk.contains(addr)) {
+
+        }
+      }
+    }
+    
+    this.dataNodesLock.writeLock().unlock();
+    for(FileMetadata metadata : this.filePathToMetadata.values()) {
+      if(metadata.getNumChunkToAddr().containsKey(addr)) {
+        //find node in node list such as 
+      }
+    }
   }
 
 }

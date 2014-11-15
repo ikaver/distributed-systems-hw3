@@ -25,7 +25,7 @@ import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.ReduceWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 
-public class IMRSchedulerImpl implements IMRScheduler {
+public class MRSchedulerImpl implements IMRScheduler {
 
   private IDFS dfs;
   private Map<SocketAddress, NodeInformation> nodeInfo;
@@ -33,10 +33,10 @@ public class IMRSchedulerImpl implements IMRScheduler {
   private ReadWriteLock nodeInfoLock;
   private int currentReducerID;
 
-  private static final Logger LOG = Logger.getLogger(IMRSchedulerImpl.class);
+  private static final Logger LOG = Logger.getLogger(MRSchedulerImpl.class);
 
   @Inject
-  public IMRSchedulerImpl(
+  public MRSchedulerImpl(
       @Named(Definitions.SCHEDULER_NODES_INFORMATION_MAP)
       Map<SocketAddress, NodeInformation> availableNodes,
       @Named(Definitions.SCHEDULER_NODES_INFORMATION_LOCK)ReadWriteLock availableNodesLock,

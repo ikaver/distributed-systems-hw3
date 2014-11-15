@@ -19,7 +19,7 @@ public class Definitions {
   public static final String DFS_REPLICATION_FACTOR_ANNOTATION = "DFSReplicationFactor";
   public static final String DFS_MAP_FILE_TO_METADATA_ANNOTATION = "DFSMapFileToMetadata";
   public static final String DFS_DATA_NODES_ANNOTATION = "DFSDataNodes";
-  public static final String DFS_MAP_LOCK_ANNOTATION = "DFSMapLock";
+  public static final String DFS_DATA_NODES_SET_LOCK_ANNOTATION = "DFSDataNodesLock";
   
   //Scheduler
   public static final int SCHEDULER_TIME_TO_CHECK_FOR_NODES_STATE = 3;

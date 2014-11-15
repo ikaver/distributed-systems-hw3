@@ -19,7 +19,7 @@ import com.ikaver.aagarwal.hw3.mrdfs.master.DFSImpl;
 import com.ikaver.aagarwal.hw3.mrmaster.jobmanager.JobManagerMockImpl;
 import com.ikaver.aagarwal.hw3.mrmaster.jobmanager.JobsState;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.IMRScheduler;
-import com.ikaver.aagarwal.hw3.mrmaster.scheduler.IMRSchedulerImpl;
+import com.ikaver.aagarwal.hw3.mrmaster.scheduler.MRSchedulerImpl;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.NodeInformation;
 
 public class MRMasterModule extends AbstractModule {
@@ -36,13 +36,13 @@ public class MRMasterModule extends AbstractModule {
   protected void configure() {
     bind(IJobManager.class).to(JobManagerMockImpl.class);
     bind(IDFS.class).to(DFSImpl.class);
-    bind(IMRScheduler.class).to(IMRSchedulerImpl.class);
+    bind(IMRScheduler.class).to(MRSchedulerImpl.class);
     
     //Master DFS setup
     ReadWriteLock dfsLock = new ReentrantReadWriteLock();
     HashMap<String, FileMetadata> dfsMap = new HashMap<String, FileMetadata>();
     bind(ReadWriteLock.class)
-      .annotatedWith(Names.named(Definitions.DFS_MAP_LOCK_ANNOTATION))
+      .annotatedWith(Names.named(Definitions.DFS_DATA_NODES_SET_LOCK_ANNOTATION))
       .toInstance(dfsLock);
     bind(new TypeLiteral<Map<String, FileMetadata>>(){})
       .annotatedWith(Names.named(Definitions.DFS_MAP_FILE_TO_METADATA_ANNOTATION))
