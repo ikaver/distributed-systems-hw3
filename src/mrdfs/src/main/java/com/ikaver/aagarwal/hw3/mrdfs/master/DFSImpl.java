@@ -10,6 +10,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 
 import org.apache.log4j.LogManager;
@@ -38,6 +41,7 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
   private Map<String, FileMetadata> filePathToMetadata;
   private ReadWriteLock dataNodesLock;
   private ReadWriteLock metadataLock;
+  private ScheduledExecutorService nodeTrackerService;
   private int replicationFactor;
 
   @Inject
@@ -51,7 +55,12 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
     this.replicationFactor = replicationFactor;
     this.dataNodes = dataNodes;
     this.dataNodesLock = dataNodesLock;
-  }
+    //Start node tracker service (keeps track of node performance).
+    this.nodeTrackerService = Executors.newScheduledThreadPool(1);
+    DataNodeTracker tracker = new DataNodeTracker(dataNodes, dataNodesLock, this);
+    this.nodeTrackerService.scheduleAtFixedRate(tracker, 0,
+        Definitions.SCHEDULER_TIME_TO_CHECK_FOR_NODES_STATE, TimeUnit.SECONDS);
+    }
 
   public FileMetadata getMetadata(String file) throws RemoteException {
     this.metadataLock.readLock().lock();

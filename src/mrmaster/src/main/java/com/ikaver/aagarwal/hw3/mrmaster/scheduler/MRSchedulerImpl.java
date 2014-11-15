@@ -33,6 +33,7 @@ public class MRSchedulerImpl implements IMRScheduler {
   private Map<SocketAddress, NodeInformation> nodeInfo;
   private Set<SocketAddress> allNodes;
   private ReadWriteLock nodeInfoLock;
+  private ScheduledExecutorService scheduler;
   private int currentReducerID;
 
   private static final Logger LOG = Logger.getLogger(MRSchedulerImpl.class);
@@ -50,7 +51,7 @@ public class MRSchedulerImpl implements IMRScheduler {
     this.allNodes = allNodes;
     
     //Start node tracker service (keeps track of node performance).
-    ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    this.scheduler = Executors.newScheduledThreadPool(1);
     NodeTracker tracker = new NodeTracker(this.nodeInfo, this.allNodes, this.nodeInfoLock);
     scheduler.scheduleAtFixedRate(tracker, 0,
         Definitions.SCHEDULER_TIME_TO_CHECK_FOR_NODES_STATE, TimeUnit.SECONDS);

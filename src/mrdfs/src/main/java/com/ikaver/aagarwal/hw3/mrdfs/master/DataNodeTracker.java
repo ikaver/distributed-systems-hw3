@@ -15,6 +15,14 @@ public class DataNodeTracker implements Runnable {
   private ReadWriteLock dataNodesLock;
   private IOnDataNodeFailureHandler onFailureHandler;
 
+  public DataNodeTracker(Set<SocketAddress> dataNodes,
+      ReadWriteLock dataNodesLock,
+      IOnDataNodeFailureHandler handler) {
+    this.dataNodes = dataNodes;
+    this.dataNodesLock = dataNodesLock;
+    this.onFailureHandler = handler;
+  }
+  
   public void run() {
     queryDataNodes();
   }

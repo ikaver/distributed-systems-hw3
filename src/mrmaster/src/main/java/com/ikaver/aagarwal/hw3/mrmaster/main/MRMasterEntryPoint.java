@@ -45,8 +45,9 @@ public class MRMasterEntryPoint {
     //TODO: get nodes somehow
     HashSet<SocketAddress> nodes = new HashSet<SocketAddress>();
     nodes.add(new SocketAddress("ghc28.ghc.andrew.cmu.edu", 3000));
-    nodes.add(new SocketAddress("ghc30.ghc.andrew.cmu.edu", 3000));
     nodes.add(new SocketAddress("ghc29.ghc.andrew.cmu.edu", 3000));
+    nodes.add(new SocketAddress("ghc30.ghc.andrew.cmu.edu", 3000));
+    nodes.add(new SocketAddress("ghc31.ghc.andrew.cmu.edu", 3000));
 
     
     Injector injector = Guice.createInjector(new MRMasterModule(nodes));
