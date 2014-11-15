@@ -1,6 +1,7 @@
 package com.ikaver.aagarwal.hw3.mrmaster.jobmanager;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +36,7 @@ import com.ikaver.aagarwal.hw3.mrmaster.scheduler.MapperWorkerInfo;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.NodeManagerFactory;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.ReducerWorkerInfo;
 
-public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
+public class JobManagerImpl extends UnicastRemoteObject implements IJobManager, IOnWorkerFailedHandler,
 IOnWorkCompletedHandler {
 
   private static final Logger LOG = Logger.getLogger(JobManagerImpl.class);
@@ -53,7 +54,8 @@ IOnWorkCompletedHandler {
       JobsState state,
       IDFS dfs,
       IJobValidator validator,
-      @Named(Definitions.NODE_MANAGER_SET_ANNOTATION) Set<SocketAddress> nodeManagers) {
+      @Named(Definitions.NODE_MANAGER_SET_ANNOTATION) Set<SocketAddress> nodeManagers) throws RemoteException {
+    super();
     this.scheduler = scheduler;
     this.jobsState = state;
     this.dfs = dfs;
@@ -62,27 +64,35 @@ IOnWorkCompletedHandler {
   }
 
   public JobInfoForClient createJob(JobConfig job) throws RemoteException {
-    LOG.info("Received a job" + job);
+    LOG.info("Received a job: " + job);
 
     if (job == null || !jobValidator.isJobValid(job)) {
       LOG.info("Received invalid job: " + job + " Ignoring...");
       return null;
     }
       
+    LOG.info("Asking DFS for input size of metadata");
     FileMetadata metadata = this.dfs.getMetadata(job.getInputFilePath());
+    if(metadata == null) {
+      LOG.info("Received job with no input file. Ignoring...");
+      return null;
+    }
+    
     long sizeOfInputFile = metadata.getSizeOfFile();
     if (sizeOfInputFile <= 0) { 
       LOG.info("Received job with input file size <= 0. Ignoring...");
       return null;
     }
     
+    LOG.info("Got metadata: " + metadata);
     int numMappers = metadata.getNumChunks();
-
+    
     int jobID = this.getNewJobID();
     // create mappers work descriptions
     Set<MapWorkDescription> mappers = new HashSet<MapWorkDescription>();
     List<MapperChunk> chunks = new ArrayList<MapperChunk>();
     for (int i = 0; i < numMappers; ++i) {
+      
       MapWorkDescription work = new MapWorkDescription(
           jobID, 
           new MapperChunk(
@@ -97,6 +107,7 @@ IOnWorkCompletedHandler {
       chunks.add(work.getChunk());
       mappers.add(work);
     }
+    LOG.info("Asking scheduler to schedule mappers");
     // schedule the mappers
     Set<MapperWorkerInfo> mapWorkers = scheduler.runMappersForWork(mappers);
 

@@ -84,26 +84,7 @@ public class MapInstanceRunner extends UnicastRemoteObject implements
 	
 	private IMapper getMapperClass(MapWorkDescription input) {
 		IMapper mapper = null;
-		try {
-			File file = new File(input.getJarPath());
-			ClassLoader loader = new URLClassLoader(new URL[] { file.toURI()
-					.toURL() });
-			Class<IMapper> mapperClass = (Class<IMapper>) loader
-					.loadClass(input.getMapperClass());
-			mapper = mapperClass.newInstance();
-		} catch (IOException e) {
-			LOGGER.fatal("Error reading jar file from the disk. Either the"
-					+ "file" + input.getJarPath()
-					+ "doesn't exist on the local filesystem"
-					+ " or the local disk is full");
-		} catch (ClassNotFoundException e) {
-			LOGGER.fatal("Unable to locate the mapper class"
-					+ input.getMapperClass());
-		} catch (InstantiationException e) {
-			LOGGER.fatal("Error instanting the mapper class"
-					+ input.getMapperClass());
-		} catch (IllegalAccessException e) {
-		}
+
 
 		return mapper;
 	}

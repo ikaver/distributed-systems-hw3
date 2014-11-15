@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import com.ikaver.aagarwal.hw3.common.commandhandler.ICommandHandler;
 import com.ikaver.aagarwal.hw3.common.config.JobConfig;
 import com.ikaver.aagarwal.hw3.common.config.JobFromJSONCreator;
+import com.ikaver.aagarwal.hw3.common.config.JobInfoForClient;
 import com.ikaver.aagarwal.hw3.mrclient.jobmonitor.JobMonitor;
 
 public class CreateJobCommandHandler implements ICommandHandler {
@@ -30,12 +31,20 @@ public class CreateJobCommandHandler implements ICommandHandler {
       job = JobFromJSONCreator.createJobFromJSONFile(new File(filePath));
     } catch (UnsupportedEncodingException e) {
       LOG.info(e.toString());      
+      System.out.println("Failed to create job, check your config file");
     } catch (IOException e) {
       LOG.info(e.toString());
+      System.out.println("Failed to create job, check your config file");
     }
     
     if(job != null) {
-      monitor.createJob(job);
+      JobInfoForClient jobInfo = monitor.createJob(job);
+      if(jobInfo == null) {
+        System.out.println("Job manager failed to create job. Make sure its running and check your config file");
+      }
+      else {
+        System.out.println("Created job: " + jobInfo);
+      }
     }
     else {
       System.out.println("Failed to create job with config file: " + filePath);

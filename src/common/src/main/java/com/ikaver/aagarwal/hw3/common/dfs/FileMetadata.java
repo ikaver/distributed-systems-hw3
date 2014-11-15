@@ -47,6 +47,10 @@ public class FileMetadata implements Serializable {
     return sizeOfFile;
   }
   
-  
+  @Override
+  public String toString() {
+    return String.format("[Filename: %s , Num chunks: %d , Record size: %d , Size of file: %d]",
+        getFileName(), getNumChunks(), getRecordSize(), getSizeOfFile());
+  }
 
 }

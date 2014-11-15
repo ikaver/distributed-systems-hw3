@@ -16,8 +16,10 @@ import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.mrdfs.master.DFSImpl;
-import com.ikaver.aagarwal.hw3.mrmaster.jobmanager.JobManagerMockImpl;
+import com.ikaver.aagarwal.hw3.mrmaster.jobmanager.JobManagerImpl;
 import com.ikaver.aagarwal.hw3.mrmaster.jobmanager.JobsState;
+import com.ikaver.aagarwal.hw3.mrmaster.jobmanager.jobvalidator.IJobValidator;
+import com.ikaver.aagarwal.hw3.mrmaster.jobmanager.jobvalidator.JobValidatorImpl;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.IMRScheduler;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.MRSchedulerImpl;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.NodeInformation;
@@ -34,9 +36,10 @@ public class MRMasterModule extends AbstractModule {
   
   @Override
   protected void configure() {
-    bind(IJobManager.class).to(JobManagerMockImpl.class);
+    bind(IJobManager.class).to(JobManagerImpl.class);
     bind(IDFS.class).to(DFSImpl.class);
     bind(IMRScheduler.class).to(MRSchedulerImpl.class);
+    bind(IJobValidator.class).to(JobValidatorImpl.class);
     
     //Master DFS setup
     ReadWriteLock dfsLock = new ReentrantReadWriteLock();
