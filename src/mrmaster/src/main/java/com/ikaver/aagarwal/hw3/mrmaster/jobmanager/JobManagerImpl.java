@@ -177,7 +177,7 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
   }
 
   public void onAllMappersFinished(RunningJob job) {
-
+    //nothing to do here
   }
 
   public void onAllReducersFinished(RunningJob job) {
@@ -196,6 +196,15 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
     Set<MapperWorkerInfo> newInfoSet = scheduler.runMappersForWork(workSet);
     for(MapperWorkerInfo newInfo : newInfoSet) {
       info.copy(newInfo);
+    }
+    for(ReducerWorkerInfo worker : job.getReducers()) {
+      IMRNodeManager nm = NodeManagerFactory.nodeManagerFromSocketAddress(worker.getNodeManagerAddress());
+      if(nm != null) {
+        
+      }
+      else {
+        onReducerFailed(job, worker);
+      }
     }
   }
 
