@@ -38,6 +38,7 @@ def copy_files(remote, username, password, source_paths, rwd, dfs_dir):
     destination = destination + get_file_name(source_path);
     print "Destination file path: {0}".format(destination);
     sftp.put(source_path, destination);
+    sftp.chmod(destination, 0777);
 
   sftp.close();
 
