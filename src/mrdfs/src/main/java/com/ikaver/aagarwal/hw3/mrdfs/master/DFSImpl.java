@@ -105,7 +105,7 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
     FileMetadata metadata = this.filePathToMetadata.get(filePath);
     this.metadataLock.readLock().unlock();
     if(metadata != null) {
-      this.writeNewFile(metadata, numChunk, file);
+      success = this.writeNewFile(metadata, numChunk, file);
     }
     return success;
   }
