@@ -156,6 +156,7 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
   }
 
   public void onDataNodeFailed(SocketAddress addr) {
+    LOG.info("Data node at addr: " + addr + " failed.");
     this.dataNodesLock.readLock().lock();
     //list of nodes that are still working (we will replicate files on some of
     //this nodes).

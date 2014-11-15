@@ -23,6 +23,11 @@ public class SocketAddress implements Serializable {
   }
   
   @Override
+  public String toString() {
+    return String.format("[%s:%d]",hostname,port);
+  }
+  
+  @Override
   public boolean equals(Object o) {
     if(o == null) return false;
     if(!(o instanceof SocketAddress)) return false;
