@@ -47,13 +47,19 @@ public class JobFromJSONCreator {
     int numMappers = config.getInt(NUM_MAPPERS);
     int numReducers = config.getInt(NUM_REDUCERS);
     int recordSize = config.getInt(RECORD_SIZE);
+    
+    File jarFile = new File(bundlePath);
+    FileInputStream fis = new FileInputStream(jarFile);
+    byte[] data = new byte[(int)jarFile.length()];
+    fis.read(data);
+    fis.close();
         
     JobConfig job = new JobConfig();
         
     job.setJobName(jobName);
     job.setMasterIP(masterIP);
     job.setMasterPort(masterPort);
-    job.setJarFilePath(bundlePath);
+    job.setJarFile(data);
     job.setMapperClass(mapperClass);
     job.setReducerClass(reducerClass);
     job.setInputFilePath(inputFilePath);

@@ -24,7 +24,8 @@ public class JobValidatorImpl implements IJobValidator {
     try {
       validJob = job != null 
           && dfs.containsFile(job.getInputFilePath())
-          && dfs.containsFile(job.getJarFilePath())
+          && job.getJarFile() != null
+          && job.getJarFile().length > 0
           && job.getNumMappers() > 0
           && job.getNumReducers() > 0
           && job.getOutputFilePath() != null

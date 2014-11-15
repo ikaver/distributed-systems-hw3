@@ -91,7 +91,7 @@ IOnWorkCompletedHandler {
               0,                       //start record
               job.getRecordSize(),     //record size
               (int)FileUtil.getTotalRecords(job.getRecordSize(), metadata.getSizeOfFile())), //records in chunk, 
-              job.getJarFilePath(), 
+              job.getJarFile(), 
               job.getMapperClass()
           );
       chunks.add(work.getChunk());
@@ -114,7 +114,8 @@ IOnWorkCompletedHandler {
           i,
           mapperAddresses, /* input sources, socket addresses of mappers */
           chunks, /* Mapper chunks */
-          job.getOutputFilePath()
+          job.getOutputFilePath(),
+          job.getJarFile()
           );
       reducers.add(work);
     }
@@ -222,7 +223,7 @@ IOnWorkCompletedHandler {
     LOG.info(String.format("Mapper %s for job %d failed", 
         info.getNodeManagerAddress(), job.getJobID()));
     MapWorkDescription newWork = new MapWorkDescription(info.getJobID(), 
-        info.getChunk(), info.getJarFilePath(), info.getMapperClass());
+        info.getChunk(), info.getJarFile(), info.getMapperClass());
     HashSet<MapWorkDescription> workSet = new HashSet<MapWorkDescription>();
     workSet.add(newWork);
     Set<MapperWorkerInfo> newInfoSet = scheduler.runMappersForWork(workSet);
@@ -237,7 +238,8 @@ IOnWorkCompletedHandler {
     LOG.info(String.format("Reducer %s for job %d failed", 
         info.getNodeManagerAddress(), job.getJobID()));
     ReduceWorkDescription newWork = new ReduceWorkDescription(info.getJobID(), info.getReducerID(), 
-        info.getInputSources(), info.getMapperChunks(), info.getOutputFilePath());
+        info.getInputSources(), info.getMapperChunks(), info.getOutputFilePath(),
+        info.getJarFile());
     HashSet<ReduceWorkDescription> workSet = new HashSet<ReduceWorkDescription>();
     workSet.add(newWork);
     Set<ReducerWorkerInfo> newInfoSet = scheduler.runReducersForWork(workSet);

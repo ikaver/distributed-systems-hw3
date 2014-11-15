@@ -11,6 +11,7 @@ public class ReduceWorkDescription implements Serializable {
 
   private final int jobID;
   private final int reducerID;
+  private final byte [] jarFile;
   private final List<SocketAddress> inputSources;
   private final List<MapperChunk> mapperChunks;
   private final String outputFilePath;
@@ -18,7 +19,8 @@ public class ReduceWorkDescription implements Serializable {
   public ReduceWorkDescription(int jobID, int reducerID, 
       List<SocketAddress> inputSources, 
       List<MapperChunk> chunks /* Get the partition id of each input source */,
-      String outputFilePath) {
+      String outputFilePath,
+      byte [] jarFile) {
     if(inputSources == null) 
       throw new IllegalArgumentException("Input sources cannot be null");
     if(chunks == null) 
@@ -32,6 +34,7 @@ public class ReduceWorkDescription implements Serializable {
     this.inputSources = inputSources;
     this.mapperChunks = chunks;
     this.outputFilePath = outputFilePath;
+    this.jarFile = jarFile;
   }
 
   public int getJobID() {
@@ -40,6 +43,10 @@ public class ReduceWorkDescription implements Serializable {
 
   public int getReducerID() {
     return reducerID;
+  }
+  
+  public byte [] getJarFile() {
+    return jarFile;
   }
 
   public List<SocketAddress> getInputSources() {
