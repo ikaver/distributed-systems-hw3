@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -41,7 +42,7 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
   private Map<String, FileMetadata> filePathToMetadata;
   private ReadWriteLock dataNodesLock;
   private ReadWriteLock metadataLock;
-  private ScheduledExecutorService nodeTrackerService;
+  transient private ScheduledExecutorService nodeTrackerService;
   private int replicationFactor;
 
   @Inject
@@ -55,12 +56,13 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
     this.replicationFactor = replicationFactor;
     this.dataNodes = dataNodes;
     this.dataNodesLock = dataNodesLock;
+    this.metadataLock = new ReentrantReadWriteLock();
     //Start node tracker service (keeps track of node performance).
     this.nodeTrackerService = Executors.newScheduledThreadPool(1);
     DataNodeTracker tracker = new DataNodeTracker(dataNodes, dataNodesLock, this);
     this.nodeTrackerService.scheduleAtFixedRate(tracker, 0,
         Definitions.SCHEDULER_TIME_TO_CHECK_FOR_NODES_STATE, TimeUnit.SECONDS);
-    }
+  }
 
   public FileMetadata getMetadata(String file) throws RemoteException {
     this.metadataLock.readLock().lock();
@@ -162,7 +164,7 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
     Collections.shuffle(dataNodesList);
 
     List<Pair<FileMetadata, Integer>> filesThatNeedToBeReplicated = new ArrayList<Pair<FileMetadata, Integer>>();
-    
+
     //get all files that were were on the data node that failed.
     this.metadataLock.writeLock().lock();
     for(FileMetadata metadata : this.filePathToMetadata.values()) {
