@@ -3,13 +3,13 @@
 		"job-name" : "MyJob",
 		"master-ip" : "127.0.0.1",
 		"master-port" : 3001,
-		"bundle-path" : "/home/ankit/git/distributed-systems-hw3/src/common/target/common-1.0-SNAPSHOT.jar",
+		"bundle-path" : "/Users/Kaver/Courses/CMU/fall14/15640-ds/projects/hw3/src/common/target/common-1.0-SNAPSHOT.jar",
 		"map-class" : "com.ikaver.aagarwal.hw3.common.examples.WordCountMapper",
 		"reduce-class" : "com.ikaver.aagarwal.hw3.common.examples.WordCountReducer",
-		"input-file-path" : "lol.wtf",
+		"input-file-path" : "test.txt",
 		"output-file-path" : "op.txt",
 		"num-mappers" : 2,
 		"num-reducers" : 2,
-		"record-size" : 32
+		"record-size" : 7
 	}
 }
