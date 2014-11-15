@@ -24,7 +24,7 @@ public class MRMapTaskAttempt {
 
 		// TODO(ankit): Remove this!
 		ProcessBuilder builder = new ProcessBuilder("java", "-jar"
-				,"/tmp/mrmap-1.0-SNAPSHOT-jar-with-dependencies.jar", "-port", port + "");
+				,"mrmap-1.0-SNAPSHOT-jar-with-dependencies.jar", "-port", port + "");
 
 		try {
 			builder.start();
