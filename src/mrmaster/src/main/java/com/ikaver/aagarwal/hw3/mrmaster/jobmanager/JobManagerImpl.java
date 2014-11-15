@@ -177,15 +177,7 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
   }
 
   public void onAllMappersFinished(RunningJob job) {
-    for(ReducerWorkerInfo info : job.getReducers()) {
-      IMRNodeManager nm = NodeManagerFactory.nodeManagerFromSocketAddress(info.getNodeManagerAddress());
-      try {
-        nm.startReducerWork(job.getJobID(), info.getReducerID());
-      } catch (RemoteException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-    }
+
   }
 
   public void onAllReducersFinished(RunningJob job) {
