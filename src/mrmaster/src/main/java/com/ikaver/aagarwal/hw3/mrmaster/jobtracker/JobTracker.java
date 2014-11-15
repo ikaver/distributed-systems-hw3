@@ -2,10 +2,15 @@ package com.ikaver.aagarwal.hw3.mrmaster.jobtracker;
 
 import java.rmi.RemoteException;
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
 import com.ikaver.aagarwal.hw3.common.nodemanager.IMRNodeManager;
+import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
+import com.ikaver.aagarwal.hw3.common.workers.MapperChunk;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 import com.ikaver.aagarwal.hw3.mrmaster.jobmanager.RunningJob;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.MapperWorkerInfo;
@@ -89,6 +94,7 @@ public class JobTracker implements Runnable {
         else {
           try {
             info.setState(nm.getReducerState(info.getJobID(), info.getReducerID()));
+            this.updateMappersReferences(nm);
           } catch (RemoteException e) {
             info.setState(WorkerState.FAILED);
             LOG.warn("Failed to get nm state", e);
@@ -110,6 +116,17 @@ public class JobTracker implements Runnable {
     }
   }
 
+  private void updateMappersReferences(IMRNodeManager nm) throws RemoteException{
+    Set<MapperWorkerInfo> mappers = this.job.getMappers();
+    List<SocketAddress> mapperAddress = new ArrayList<SocketAddress>();
+    List<MapperChunk> chunks = new ArrayList<MapperChunk>();
+    for(MapperWorkerInfo mapper : mappers) {
+      mapperAddress.add(mapper.getNodeManagerAddress());
+      chunks.add(mapper.getChunk());
+    }
+    nm.updateMappersReferences(mapperAddress, chunks);
+  }
+  
 }
 
 
