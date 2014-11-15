@@ -57,17 +57,17 @@ public class FileUploader {
         int recordNum = 0;
         byte [] data = new byte[recordsPerChunk * recordSize];
         for(int i = 0; i < numChunks; ++i) {
+          System.out.printf("Uploading chunk %d of %d...\n", i+1, numChunks); 
           int len = recordSize * recordsPerChunk;
           if(i == numChunks-1) {
             len = (totalRecords - recordNum) * recordSize;
             data = new byte[len];
           }
-          System.out.printf("%d %d %d %d\n",numChunks, totalRecords, recordNum, len);
-          System.out.printf("LEN %d OFF %d TOTAL %d\n", len, recordNum*recordSize, size);
           fis.read(data, 0, len);
           dfs.saveFile(destinationPath, i, data);
           recordNum += recordsPerChunk;
         }
+        System.out.println("File uploaded successfully!");
       }
     } catch (RemoteException e) {
       System.out.println("Failed to communicate with DFS");

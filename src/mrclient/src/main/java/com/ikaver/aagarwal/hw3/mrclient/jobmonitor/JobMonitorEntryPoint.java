@@ -21,7 +21,6 @@ public class JobMonitorEntryPoint {
     catch (ParameterException ex) {
       argsParser.usage();
       System.exit(-1);
-      //TODO: quit program here
     }
     
     SocketAddress masterAddr = new SocketAddress(host,port);
