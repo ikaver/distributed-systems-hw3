@@ -22,6 +22,7 @@ import com.ikaver.aagarwal.hw3.common.dfs.FileMetadata;
 import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.dfs.IDataNode;
+import com.ikaver.aagarwal.hw3.common.objects.KeyValuePair;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.mrdfs.datanode.DataNodeFactory;
 
@@ -147,13 +148,13 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
     this.dataNodesLock.readLock().unlock();
     Collections.shuffle(dataNodesList);
 
-    Set<String> filesThatNeedToBeReplicated = new HashSet<String>();
+   // List<Pair> filesThatNeedToBeReplicated = new HashSet<String>();
     this.dataNodesLock.writeLock().lock();
     for(FileMetadata metadata : this.filePathToMetadata.values()) {
       for(int numChunk : metadata.getNumChunkToAddr().keySet()) {
         Set<SocketAddress> nodesForChunk = metadata.getNumChunkToAddr().get(numChunk);
         if(nodesForChunk.contains(addr)) {
-
+          
         }
       }
     }
