@@ -11,22 +11,22 @@ public class MapWorkDescription implements Serializable {
 
 	// Path of the jar file on DFS which contains user
 	// written mapper and reducer classes.
-	private final String jarPath;
+	private final byte [] jarFile;
 
 	// Fully qualified name of the mapper class.
 	private final String mapperClass;
 
-	public MapWorkDescription(int jobID, MapperChunk chunk, String jarPath,
+	public MapWorkDescription(int jobID, MapperChunk chunk, byte [] jarFile,
 			String mapperClass) {
 		if (chunk == null)
 			throw new IllegalArgumentException("Chunk cannot be null");
-		if (jarPath == null)
-			throw new IllegalArgumentException("Jar path cannot be null");
+		if (jarFile == null)
+			throw new IllegalArgumentException("Jar file cannot be null");
 		if (mapperClass == null)
 			throw new IllegalArgumentException("Mapper class cannot be null");
 		this.jobID = jobID;
 		this.chunk = chunk;
-		this.jarPath = jarPath;
+		this.jarFile = jarFile;
 		this.mapperClass = mapperClass;
 	}
 
@@ -38,8 +38,8 @@ public class MapWorkDescription implements Serializable {
 		return chunk;
 	}
 
-	public String getJarPath() {
-		return jarPath;
+	public byte [] getJarFile() {
+		return jarFile;
 	}
 
 	public String getMapperClass() {

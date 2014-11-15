@@ -12,7 +12,7 @@ public class JobConfig implements Serializable {
   private String outputFilePath;
   private int recordSize;
   
-  private String jarFilePath;
+  private byte [] jarFile;
   private String mapperClass;
   private String reducerClass;
   
@@ -42,8 +42,8 @@ public class JobConfig implements Serializable {
     return recordSize;
   }
   
-  public String getJarFilePath() {
-    return jarFilePath;
+  public byte [] getJarFile() {
+    return jarFile;
   }
   
   public String getMapperClass() {
@@ -86,8 +86,8 @@ public class JobConfig implements Serializable {
     this.recordSize = recordSize;
   }
   
-  public void setJarFilePath(String jarFilePath) {
-    this.jarFilePath = jarFilePath;
+  public void setJarFile(byte [] jarFile) {
+    this.jarFile = jarFile;
   }
   
   public void setMapperClass(String mapperClass) {

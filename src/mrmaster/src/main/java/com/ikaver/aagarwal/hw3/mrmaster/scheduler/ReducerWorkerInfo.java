@@ -14,17 +14,24 @@ public class ReducerWorkerInfo extends WorkerInfo {
   private final List<SocketAddress> inputSources;
   private final List<MapperChunk> mapperChunks;
   private final String outputFilePath;
+  private final byte [] jarFile;
 
   public ReducerWorkerInfo(int jobID, SocketAddress nodeManagerAddr, 
       WorkerState state, int reducerID,
       List<SocketAddress> inputSources,
       List<MapperChunk> mapperChunks,
-      String outputFilePath) {
+      String outputFilePath,
+      byte [] jarFile) {
     super(jobID, nodeManagerAddr, state);
     this.reducerID = reducerID;
     this.inputSources = inputSources;
     this.mapperChunks = mapperChunks;
     this.outputFilePath = outputFilePath;
+    this.jarFile = jarFile;
+  }
+
+  public byte[] getJarFile() {
+    return jarFile;
   }
 
   public List<SocketAddress> getInputSources() {
