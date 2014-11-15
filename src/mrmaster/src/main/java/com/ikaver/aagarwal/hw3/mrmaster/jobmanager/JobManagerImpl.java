@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import com.ikaver.aagarwal.hw3.common.config.FinishedJob;
 import com.ikaver.aagarwal.hw3.common.config.JobConfig;
 import com.ikaver.aagarwal.hw3.common.config.JobInfoForClient;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
@@ -61,7 +62,7 @@ IOnWorkCompletedHandler {
   }
 
   public JobInfoForClient createJob(JobConfig job) throws RemoteException {
-    LOG.info("received a job" + job);
+    LOG.info("Received a job" + job);
 
     if (job == null || !jobValidator.isJobValid(job)) {
       LOG.info("Received invalid job: " + job + " Ignoring...");
@@ -146,6 +147,12 @@ IOnWorkCompletedHandler {
       jobsInfo.add(jobInfo);
     }
     return jobsInfo;
+  }
+  
+
+  public List<FinishedJob> finishedJobs() throws RemoteException {
+    List<FinishedJob> jobs = jobsState.finishedJobs();
+    return jobs;
   }
 
   public boolean terminate(int jobID) throws RemoteException {
