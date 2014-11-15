@@ -31,10 +31,12 @@ public class DataNodeImpl extends UnicastRemoteObject implements IDataNode {
 
   public void saveFile(String filePath, int numChunk, byte[] data)
       throws IOException, RemoteException {
+    String filePathForFile = filePathForFile(filePath, numChunk);
     File file = new File(filePathForFile(filePath, numChunk));
     FileOutputStream fos = new FileOutputStream(file);
     fos.write(data);
     fos.close();    
+    Runtime.getRuntime().exec("chmod 777 " + filePathForFile);
   }
   
   public boolean alive() {
