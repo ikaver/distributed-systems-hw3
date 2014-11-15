@@ -149,7 +149,7 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
     this.dataNodesLock.readLock().unlock();
     Collections.shuffle(dataNodesList);
     Set<SocketAddress> subset = new HashSet<SocketAddress>();
-    for(int i = 0; i < replicationFactor; ++i) {
+    for(int i = 0; i < Math.min(replicationFactor, dataNodesList.size()); ++i) {
       subset.add(dataNodesList.get(i));
     }
     return subset;
