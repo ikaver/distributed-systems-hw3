@@ -7,6 +7,7 @@ import java.rmi.registry.LocateRegistry;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 
@@ -63,11 +64,14 @@ public class MRMasterEntryPoint {
 		}
 	}
 
-	private static Set<SocketAddress> getNodes(List<String> slaves) {
+	private static Set<SocketAddress> getNodes(String slaves) {
+		StringTokenizer tokenizer = new StringTokenizer(slaves, ",");
+		
 		Set<SocketAddress> nodes = new HashSet<SocketAddress>();
-		for (String slave : slaves) {
-			SocketAddress address = new SocketAddress(slave,
+		while (tokenizer.hasMoreTokens()) {
+			SocketAddress address = new SocketAddress(tokenizer.nextToken(),
 					Definitions.NODE_MANAGER_SERVICE_PORT);
+			LOG.info("Adding node with ip address:" + address.getHostname());
 			nodes.add(address);
 		}
 		return nodes;

@@ -5,13 +5,17 @@ import paramiko;
 def get_file_name(path):
   return path.split("/")[-1];
 
+def create_dir(sftp, dir_path): 
+  # Create the remote directory, if it doesn't exist.
+  try:
+    sftp.mkdir(dir_path);
+  except IOError:  
+    print "Working directory exists. Skipping..";
+
 def copy_files(remote, username, password, source_paths, rwd, dfs_dir):
   """ Copies a bunch of files from host to the remote machine. 
       The files are copied inside the directory pointed by the rwd (which
       is an abbreviation for remote working directory)"""
-
-  # Remove this.
-  source_paths.append('run.py');
 
   ssh = paramiko.SSHClient();
 
@@ -22,17 +26,13 @@ def copy_files(remote, username, password, source_paths, rwd, dfs_dir):
 
   sftp = ssh.open_sftp()
 
-  # Create the remote directory, if it doesn't exist.
-  try:
-    sftp.mkdir(rwd);
-    sftp.mkdir(dfs_dir);
-  except IOError:  
-    print "Working directory exists. Skipping..";
+  create_dir(sftp, rwd);
+  create_dir(sftp, dfs_dir);
 
   for source_path in source_paths:
     destination = rwd;
 
-    if (not source_path.startswith("/")):
+    if (not rwd.startswith("/")):
       destination += "/";
 
     destination = destination + get_file_name(source_path);
@@ -58,8 +58,15 @@ def set_up_args():
       help='File containing list of IPs for running slave instances, each of which'
            + ' is separated by a newline character');
   parser.add_argument("--slave_binary_path", type=str);
-  # Ports at which the service runs. Assumed to be same for all master and slaves
-  parser.add_argument("--port", type=int);
+  parser.add_argument("--mr_map_binary_path", type=str);
+
+  parser.add_argument("--master_port", type=int, default=3001);
+  parser.add_argument("--slave_port", type=int, default=3000);
+  
+  parser.add_argument("--kill_all", type=bool, default=False);
+
+  parser.add_argument("--skip_copy", type=bool, default=False);
+
   parser.add_argument("--dfs_base_path", type=str, default='/tmp/mrikav-ank-dfs/');
   parser.add_argument("--rwd", type=str, help='Remote server working directory i.e.'
      + 'the directory into which the files have to be copied.');
@@ -85,7 +92,7 @@ def copy_slave_binary(args, username, password):
     ip = ip.strip();
     print "Copying binary files to the MR slaves: {0}".format(ip);
     copy_files(ip, username, password, [args.slave_binary_path,
-        'run_slave.sh'], args.rwd, args.dfs_base_path);
+        'run_slave.sh', args.mr_map_binary_path], args.rwd, args.dfs_base_path);
 
 def setup(rwd, setupfile, remote, username, password, fileArgs):
   """Makes an ssh connection and runs the setup script on the remote
@@ -99,34 +106,53 @@ def setup(rwd, setupfile, remote, username, password, fileArgs):
   # Change to a new directory and run the shell script.
   cmd = 'cd {0}; sh {1} {2}'.format(rwd, setupfile, fileArgs);
   
-  print "Running command {0} on the remote server.".format(cmd);
+  print "Running command {0} on the remote server{1}.".format(cmd, remote);
  
   ssh.exec_command(cmd); 
   
   ssh.close(); 
 
+def kill(remote, username, password):
+  ssh = paramiko.SSHClient();
+  ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy());
+  ssh.connect(remote, username=username, password=password);
+  cmd = "pkill -f 'java -jar'";
+  ssh.exec_command(cmd);
+  ssh.close();  
+
 def setup_master(args, username, password):
-  script_args= "{0} {1}".format(args.port, args.slave_ips);
+  csv_list = ','.join(str(ip) for ip in get_ips_from_file(args.slave_ips));
+  script_args= "{0} {1}".format(args.master_port, csv_list);
   setup(args.rwd, 'run_master.sh', args.master_ip, username, password, script_args);
 
 def setup_slaves(args, username, password):
-  script_args = "{0} {1}".format(args.port, args.master_ip); 
   ips = get_ips_from_file(args.slave_ips);
   for ip in ips:
-    setup(args.rwd, 'run_slaves.sh', ip, username, password, script_args);
+    script_args = "{0} {1} {2}".format(args.slave_port,args.master_ip , args.master_port); 
+    setup(args.rwd, 'run_slave.sh', ip, username, password, script_args);
  
 def main():
-  args = set_up_args();
-   
+  args = set_up_args(); 
   [username, password] = get_login_credentials();
 
-  copy_master_binary(args, username, password);
-  copy_slave_binary(args, username, password);
-  
-  setup_master(args, username, password);
-  setup_slaves(args, username, password);
-  
-  print "** Copied relevant binaries **";
+  if (args.kill_all):
+    print "** Terminating the system **";
+    kill(args.master_ip, username, password);
+    ips = get_ips_from_file(args.slave_ips);
+    for ip in ips:
+      kill(ip, username, password);
+    print "** System termination successful **";  
+  else:
+    if not args.skip_copy:
+      copy_master_binary(args, username, password);
+      copy_slave_binary(args, username, password);
+      print "** Copied relevant binaries **";
+    else:
+      print "** Skipping copy step **";
+
+    setup_slaves(args, username, password);
+    setup_master(args, username, password);
+    print "** The system is up and running **";
 
 if __name__ == "__main__":
    main(); 
