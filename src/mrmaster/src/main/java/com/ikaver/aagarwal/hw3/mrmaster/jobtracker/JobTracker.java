@@ -3,6 +3,8 @@ package com.ikaver.aagarwal.hw3.mrmaster.jobtracker;
 import java.rmi.RemoteException;
 import java.security.InvalidParameterException;
 
+import org.apache.log4j.Logger;
+
 import com.ikaver.aagarwal.hw3.common.nodemanager.IMRNodeManager;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 import com.ikaver.aagarwal.hw3.mrmaster.jobmanager.RunningJob;
@@ -11,6 +13,8 @@ import com.ikaver.aagarwal.hw3.mrmaster.scheduler.NodeManagerFactory;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.ReducerWorkerInfo;
 
 public class JobTracker implements Runnable {
+  
+  private static final Logger LOG = Logger.getLogger(JobTracker.class);
 
   private RunningJob job;
   private IOnWorkerFailedHandler onWorkerFailedHandler;
@@ -51,8 +55,8 @@ public class JobTracker implements Runnable {
           try {
             info.setState(nm.getMapperState(info.getJobID(), info.getChunk().getPartitionID()));
           } catch (RemoteException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            info.setState(WorkerState.FAILED);
+            LOG.warn("Failed to get nm state", e);
           }
         }
       }
@@ -68,6 +72,7 @@ public class JobTracker implements Runnable {
     if(job.getAmountOfMappers() == job.getAmountOfFinishedMappers()
         && !notifiedMappersCompleted) {
       this.onWorkCompletedHandler.onAllMappersFinished(job);
+      this.notifiedMappersCompleted = true;
     }
   }
 
@@ -85,8 +90,8 @@ public class JobTracker implements Runnable {
           try {
             info.setState(nm.getReducerState(info.getJobID(), info.getReducerID()));
           } catch (RemoteException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            info.setState(WorkerState.FAILED);
+            LOG.warn("Failed to get nm state", e);
           }
         }
       }
@@ -101,6 +106,7 @@ public class JobTracker implements Runnable {
     if(job.getAmountOfReducers() == job.getAmountOfFinishedReducers()
         && !notifiedReducersCompleted) {
       this.onWorkCompletedHandler.onAllReducersFinished(job);
+      this.notifiedReducersCompleted = true;
     }
   }
 
