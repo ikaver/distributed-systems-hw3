@@ -57,6 +57,10 @@ public class MRMasterModule extends AbstractModule {
     //Job manager setup
     JobsState jobsState = new JobsState();
     bind(JobsState.class).toInstance(jobsState);
+    bind(new TypeLiteral<Set<SocketAddress>>(){})
+    .annotatedWith(Names.named(Definitions.NODE_MANAGER_SET_ANNOTATION))
+    .toInstance(nodes);   
+
     
     //Scheduler setup
     Map<SocketAddress, NodeInformation> nodeInfo = new HashMap<SocketAddress, NodeInformation>();
