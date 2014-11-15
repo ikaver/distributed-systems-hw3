@@ -8,7 +8,15 @@ import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 
 public interface IMapInstanceRunner extends Remote {
 
-	public void runMapInstance(MapWorkDescription input) throws RemoteException;
+	/**
+	 * Run the map instance.
+	 * @param input
+	 * @param localFilePath is the path of the local file on which
+	 *    the mapper should act upon.
+	 * @throws RemoteException
+	 */
+	public void runMapInstance(MapWorkDescription input,
+			String localFilePath) throws RemoteException;
 
 	/**
 	 * Enum indicating state of the mapper task.

@@ -1,5 +1,6 @@
 package com.ikaver.aagarwal.hw3.common.examples;
 
+import com.ikaver.aagarwal.hw3.common.mrmap.ICollector;
 import com.ikaver.aagarwal.hw3.common.workers.IMapper;
 
 /**
@@ -7,9 +8,8 @@ import com.ikaver.aagarwal.hw3.common.workers.IMapper;
  */
 public class WordCountMapper implements IMapper {
 
-	public void map() {
-	  //TODO: implement
-		System.out.println("map function called.");
+	public void map(String record, ICollector collector) {
+		collector.collect(record, "1");
 	}
 
 }
