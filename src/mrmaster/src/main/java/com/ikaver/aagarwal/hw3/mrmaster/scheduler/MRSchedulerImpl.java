@@ -15,6 +15,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import org.apache.log4j.Logger;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.FileMetadata;
@@ -25,6 +26,7 @@ import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.ReduceWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 
+@Singleton
 public class MRSchedulerImpl implements IMRScheduler {
 
   private IDFS dfs;
@@ -41,7 +43,7 @@ public class MRSchedulerImpl implements IMRScheduler {
       Map<SocketAddress, NodeInformation> availableNodes,
       @Named(Definitions.SCHEDULER_NODES_INFORMATION_LOCK)ReadWriteLock availableNodesLock,
       @Named(Definitions.NODE_MANAGER_SET_ANNOTATION) Set<SocketAddress> allNodes,
-      @Named(Definitions.DFS_SERVICE)IDFS dfs) {
+      IDFS dfs) {
     this.nodeInfo = availableNodes;
     this.nodeInfoLock = availableNodesLock;
     this.dfs = dfs;
