@@ -65,7 +65,9 @@ public class MRSchedulerImpl implements IMRScheduler {
       worker = nodeManagerForMapperWork(workToDo);
       if(worker != null) {
         try {
+          LOG.info("Will ask mapper to start work: " + worker.sa);
           worker.nm.doMap(workToDo);
+          LOG.info("Mapper started working: " + worker.sa);
           MapperWorkerInfo workerInfo = new MapperWorkerInfo(
               workToDo.getJobID(),
               worker.sa,
@@ -89,6 +91,7 @@ public class MRSchedulerImpl implements IMRScheduler {
   }
 
   private MapperWorkerInfo mapperWorkerInfoForFailure(MapWorkDescription workToDo) {
+    LOG.info("Failed to launch mapper. Creating failed worker for now");
     MapperWorkerInfo workerInfo = new MapperWorkerInfo(
         workToDo.getJobID(),
         null,
@@ -107,7 +110,9 @@ public class MRSchedulerImpl implements IMRScheduler {
       NodeManagerWithSocketAddress worker = nodeManagerForReducer();
       if(worker != null) {
         try {
+          LOG.info("Will ask reducer to start work: " + worker.sa);
           worker.nm.doReduce(workToDo);
+          LOG.info("Reducer started working: " + worker.sa);
           ReducerWorkerInfo workerInfo = new ReducerWorkerInfo(
               workToDo.getJobID(),
               worker.sa,
