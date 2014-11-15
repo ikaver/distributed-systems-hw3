@@ -26,6 +26,7 @@ public class JobMonitorCommandHandlerFactory implements ICommandHandlerFactory {
   public JobMonitorCommandHandlerFactory(JobMonitor monitor, 
       @Named(Definitions.MASTER_SOCKET_ADDR_ANNOTATION) SocketAddress masterAddr) {
     this.monitor = monitor;
+    this.masterSocketAddress = masterAddr;
   }
 
   public Map<String, ICommandHandler> getCommandHandlers() {

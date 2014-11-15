@@ -5,12 +5,18 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.IDataNode;
 
-public class DataNodeImpl implements IDataNode {
-  
+public class DataNodeImpl extends UnicastRemoteObject implements IDataNode {
+
+  protected DataNodeImpl() throws RemoteException {
+    super();
+  }
+
+  private static final long serialVersionUID = -3845024306730355403L;
   private static final String CHUNK_NUM_SEPARATOR = "______";
 
   public byte[] getFile(String filePath, int numChunk) throws IOException,

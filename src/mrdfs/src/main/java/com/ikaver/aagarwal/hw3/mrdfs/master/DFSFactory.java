@@ -25,6 +25,8 @@ public class DFSFactory {
         Definitions.DFS_SERVICE
         );
     try {
+      Object obj = Naming.lookup(url);
+      System.out.println("LOOKUP " + url + " " + obj);
       return (IDFS) Naming.lookup (url);
     } catch (MalformedURLException e) {
       LOG.info("Bad URL", e);

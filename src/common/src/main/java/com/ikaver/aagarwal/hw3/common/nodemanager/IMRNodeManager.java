@@ -34,14 +34,14 @@ public interface IMRNodeManager extends Remote {
 	 * Terminates all workers working for job with jobID (jobID).
 	 * @param jobID
 	 */
-	public boolean terminateWorkers(int jobID);
+	public boolean terminateWorkers(int jobID) throws RemoteException;
 	
 	/**
 	 * Starts the work of the reducer. Should be called after all mappers finished.
 	 * @param jobID
 	 * @param reducerID
 	 */
-	public void startReducerWork(int jobID, int reducerID);
+	public void startReducerWork(int jobID, int reducerID) throws RemoteException;
 
 	/**
 	 * 
@@ -51,25 +51,25 @@ public interface IMRNodeManager extends Remote {
 	 * @return
 	 */
 	public <K extends Serializable & Comparable<K>, V extends Serializable> List<MapperOutput<K, V>> dataForJob(
-			int jobID, MapperChunk chunk, int reducerID);
+			int jobID, MapperChunk chunk, int reducerID) throws RemoteException;
 
 	/**
 	 * Returns the status and capacity of number of mappers and reducers.
 	 * @return
 	 */
-	public NodeState getNodeState();
+	public NodeState getNodeState() throws RemoteException;
 	
 	/**
 	 * Returns an enum indicating state of the mapper.
 	 * @param jobId
 	 * @param partitionId
 	 */
-	public WorkerState getMapperState(int jobId, int partitionId);
+	public WorkerState getMapperState(int jobId, int partitionId) throws RemoteException;
 
 	/**
 	 * Returns an enum indicating state of the reducer.
 	 * @param jobId
 	 * @param reducerId
 	 */
-	public WorkerState getReducerState(int jobId, int reducerId);
+	public WorkerState getReducerState(int jobId, int reducerId) throws RemoteException;
 }

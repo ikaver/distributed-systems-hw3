@@ -48,11 +48,11 @@ public class MRNodeManagerEntryPoint {
 		Naming.rebind(String.format("//:%d/" + Definitions.MR_NODE_MANAGER_SERVICE, port), manager);
     Naming.rebind(String.format("//:%d/" + Definitions.DATA_NODE_SERVICE, port), dataNode);
 		
-		MapWorkDescription input = new  MapWorkDescription(
-				0, null, "/home/ankit/git/distributed-systems-hw3/src/common/target/common-1.0-SNAPSHOT-jar-with-dependencies.jar",
-				"com.ikaver.aagarwal.hw3.common.examples.WordCountMapper");
+		//MapWorkDescription input = new  MapWorkDescription(
+		//		0, null, "/home/ankit/git/distributed-systems-hw3/src/common/target/common-1.0-SNAPSHOT-jar-with-dependencies.jar",
+		//		"com.ikaver.aagarwal.hw3.common.examples.WordCountMapper");
 
-		manager.doMap(input);
+		//manager.doMap(input);
 
 		LOGGER.info(String.format("MR Task manager is now running at port %d", settings.getPort()));
 	}

@@ -1,22 +1,11 @@
 package com.ikaver.aagarwal.hw3.mrclient.jobmonitor.commandhandler;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.rmi.RemoteException;
-
-import org.apache.log4j.Logger;
-
 import com.ikaver.aagarwal.hw3.common.commandhandler.ICommandHandler;
-import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.mrclient.fileuploader.FileUploader;
-import com.ikaver.aagarwal.hw3.mrdfs.master.DFSFactory;
 
 public class UploadFileCommandHandler implements ICommandHandler {
-  
-  private static final Logger LOG = Logger.getLogger(UploadFileCommandHandler.class);
-  
+    
   private SocketAddress masterSocketAddr;
   
   public UploadFileCommandHandler(SocketAddress masterAddr) {

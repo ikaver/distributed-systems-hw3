@@ -1,5 +1,6 @@
 package com.ikaver.aagarwal.hw3.mrmaster.jobtracker;
 
+import java.rmi.RemoteException;
 import java.security.InvalidParameterException;
 
 import com.ikaver.aagarwal.hw3.common.nodemanager.IMRNodeManager;
@@ -47,7 +48,12 @@ public class JobTracker implements Runnable {
           info.setState(WorkerState.FAILED);
         }
         else {
-          info.setState(nm.getMapperState(info.getJobID(), info.getChunk().getPartitionID()));
+          try {
+            info.setState(nm.getMapperState(info.getJobID(), info.getChunk().getPartitionID()));
+          } catch (RemoteException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
         }
       }
       else if(info.getState() == WorkerState.FAILED) {
@@ -76,7 +82,12 @@ public class JobTracker implements Runnable {
           info.setState(WorkerState.FAILED);
         }
         else {
-          info.setState(nm.getReducerState(info.getJobID(), info.getReducerID()));
+          try {
+            info.setState(nm.getReducerState(info.getJobID(), info.getReducerID()));
+          } catch (RemoteException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
         }
       }
       else if(info.getState() == WorkerState.FAILED) {

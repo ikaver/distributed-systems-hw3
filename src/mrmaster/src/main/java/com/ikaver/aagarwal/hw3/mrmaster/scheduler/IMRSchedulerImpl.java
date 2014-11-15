@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.nodemanager.IMRNodeManager;
@@ -25,6 +26,7 @@ public class IMRSchedulerImpl implements IMRScheduler {
   private static final int AMOUNT_RETRIES = 5;
   private static final Logger LOG = Logger.getLogger(IMRSchedulerImpl.class);
   
+  @Inject
   public IMRSchedulerImpl(
       @Named(Definitions.NODE_MANAGER_SET_ANNOTATION)Set<SocketAddress> nodes) {
     this.workerNodes = nodes;

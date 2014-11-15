@@ -4,7 +4,7 @@ public class FileUtil {
   
   public static int numChunksForFile(int sizeOfChunk, int recordSize, long totalFileSize) {
     int recordsInChunk = numRecordsPerChunk(sizeOfChunk, recordSize);
-    int numChunks = (int)(Math.ceil(totalFileSize / (double)(recordsInChunk)));
+    int numChunks = (int)(Math.ceil(totalFileSize / (double)(recordsInChunk * recordSize)));
     return numChunks;
   }
   

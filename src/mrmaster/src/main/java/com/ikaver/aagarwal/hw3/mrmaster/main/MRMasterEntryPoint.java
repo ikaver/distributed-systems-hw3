@@ -44,12 +44,14 @@ public class MRMasterEntryPoint {
     
     //TODO: get nodes somehow
     HashSet<SocketAddress> nodes = new HashSet<SocketAddress>();
-    
+    nodes.add(new SocketAddress("ghc28.ghc.andrew.cmu.edu", 3000));
+    nodes.add(new SocketAddress("ghc30.ghc.andrew.cmu.edu", 3000));
+    nodes.add(new SocketAddress("ghc29.ghc.andrew.cmu.edu", 3000));
+
     
     Injector injector = Guice.createInjector(new MRMasterModule(nodes));
     IJobManager jobManager = injector.getInstance(IJobManager.class);
     IDFS dfs = injector.getInstance(IDFS.class);
-    
     //Start MR Master services
     try {
       Naming.rebind(String.format("//:%d/%s", port, 

@@ -30,7 +30,7 @@ import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
  */
 public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeManager  {
 
-	protected MRNodeManagerImpl() throws RemoteException {
+	public MRNodeManagerImpl() throws RemoteException {
 		super();
 	}
 

@@ -21,6 +21,7 @@ public class FileUploader {
   public static boolean uploadFile(SocketAddress dfsAddr, String filePath, String destinationPath, int recordSize) {
     IDFS dfs = DFSFactory.dfsFromSocketAddress(dfsAddr);
     if(dfs == null) {
+      System.out.println("NULL");
       System.out.println("Failed to communicate with DFS");
       return false;
     }
@@ -35,7 +36,7 @@ public class FileUploader {
     }
     long size = file.length();
     if(size % recordSize != 0) {
-      System.out.println("Record size should be a divisor of total file size");
+      System.out.println("Record size should be a divisor of total file size" + size + " " + recordSize);
       return false;
     }
     
@@ -49,7 +50,7 @@ public class FileUploader {
     }
     
     try {
-      if(dfs.createFile(filePath, recordSize, size)) {
+      if(dfs.createFile(destinationPath, recordSize, size)) {
         int numChunks = FileUtil.numChunksForFile(Definitions.SIZE_OF_CHUNK, recordSize, size);
         int recordsPerChunk = FileUtil.numRecordsPerChunk(Definitions.SIZE_OF_CHUNK, recordSize);
         int totalRecords = (int)FileUtil.getTotalRecords(recordSize, size);
@@ -61,8 +62,10 @@ public class FileUploader {
             len = (totalRecords - recordNum) * recordSize;
             data = new byte[len];
           }
-          fis.read(data, recordNum * recordSize, len);
-          dfs.saveFile(filePath, i, data);
+          System.out.printf("%d %d %d %d\n",numChunks, totalRecords, recordNum, len);
+          System.out.printf("LEN %d OFF %d TOTAL %d\n", len, recordNum*recordSize, size);
+          fis.read(data, 0, len);
+          dfs.saveFile(destinationPath, i, data);
           recordNum += recordsPerChunk;
         }
       }

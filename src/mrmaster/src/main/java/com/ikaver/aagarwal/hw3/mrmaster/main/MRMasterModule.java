@@ -10,6 +10,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
+import com.ikaver.aagarwal.hw3.common.dfs.FileMetadata;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
@@ -35,11 +36,11 @@ public class MRMasterModule extends AbstractModule {
     
     //Master DFS setup
     ReadWriteLock dfsLock = new ReentrantReadWriteLock();
-    HashMap<String, Set<SocketAddress>> dfsMap = new HashMap<String, Set<SocketAddress>>();
+    HashMap<String, FileMetadata> dfsMap = new HashMap<String, FileMetadata>();
     bind(ReadWriteLock.class)
       .annotatedWith(Names.named(Definitions.DFS_MAP_LOCK_ANNOTATION))
       .toInstance(dfsLock);
-    bind(new TypeLiteral<Map<String, Set<SocketAddress>>>(){})
+    bind(new TypeLiteral<Map<String, FileMetadata>>(){})
       .annotatedWith(Names.named(Definitions.DFS_MAP_FILE_TO_METADATA_ANNOTATION))
       .toInstance(dfsMap);
     bind(new TypeLiteral<Set<SocketAddress>>(){})
