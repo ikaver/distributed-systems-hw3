@@ -65,4 +65,6 @@ public interface IMRNodeManager extends Remote {
 	 * @param reducerId
 	 */
 	public WorkerState getReducerState(int jobId, int reducerId) throws RemoteException;
+	
+	public int getAvailableSlots() throws RemoteException;
 }
