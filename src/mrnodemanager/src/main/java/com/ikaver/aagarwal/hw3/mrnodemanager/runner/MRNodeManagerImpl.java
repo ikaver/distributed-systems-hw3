@@ -222,4 +222,8 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 	public void startReducerWork(int jobID, int reducerID) {
 		throw new UnsupportedOperationException("Not yet implemented :(");
 	}
+
+  public int getAvailableSlots() throws RemoteException {
+    throw new UnsupportedOperationException("Not yet implemented :(");
+  }
 }
