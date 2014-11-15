@@ -53,6 +53,8 @@ public class FileUploader {
         int recordsPerChunk = FileUtil.numRecordsPerChunk(Definitions.SIZE_OF_CHUNK, recordSize);
         int totalRecords = (int)FileUtil.getTotalRecords(recordSize, size);
         int recordNum = 0;
+        
+        
         byte [] data = new byte[recordsPerChunk * recordSize];
         for(int i = 0; i < numChunks; ++i) {
           System.out.printf("Uploading chunk %d of %d...\n", i+1, numChunks); 
@@ -62,11 +64,17 @@ public class FileUploader {
             data = new byte[len];
           }
           fis.read(data, 0, len);
-          dfs.saveFile(destinationPath, i, data);
+          if(!dfs.saveFile(destinationPath, i, data)) {
+            System.out.println("Failed to upload chunk of file");
+            return false;
+          }
           recordNum += recordsPerChunk;
         }
         System.out.println("File uploaded successfully!");
       }
+      else {
+        System.out.println("Failed to create file on DFS, it may already exist");
+      } 
     } catch (RemoteException e) {
       System.out.println("Failed to communicate with DFS");
       LOG.warn("Failed to communicate to DFS", e);
