@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import com.ikaver.aagarwal.hw3.common.config.FinishedJob;
 import com.ikaver.aagarwal.hw3.common.config.JobConfig;
 import com.ikaver.aagarwal.hw3.common.config.JobInfoForClient;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
@@ -49,6 +50,19 @@ public class JobMonitor {
       jobs = manager.listJobs();
     } catch (RemoteException e) {
       LOG.info("Failed listing jobs", e);
+    }
+    return jobs;
+  }
+  
+  public List<FinishedJob> listFinishedJobs() {
+    IJobManager manager = this.factory.getJobManager(masterAddr);
+    if(manager == null) return null;
+
+    List<FinishedJob> jobs = null;
+    try {
+      jobs = manager.finishedJobs();
+    } catch (RemoteException e) {
+      LOG.info("Failed getting finished jobs", e);
     }
     return jobs;
   }

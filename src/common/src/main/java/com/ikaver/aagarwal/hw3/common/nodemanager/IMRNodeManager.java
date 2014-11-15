@@ -5,6 +5,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.MapperChunk;
 import com.ikaver.aagarwal.hw3.common.workers.MapperOutput;
@@ -29,6 +30,9 @@ public interface IMRNodeManager extends Remote {
 	 * @throws RemoteException
 	 */
 	public boolean doReduce(ReduceWorkDescription input) throws RemoteException;
+	
+	public void updateMappersReferences(List<SocketAddress> mapperAddr, 
+	    List<MapperChunk> chunks) throws RemoteException;
 	
 	/**
 	 * Terminates all workers working for job with jobID (jobID).

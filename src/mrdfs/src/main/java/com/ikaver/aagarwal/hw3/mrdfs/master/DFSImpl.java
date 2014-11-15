@@ -123,6 +123,12 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
         dataNodesForFile);
     if(saveSuccessful) {
       metadata.getNumChunkToAddr().put(numChunk, dataNodesForFile);
+      LOG.warn(String.format("Saved file (%s %d) successfully", 
+          metadata.getFileName(), numChunk));
+    }
+    else {
+      LOG.warn(String.format("Failed to save file (%s %d)", 
+          metadata.getFileName(), numChunk));
     }
     return saveSuccessful;
   }
@@ -133,7 +139,11 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
       IDataNode dataNode = DataNodeFactory.dataNodeFromSocketAddress(addr);
       if(dataNode != null) {
         try {
+          LOG.info(String.format("Will send file: (%s, %d) to data node %s",
+              metadata.getFileName(), numChunk, addr));
           dataNode.saveFile(metadata.getFileName(), numChunk, file);
+          LOG.info(String.format("File (%s, %d) was sent to data node %s",
+              metadata.getFileName(), numChunk, addr));
           savedAtLeastInOneDataNode = true;
         } catch (IOException e) {
           LOG.warn("Failed to write file on data node", e);
