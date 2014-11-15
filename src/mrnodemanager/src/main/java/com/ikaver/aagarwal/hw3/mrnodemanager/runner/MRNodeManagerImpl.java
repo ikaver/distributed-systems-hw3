@@ -82,6 +82,9 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 	// TODO(ankit): Return a failure error code.
 	@SuppressWarnings("resource")
 	public boolean doMap(MapWorkDescription input) {
+		LOG.info("Received a map request for "
+				+ input.getChunk().getInputFilePath()
+				+ " for the partition" + input.getChunk().getPartitionID());
 		String inputPath = input.getChunk().getInputFilePath();
 		// partition id is chunk id for now.
 		int chunk = input.getChunk().getPartitionID();

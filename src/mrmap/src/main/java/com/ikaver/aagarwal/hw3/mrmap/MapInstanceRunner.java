@@ -38,6 +38,7 @@ public class MapInstanceRunner extends UnicastRemoteObject implements
 	 * needs to act.
 	 */
 	public void runMapInstance(MapWorkDescription input, String localFilePath) {
+		LOGGER.info("Recived " + input.getJobID() + " " + input.getChunk().getInputFilePath() + " " + localFilePath);
 		IMapper mapper = getMapperClass(input);
 
 		FileInputStream fis;

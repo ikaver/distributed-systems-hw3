@@ -33,6 +33,7 @@ public class JobValidatorImpl implements IJobValidator {
     } catch (RemoteException e) {
       LOG.warn("Remote exception calling dfs", e);
     }
+    LOG.info(job.getJobName() + " isvalid ?" + validJob);
     return validJob;
   }
 

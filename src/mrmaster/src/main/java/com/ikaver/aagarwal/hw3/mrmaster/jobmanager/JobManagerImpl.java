@@ -9,6 +9,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.print.attribute.standard.JobImpressions;
+
+import org.apache.log4j.Logger;
+
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.ikaver.aagarwal.hw3.common.config.JobConfig;
@@ -34,6 +38,8 @@ import com.ikaver.aagarwal.hw3.mrmaster.scheduler.ReducerWorkerInfo;
 
 public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
     IOnWorkCompletedHandler {
+	
+  private static final Logger LOG = Logger.getLogger(JobManagerImpl.class);
 
   private Set<SocketAddress> nodeManagers;
   private IMRScheduler       scheduler;
@@ -57,6 +63,8 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
   }
 
   public JobInfoForClient createJob(JobConfig job) throws RemoteException {
+	LOG.info("received a job" + job);
+
     if (job == null || !jobValidator.isJobValid(job))
       return null;
 
