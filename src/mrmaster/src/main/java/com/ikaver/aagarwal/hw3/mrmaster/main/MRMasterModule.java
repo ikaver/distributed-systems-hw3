@@ -1,6 +1,7 @@
 package com.ikaver.aagarwal.hw3.mrmaster.main;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -19,13 +20,16 @@ import com.ikaver.aagarwal.hw3.mrmaster.jobmanager.JobManagerMockImpl;
 import com.ikaver.aagarwal.hw3.mrmaster.jobmanager.JobsState;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.IMRScheduler;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.IMRSchedulerImpl;
+import com.ikaver.aagarwal.hw3.mrmaster.scheduler.NodeInformation;
 
 public class MRMasterModule extends AbstractModule {
 
   private Set<SocketAddress> nodes;
+  private Set<SocketAddress> availableNodes;
   
   public MRMasterModule(Set<SocketAddress> nodes) {
     this.nodes = nodes;
+    this.availableNodes = new HashSet<SocketAddress>(nodes);
   }
   
   @Override
@@ -55,9 +59,15 @@ public class MRMasterModule extends AbstractModule {
     bind(JobsState.class).toInstance(jobsState);
     
     //Scheduler setup
-    bind(new TypeLiteral<Set<SocketAddress>>(){})
-      .annotatedWith(Names.named(Definitions.NODE_MANAGER_SET_ANNOTATION))
-      .toInstance(nodes);   
+    Map<SocketAddress, NodeInformation> nodeInfo = new HashMap<SocketAddress, NodeInformation>();
+    
+    ReadWriteLock schedulerWorkerLock = new ReentrantReadWriteLock();
+    bind(new TypeLiteral<Map<SocketAddress, NodeInformation>>(){})
+      .annotatedWith(Names.named(Definitions.SCHEDULER_NODES_INFORMATION_MAP))
+      .toInstance(nodeInfo);   
+    bind(ReadWriteLock.class)
+      .annotatedWith(Names.named(Definitions.SCHEDULER_NODES_INFORMATION_LOCK))
+      .toInstance(schedulerWorkerLock);
     
   }
 

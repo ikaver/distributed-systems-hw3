@@ -20,7 +20,6 @@ public class FileUploader {
   public static boolean uploadFile(SocketAddress dfsAddr, String filePath, String destinationPath, int recordSize) {
     IDFS dfs = DFSFactory.dfsFromSocketAddress(dfsAddr);
     if(dfs == null) {
-      System.out.println("NULL");
       System.out.println("Failed to communicate with DFS");
       return false;
     }

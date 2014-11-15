@@ -13,10 +13,16 @@ public class Definitions {
   public static final String MASTER_SOCKET_ADDR_ANNOTATION = "MasterSocketAddr";
   public static final String NODE_MANAGER_SET_ANNOTATION = "NodeManagerSet";
   
+  public static final String SCHEDULER_NODES_INFORMATION_MAP = "SchedulerNodeInfoMaps";
+  public static final String SCHEDULER_NODES_INFORMATION_LOCK = "SchedulerWorkerNodes";
+  
   public static final String DFS_REPLICATION_FACTOR_ANNOTATION = "DFSReplicationFactor";
   public static final String DFS_MAP_FILE_TO_METADATA_ANNOTATION = "DFSMapFileToMetadata";
   public static final String DFS_DATA_NODES_ANNOTATION = "DFSDataNodes";
   public static final String DFS_MAP_LOCK_ANNOTATION = "DFSMapLock";
+  
+  //Scheduler
+  public static final int SCHEDULER_TIME_TO_CHECK_FOR_NODES_STATE = 3;
   
   //JobTracker
   public static final int TIME_TO_CHECK_FOR_NODE_MANAGER_STATE = 3;
