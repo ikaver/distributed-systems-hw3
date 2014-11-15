@@ -37,8 +37,8 @@ import com.ikaver.aagarwal.hw3.mrmaster.scheduler.NodeManagerFactory;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.ReducerWorkerInfo;
 
 public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
-    IOnWorkCompletedHandler {
-	
+IOnWorkCompletedHandler {
+
   private static final Logger LOG = Logger.getLogger(JobManagerImpl.class);
 
   private Set<SocketAddress> nodeManagers;
@@ -63,15 +63,19 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
   }
 
   public JobInfoForClient createJob(JobConfig job) throws RemoteException {
-	LOG.info("received a job" + job);
+    LOG.info("received a job" + job);
 
-    if (job == null || !jobValidator.isJobValid(job))
+    if (job == null || !jobValidator.isJobValid(job)) {
+      LOG.info("Received invalid job: " + job + " Ignoring...");
       return null;
-
+    }
+      
     FileMetadata metadata = this.dfs.getMetadata(job.getInputFilePath());
     long sizeOfInputFile = metadata.getSizeOfFile();
-    if (sizeOfInputFile < 0)
+    if (sizeOfInputFile <= 0) { 
+      LOG.info("Received job with input file size <= 0. Ignoring...");
       return null;
+    }
     
     int numMappers = metadata.getNumChunks();
 
@@ -88,9 +92,9 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
               0,                       //start record
               job.getRecordSize(),     //record size
               (int)FileUtil.getTotalRecords(job.getRecordSize(), metadata.getSizeOfFile())), //records in chunk, 
-          job.getJarFilePath(), 
-          job.getMapperClass()
-      );
+              job.getJarFilePath(), 
+              job.getMapperClass()
+          );
       chunks.add(work.getChunk());
       mappers.add(work);
     }
@@ -101,6 +105,8 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
     List<SocketAddress> mapperAddresses = new ArrayList<SocketAddress>();
     Set<ReduceWorkDescription> reducers = new HashSet<ReduceWorkDescription>();
     for (MapperWorkerInfo mapWorker : mapWorkers) {
+      LOG.info(String.format("Got mapper address for job %d: %s", jobID, 
+          mapWorker.getNodeManagerAddress()));
       mapperAddresses.add(mapWorker.getNodeManagerAddress());
     }
     for (int i = 0; i < job.getNumReducers(); ++i) {
@@ -110,12 +116,16 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
           mapperAddresses, /* input sources, socket addresses of mappers */
           chunks, /* Mapper chunks */
           job.getOutputFilePath()
-      );
+          );
       reducers.add(work);
     }
     // schedule the reducers
     Set<ReducerWorkerInfo> reduceWorkers = scheduler
         .runReducersForWork(reducers);
+    for(ReducerWorkerInfo workerInfo : reduceWorkers) {
+      LOG.info(String.format("Got mapper address for job %d: %s", jobID, 
+          workerInfo.getNodeManagerAddress()));
+    }
 
     // create the running job
     ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -126,6 +136,7 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
     runningJob.getMappers().addAll(mapWorkers);
     runningJob.getReducers().addAll(reduceWorkers);
     jobsState.addJob(runningJob);
+    LOG.info("Created job tracker for job with ID: " + runningJob.getJobID());
     return getJobInfo(jobID);
   }
 
@@ -161,7 +172,7 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
     }
     return info;
   }
-  
+
   private JobInfoForClient jobInfoForClientFromRunningJob(RunningJob job) {
     return new JobInfoForClient(job.getJobID(), job.getJobName(),
         job.getAmountOfMappers(), job.getAmountOfReducers(),
@@ -177,18 +188,24 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
    */
 
   public void onMapperFinished(RunningJob job, MapperWorkerInfo info) {
+    LOG.info(String.format("Mapper %s finished for job: %d", 
+        info.getNodeManagerAddress(), job.getJobID()));
     job.getFinishedMappers().add(info);
   }
 
   public void onReducerFinished(RunningJob job, ReducerWorkerInfo info) {
+    LOG.info(String.format("Reducer %s finished for job: %d", 
+        info.getNodeManagerAddress(), job.getJobID()));
     job.getFinishedReducers().add(info);
   }
 
   public void onAllMappersFinished(RunningJob job) {
     //nothing to do here
+    LOG.info(String.format("All mappers finished for job: " + job.getJobID()));
   }
 
   public void onAllReducersFinished(RunningJob job) {
+    LOG.info(String.format("All reducers finished for job: " + job.getJobID()));
     job.shutdown();
   }
 
@@ -197,6 +214,8 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
    */
 
   public void onMapperFailed(RunningJob job, MapperWorkerInfo info) {
+    LOG.info(String.format("Mapper %s for job %d failed", 
+        info.getNodeManagerAddress(), job.getJobID()));
     MapWorkDescription newWork = new MapWorkDescription(info.getJobID(), 
         info.getChunk(), info.getJarFilePath(), info.getMapperClass());
     HashSet<MapWorkDescription> workSet = new HashSet<MapWorkDescription>();
@@ -204,19 +223,14 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
     Set<MapperWorkerInfo> newInfoSet = scheduler.runMappersForWork(workSet);
     for(MapperWorkerInfo newInfo : newInfoSet) {
       info.copy(newInfo);
-    }
-    for(ReducerWorkerInfo worker : job.getReducers()) {
-      IMRNodeManager nm = NodeManagerFactory.nodeManagerFromSocketAddress(worker.getNodeManagerAddress());
-      if(nm != null) {
-        
-      }
-      else {
-        onReducerFailed(job, worker);
-      }
+      LOG.info(String.format("Created new mapper %s for job %d",
+          info.getNodeManagerAddress(), job.getJobID()));
     }
   }
 
   public void onReducerFailed(RunningJob job, ReducerWorkerInfo info) {
+    LOG.info(String.format("Reducer %s for job %d failed", 
+        info.getNodeManagerAddress(), job.getJobID()));
     ReduceWorkDescription newWork = new ReduceWorkDescription(info.getJobID(), info.getReducerID(), 
         info.getInputSources(), info.getMapperChunks(), info.getOutputFilePath());
     HashSet<ReduceWorkDescription> workSet = new HashSet<ReduceWorkDescription>();
@@ -224,6 +238,8 @@ public class JobManagerImpl implements IJobManager, IOnWorkerFailedHandler,
     Set<ReducerWorkerInfo> newInfoSet = scheduler.runReducersForWork(workSet);
     for(ReducerWorkerInfo newInfo : newInfoSet) {
       info.copy(newInfo);
+      LOG.info(String.format("Created new reducer %s for job %d",
+          info.getNodeManagerAddress(), job.getJobID()));
     }
   }
 
