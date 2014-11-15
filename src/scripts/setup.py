@@ -9,6 +9,7 @@ def create_dir(sftp, dir_path):
   # Create the remote directory, if it doesn't exist.
   try:
     sftp.mkdir(dir_path);
+    sftp.chmod(dir_path, 0777);
   except IOError:  
     print "Working directory exists. Skipping..";
 
