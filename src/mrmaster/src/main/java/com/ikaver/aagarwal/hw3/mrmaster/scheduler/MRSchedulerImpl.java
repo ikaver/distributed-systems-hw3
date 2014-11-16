@@ -113,14 +113,25 @@ public class MRSchedulerImpl implements IMRScheduler {
       if(worker != null) {
         try {
           LOG.info("Will ask reducer to start work: " + worker.sa);
-          worker.nm.doReduce(workToDo);
-          LOG.info("Reducer started working: " + worker.sa);
-          ReducerWorkerInfo workerInfo = new ReducerWorkerInfo(
-              workToDo,
-              worker.sa,
-              WorkerState.RUNNING
-              );
-          info.add(workerInfo);
+          boolean success = worker.nm.doReduce(workToDo);
+          if(success){
+            LOG.info("Reducer started working: " + worker.sa);
+            ReducerWorkerInfo workerInfo = new ReducerWorkerInfo(
+                workToDo,
+                worker.sa,
+                WorkerState.RUNNING
+                );
+            info.add(workerInfo);
+          }
+          else {
+            LOG.warn("Failed to launch reducer");
+            ReducerWorkerInfo workerInfo = new ReducerWorkerInfo(
+                workToDo,
+                null,
+                WorkerState.WORKER_NOT_ASSIGNED
+                );
+            info.add(workerInfo);
+          }
         } catch (RemoteException e) {
           LOG.warn("Failed to launch reducer", e);
           ReducerWorkerInfo workerInfo = new ReducerWorkerInfo(
