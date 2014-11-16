@@ -50,7 +50,8 @@ public class MapRunner implements Runnable {
     byte[] record = new byte[input.getChunk().getRecordSize()];
     try {
       while (fis.read(record) != -1) {
-        mapper.map(record.toString(), (ICollector)moc);
+        String recordStr = new String(record);
+        mapper.map(recordStr, (ICollector)moc);
       }
 
       // Set the output path before you set the state. Otherwise,

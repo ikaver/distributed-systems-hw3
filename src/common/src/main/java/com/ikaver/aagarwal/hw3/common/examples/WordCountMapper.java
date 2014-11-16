@@ -9,7 +9,8 @@ import com.ikaver.aagarwal.hw3.common.workers.IMapper;
 public class WordCountMapper implements IMapper {
 
 	public void map(String record, ICollector collector) {
-		collector.collect(record, "1");
+	  String cleanRecord = record.trim();
+		collector.collect(cleanRecord, "1");
 	}
 
 }
