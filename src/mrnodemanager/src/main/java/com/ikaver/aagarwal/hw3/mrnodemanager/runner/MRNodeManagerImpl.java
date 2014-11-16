@@ -242,21 +242,16 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 	public boolean terminateWorkers(int jobID) {
 		throw new UnsupportedOperationException("Not yet implemented :(");
 	}
-
-	public int getAvailableSlots() throws RemoteException {
-		return 3;
-	}
+	
+  public void shutdown() throws RemoteException {
+    
+  }
 
 	public void updateMappersReferences(List<SocketAddress> mapperAddr,
 			List<MapperChunk> chunks) throws RemoteException {
 		// TODO Auto-generated method stub
-
 	}
 
-	public WorkerState getReducerState(int jobId, int reducerId)
-			throws RemoteException {
-		return WorkerState.WORKER_DOESNT_EXIST;
-	}
 
 	private SocketAddress getRandomDataNode(Set<SocketAddress> datanodes) {
 		List<SocketAddress> list = new ArrayList<SocketAddress>(datanodes);
@@ -280,4 +275,6 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 		}
 		return null;
 	}
+
+
 }

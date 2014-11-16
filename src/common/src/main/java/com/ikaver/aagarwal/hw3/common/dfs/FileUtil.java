@@ -9,6 +9,7 @@ public class FileUtil {
   private static final Logger LOGGER = Logger.getLogger(FileUtil.class);
 
   public static int numChunksForFile(int sizeOfChunk, int recordSize, long totalFileSize) {
+    if(recordSize <= 0) return 1;
     int recordsInChunk = numRecordsPerChunk(sizeOfChunk, recordSize);
     int numChunks = (int)(Math.ceil(totalFileSize / (double)(recordsInChunk * recordSize)));
     return numChunks;
