@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 
 import com.ikaver.aagarwal.hw3.common.mrmap.ICollector;
 import com.ikaver.aagarwal.hw3.common.mrmap.IMapInstanceRunner;
+import com.ikaver.aagarwal.hw3.common.util.FileOperationsUtil;
 import com.ikaver.aagarwal.hw3.common.workers.IMapper;
 import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
@@ -26,10 +27,11 @@ public class MapInstanceRunner extends UnicastRemoteObject implements
 
 	private final MapOutputCollector moc;
 
-	private String mocFilePath;
+	private final MapWorkState mapWorkState;
 
 	protected MapInstanceRunner() throws RemoteException {
 		super();
+		mapWorkState = new MapWorkState();
 		moc = new MapOutputCollector();
 	}
 
@@ -38,7 +40,7 @@ public class MapInstanceRunner extends UnicastRemoteObject implements
 	 * needs to act.
 	 */
 	public void runMapInstance(MapWorkDescription input, String localFilePath) {
-		LOGGER.info("Recived " + input.getJobID() + " " + input.getChunk().getInputFilePath() + " " + localFilePath);
+		LOGGER.info("Received " + input.getJobID() + " " + input.getChunk().getInputFilePath() + " " + localFilePath);
 		IMapper mapper = getMapperClass(input);
 
 		FileInputStream fis;
@@ -48,8 +50,11 @@ public class MapInstanceRunner extends UnicastRemoteObject implements
 		} catch (FileNotFoundException e) {
 			LOGGER.fatal("Mapper was expecting" + localFilePath
 					+ " to be accessible.");
+			mapWorkState.setState(WorkerState.FAILED);
 			return;
 		}
+
+		mapWorkState.setState(WorkerState.RUNNING);
 
 		byte[] record = new byte[input.getChunk().getRecordSize()];
 		try {
@@ -59,11 +64,17 @@ public class MapInstanceRunner extends UnicastRemoteObject implements
 
 			// Flush the data to a file and return the path where it is
 			// being stored.
-			this.mocFilePath = moc.flush();
+			mapWorkState.setOutputPath(moc.flush());
+			if (mapWorkState.getOutputPath() != null) {
+				mapWorkState.setState(WorkerState.FAILED);
+			} else {
+				mapWorkState.setState(WorkerState.FINISHED);
+			}
 
 		} catch (IOException e) {
+			mapWorkState.setState(WorkerState.FAILED);
 			LOGGER.fatal("error reading data from the local file system. Check"
-					+ "that ");
+					+ "that the file is accessible.");
 		}
 	}
 
@@ -75,17 +86,36 @@ public class MapInstanceRunner extends UnicastRemoteObject implements
 	}
 
 	public WorkerState getMapperState() {
-		throw new UnsupportedOperationException("Not yet implemented :(");
+		return mapWorkState.getState();
 	}
 
 	public String getMapOutputFilePath() {
-		return mocFilePath;
+		return mapWorkState.getOutputPath();
 	}
 	
 	private IMapper getMapperClass(MapWorkDescription input) {
 		IMapper mapper = null;
-
-
+		String jarPath = FileOperationsUtil.storeLocalFile(input.getJarFile());
+		try {
+			File file = new File(jarPath);
+			ClassLoader loader = new URLClassLoader(new URL[] { file.toURI()
+					.toURL() });
+			Class<IMapper> mapperClass = (Class<IMapper>) loader
+					.loadClass(input.getMapperClass());
+			mapper = mapperClass.newInstance();
+		} catch (IOException e) {
+			LOGGER.fatal("Error reading jar file from the disk. Either the"
+					+ "file" + jarPath
+					+ "doesn't exist on the local filesystem"
+					+ " or the local disk is full");
+		} catch (ClassNotFoundException e) {
+			LOGGER.fatal("Unable to locate the mapper class"
+					+ input.getMapperClass());
+		} catch (InstantiationException e) {
+			LOGGER.fatal("Error instanting the mapper class"
+					+ input.getMapperClass());
+		} catch (IllegalAccessException e) {
+		}
 		return mapper;
 	}
 }

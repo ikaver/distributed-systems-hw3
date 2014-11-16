@@ -31,5 +31,4 @@ public class MRNodeManagerSettings {
 	public int getMasterPort() {
 		return masterPort;
 	}
-
 }

@@ -7,13 +7,13 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.mrmap.IMapOutputCollector;
 import com.ikaver.aagarwal.hw3.common.objects.KeyValuePair;
-import com.ikaver.aagarwal.hw3.common.util.StringUtil;
+import com.ikaver.aagarwal.hw3.common.util.FileOperationsUtil;
 
 public class MapOutputCollector implements IMapOutputCollector {
 
@@ -32,14 +32,8 @@ public class MapOutputCollector implements IMapOutputCollector {
 
 	// TODO(ankit): Sort the data before storing.
 	public String flush() {
-		String path;
-		File file;
-
-		// Generate a random file name.
-		do {
-			path = getRandomFileName();
-			file = new File(path);
-		} while (file.exists());
+		String path = FileOperationsUtil.getRandomStringForLocalFile();
+		File file = new File(path);
 
 		try {
 			ObjectOutputStream os = new ObjectOutputStream(
@@ -51,7 +45,7 @@ public class MapOutputCollector implements IMapOutputCollector {
 
 			os.flush();
 			os.close();
-
+			FileUtil.changeFilePermission(path);
 			// Clear the data node since there are no more entries to be
 			// written.
 			data.clear();
@@ -66,9 +60,4 @@ public class MapOutputCollector implements IMapOutputCollector {
 
 		return path;
 	}
-
-	private String getRandomFileName() {
-		return StringUtil.getRandomString();
-	}
-
 }
