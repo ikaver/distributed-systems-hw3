@@ -24,6 +24,7 @@ public class RunningJob {
     
   private Set<MapperWorkerInfo> mappers;
   private Set<ReducerWorkerInfo> reducers;
+  private int numFailures;
   private ExecutorService taskTrackerService;
 
   public RunningJob(int jobID, String jobName, ExecutorService service) {
@@ -34,6 +35,7 @@ public class RunningJob {
     this.finishedMappers = new HashSet<MapperWorkerInfo>();
     this.finishedReducers = new HashSet<ReducerWorkerInfo>();
     this.taskTrackerService = service;
+    this.numFailures = 0;
   }
   
   public Set<MapperWorkerInfo> getFinishedMappers() {
@@ -70,6 +72,14 @@ public class RunningJob {
   
   public int getAmountOfReducers() {
     return this.getReducers().size();
+  }
+  
+  public int getNumFailures() {
+    return numFailures;
+  }
+  
+  public void setNumFailures(int numFailures) {
+    this.numFailures = numFailures;
   }
   
   public int getAmountOfUnassignedMappers() {

@@ -72,23 +72,23 @@ IOnWorkCompletedHandler {
       LOG.info("Received invalid job: " + job + " Ignoring...");
       return null;
     }
-      
+
     LOG.info("Asking DFS for input size of metadata");
     FileMetadata metadata = this.dfs.getMetadata(job.getInputFilePath());
     if(metadata == null) {
       LOG.info("Received job with no input file. Ignoring...");
       return null;
     }
-    
+
     long sizeOfInputFile = metadata.getSizeOfFile();
     if (sizeOfInputFile <= 0) { 
       LOG.info("Received job with input file size <= 0. Ignoring...");
       return null;
     }
-    
+
     LOG.info("Got metadata: " + metadata);
     int numMappers = metadata.getNumChunks();
-    
+
     int jobID = this.getNewJobID();
     // create mappers work descriptions
     Set<MapWorkDescription> mappers = new HashSet<MapWorkDescription>();
@@ -112,26 +112,29 @@ IOnWorkCompletedHandler {
     // schedule the mappers
     Set<MapperWorkerInfo> mapWorkers = scheduler.runMappersForWork(mappers);
     LOG.info("Got mapper workers for job: " + mapWorkers.size());
-    
+
     // create reducers
     List<SocketAddress> mapperAddresses = new ArrayList<SocketAddress>();
+    List<MapWorkDescription> mapperList = new ArrayList<MapWorkDescription>();
     Set<ReduceWorkDescription> reducers = new HashSet<ReduceWorkDescription>();
     for (MapperWorkerInfo mapWorker : mapWorkers) {
       LOG.info(String.format("Got mapper address for job %d: %s", jobID, 
           mapWorker.getNodeManagerAddress()));
+      mapperList.add(mapWorker.getWorkDescription());
       mapperAddresses.add(mapWorker.getNodeManagerAddress());
     }
     for (int i = 0; i < job.getNumReducers(); ++i) {
       ReduceWorkDescription work = new ReduceWorkDescription(
           jobID, 
           i,
+          mapperList,
           mapperAddresses, /* input sources, socket addresses of mappers */
-          chunks, /* Mapper chunks */
           job.getOutputFilePath(),
           job.getJarFile()
           );
       reducers.add(work);
     }
+    LOG.info("Will ask scheduler to schedule reduces for job " + jobID);
     // schedule the reducers
     Set<ReducerWorkerInfo> reduceWorkers = scheduler
         .runReducersForWork(reducers);
@@ -162,7 +165,7 @@ IOnWorkCompletedHandler {
     }
     return jobsInfo;
   }
-  
+
 
   public List<FinishedJob> finishedJobs() throws RemoteException {
     List<FinishedJob> jobs = jobsState.finishedJobs();
@@ -226,6 +229,7 @@ IOnWorkCompletedHandler {
   public void onAllReducersFinished(RunningJob job) {
     LOG.info(String.format("All reducers finished for job: " + job.getJobID()));
     job.shutdown();
+    this.jobsState.onJobFinished(job.getJobID(), true);
   }
 
   /*
@@ -233,30 +237,57 @@ IOnWorkCompletedHandler {
    */
 
   public void onMapperFailed(RunningJob job, MapperWorkerInfo info) {
-    LOG.info(String.format("Mapper %s for job %d failed", 
-        info.getNodeManagerAddress(), job.getJobID()));
-    HashSet<MapWorkDescription> workSet = new HashSet<MapWorkDescription>();
-    workSet.add(info.getWorkDescription());
-    Set<MapperWorkerInfo> newInfoSet = scheduler.runMappersForWork(workSet);
-    for(MapperWorkerInfo newInfo : newInfoSet) {
-      info.setState(newInfo.getState());
-      info.setNodeManagerAddress(newInfo.getNodeManagerAddress());
-      LOG.info(String.format("Created new mapper %s for job %d",
+    LOG.info(String.format("Mapper with ID %d for job %d failed. Num failures: %d", 
+        info.getWorkDescription().getChunk().getPartitionID(), job.getJobID(), 
+        job.getNumFailures()));
+    job.setNumFailures(job.getNumFailures()+1);
+    if(job.getNumFailures() >= Definitions.MAX_WORKER_RETRIES_BEFORE_CANCELLING_JOB) {
+      this.onJobFailed(job);
+    }
+    else {
+      LOG.info(String.format("Mapper %s for job %d failed", 
           info.getNodeManagerAddress(), job.getJobID()));
+      HashSet<MapWorkDescription> workSet = new HashSet<MapWorkDescription>();
+      workSet.add(info.getWorkDescription());
+      Set<MapperWorkerInfo> newInfoSet = scheduler.runMappersForWork(workSet);
+      for(MapperWorkerInfo newInfo : newInfoSet) {
+        info.setState(newInfo.getState());
+        info.setNodeManagerAddress(newInfo.getNodeManagerAddress());
+        LOG.info(String.format("Created new mapper %s for job %d",
+            info.getNodeManagerAddress(), job.getJobID()));
+      }
     }
   }
 
   public void onReducerFailed(RunningJob job, ReducerWorkerInfo info) {
-    LOG.info(String.format("Reducer %s for job %d failed", 
-        info.getNodeManagerAddress(), job.getJobID()));
-    HashSet<ReduceWorkDescription> workSet = new HashSet<ReduceWorkDescription>();
-    workSet.add(info.getWorkDescription());
-    Set<ReducerWorkerInfo> newInfoSet = scheduler.runReducersForWork(workSet);
-    for(ReducerWorkerInfo newInfo : newInfoSet) {
-      info.setState(newInfo.getState());
-      info.setNodeManagerAddress(newInfo.getNodeManagerAddress());
-      LOG.info(String.format("Created new reducer %s for job %d",
-          info.getNodeManagerAddress(), job.getJobID()));
+    LOG.info(String.format("Reducer with ID %d for job %d failed. Num failures: %d", 
+        info.getWorkDescription().getReducerID(), job.getJobID(), 
+        job.getNumFailures()));
+    job.setNumFailures(job.getNumFailures()+1);
+    if(job.getNumFailures() >= Definitions.MAX_WORKER_RETRIES_BEFORE_CANCELLING_JOB) {
+      this.onJobFailed(job);
+    }
+    else {
+      HashSet<ReduceWorkDescription> workSet = new HashSet<ReduceWorkDescription>();
+      workSet.add(info.getWorkDescription());
+      Set<ReducerWorkerInfo> newInfoSet = scheduler.runReducersForWork(workSet);
+      for(ReducerWorkerInfo newInfo : newInfoSet) {
+        info.setState(newInfo.getState());
+        info.setNodeManagerAddress(newInfo.getNodeManagerAddress());
+        LOG.info(String.format("Created new reducer %s for job %d",
+            info.getNodeManagerAddress(), job.getJobID()));
+      }
+    }
+  }
+
+  private void onJobFailed(RunningJob job) {
+    if(this.jobsState.getJob(job.getJobID()) != null) {
+      LOG.info("Job: " + job.getJobID() + " failed too many times. It will be terminated.");
+      this.jobsState.onJobFinished(job.getJobID(), false);
+      job.shutdown();
+    }
+    else {
+      LOG.info("Already terminated job with ID: " + job.getJobID());
     }
   }
 

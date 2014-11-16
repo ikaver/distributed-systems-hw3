@@ -12,27 +12,27 @@ public class ReduceWorkDescription implements Serializable {
   private final int jobID;
   private final int reducerID;
   private final byte [] jarFile;
-  private final List<SocketAddress> inputSources;
-  private final List<MapperChunk> mapperChunks;
+  private final List<MapWorkDescription> mappers;
+  private final List<SocketAddress> mapperAddresses;
   private final String outputFilePath;
 
   public ReduceWorkDescription(int jobID, int reducerID, 
-      List<SocketAddress> inputSources, 
-      List<MapperChunk> chunks /* Get the partition id of each input source */,
+      List<MapWorkDescription> mappers,
+      List<SocketAddress> mapperAddresses,
       String outputFilePath,
       byte [] jarFile) {
-    if(inputSources == null) 
-      throw new IllegalArgumentException("Input sources cannot be null");
-    if(chunks == null) 
-      throw new IllegalArgumentException("Chunks cannot be null");
+    if(mappers == null) 
+      throw new IllegalArgumentException("Mappers list cannot be null");
+    if(mappers.size() == 0)
+      throw new IllegalArgumentException("Mappers list cannot be null");
+    if(mappers.size() != mapperAddresses.size())
+      throw new IllegalArgumentException("Mappers list size should be the same as the mappers addresses list");
     if(outputFilePath == null) 
       throw new IllegalArgumentException("Output file path cannot be null");
-    if(inputSources.size() != chunks.size()) 
-      throw new IllegalArgumentException("Amount of input sources must be equal to amount of chunks");
     this.jobID = jobID;
     this.reducerID = reducerID;
-    this.inputSources = inputSources;
-    this.mapperChunks = chunks;
+    this.mappers = mappers;
+    this.mapperAddresses = mapperAddresses;
     this.outputFilePath = outputFilePath;
     this.jarFile = jarFile;
   }
@@ -49,12 +49,12 @@ public class ReduceWorkDescription implements Serializable {
     return jarFile;
   }
 
-  public List<SocketAddress> getInputSources() {
-    return inputSources;
+  public List<MapWorkDescription> getMappers() {
+    return mappers;
   }
 
-  public List<MapperChunk> getMapperChunks() {
-    return mapperChunks;
+  public List<SocketAddress> getMapperAddresses() {
+    return mapperAddresses;
   }
 
   public String getOutputFilePath() {
