@@ -144,18 +144,17 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 
 				SocketAddress preferredNode = getPreferredAddress(datanodes);
 
-				if (preferredNode != null) {
+				if (preferredNode == null) {
 					preferredNode = getRandomDataNode(datanodes);
 				}
 				IDataNode datanode = DataNodeFactory
 						.dataNodeFromSocketAddress(preferredNode);
-
-				byte[] data = datanode.getFile(inputPath, chunk);
-				return data;
+				byte[] data = null;
+				if(datanode != null) data = datanode.getFile(inputPath, chunk);
+				if(data != null) return data;
 			} catch (RemoteException e) {
 				LOG.warn("Remote exception while reading data.", e);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				LOG.warn("Error while fetching data from the dfs.", e);
 			}
 		}
@@ -222,11 +221,13 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 		int port = workDescriptionToPortMapping.get(wd);
 		IMapInstanceRunner mapper = MRMapFactory.mapInstanceFromPort(port);
 		if (mapper == null) {
+		  LOG.warn(String.format("Mapper %s failed", wd));
 			return WorkerState.FAILED;
 		} else {
 			try {
 				return mapper.getMapperState();
 			} catch (RemoteException e) {
+		     LOG.warn(String.format("Mapper %s failed (remote exception)", wd));
 				return WorkerState.FAILED;
 			}
 		}
