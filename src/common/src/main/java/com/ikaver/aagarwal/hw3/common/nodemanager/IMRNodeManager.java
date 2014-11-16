@@ -5,6 +5,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import com.ikaver.aagarwal.hw3.common.objects.KeyValuePair;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.MapperChunk;
@@ -41,14 +42,14 @@ public interface IMRNodeManager extends Remote {
 	public boolean terminateWorkers(int jobID) throws RemoteException;
 	
 	/**
-	 * 
-	 * @param jobID
-	 * @param chunk
+	 * Fetches data from a mapper corresponding to the map work. It is assumed that this
+	 * function is called only when all the mappers have finished executing.
+	 * @param mwd is the map work description.
 	 * @param reducerID
 	 * @return
 	 */
-	public <K extends Serializable & Comparable<K>, V extends Serializable> List<MapperOutput<K, V>> dataForJob(
-			int jobID, MapperChunk chunk, int reducerID) throws RemoteException;
+	public List<KeyValuePair> dataForJob(
+			MapWorkDescription mwd, int reducerID) throws RemoteException;
 
 	/**
 	 * Returns the status and capacity of number of mappers and reducers.
