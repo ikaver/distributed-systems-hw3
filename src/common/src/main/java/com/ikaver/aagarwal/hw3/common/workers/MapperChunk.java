@@ -45,5 +45,9 @@ public class MapperChunk implements Serializable {
     return numberOfRecords;
   }
   
-  
+  @Override
+  public String toString() {
+    return String.format("[Input path: %s, partition: %d]", getInputFilePath(), 
+        getPartitionID());
+  }
 }
