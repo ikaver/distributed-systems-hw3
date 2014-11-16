@@ -232,7 +232,6 @@ public class MRSchedulerImpl implements IMRScheduler {
     
     SocketAddress randomAddr = null;
     if(dataNodesList.size() > 0) randomAddr = dataNodesList.get(0);
-    
     IMRNodeManager availableNodeManager = NodeManagerFactory.nodeManagerFromSocketAddress(randomAddr);
     if(availableNodeManager != null)
       return new NodeManagerWithSocketAddress(availableNodeManager, randomAddr);
