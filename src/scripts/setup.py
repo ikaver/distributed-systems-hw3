@@ -62,6 +62,7 @@ def set_up_args():
            + ' is separated by a newline character');
   parser.add_argument("--slave_binary_path", type=str);
   parser.add_argument("--mr_map_binary_path", type=str);
+  parser.add_argument("--mr_reduce_binary_path", type=str);
 
   parser.add_argument("--master_port", type=int, default=3001);
   parser.add_argument("--slave_port", type=int, default=3000);
@@ -96,7 +97,8 @@ def copy_slave_binary(args, username, password):
     ip = ip.strip();
     print "Copying binary files to the MR slaves: {0}".format(ip);
     copy_files(ip, username, password, [args.slave_binary_path,
-        'run_slave.sh', args.mr_map_binary_path], args.rwd, args.dfs_base_path, args.localfs_base_path);
+        'run_slave.sh', args.mr_map_binary_path, args.mr_reduce_binary_path],
+        args.rwd, args.dfs_base_path, args.localfs_base_path);
 
 def setup(rwd, setupfile, remote, username, password, fileArgs):
   """Makes an ssh connection and runs the setup script on the remote
