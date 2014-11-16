@@ -45,6 +45,11 @@ public class MapWorkDescription implements Serializable {
 	public String getMapperClass() {
 		return mapperClass;
 	}
+	
+	@Override
+	public String toString() {
+	  return String.format("Job ID: %d, mapper chunk: %s", getJobID(), getChunk());
+	}
 
 	@Override
 	public boolean equals(Object obj) {
