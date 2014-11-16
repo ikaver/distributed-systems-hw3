@@ -39,6 +39,8 @@ import com.ikaver.aagarwal.hw3.mrmaster.scheduler.ReducerWorkerInfo;
 public class JobManagerImpl extends UnicastRemoteObject implements IJobManager, IOnWorkerFailedHandler,
 IOnWorkCompletedHandler {
 
+  private static final long serialVersionUID = -6574342468216313714L;
+
   private static final Logger LOG = Logger.getLogger(JobManagerImpl.class);
 
   private Set<SocketAddress> nodeManagers;
