@@ -96,7 +96,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 			return false;
 		}
 
-		String localfp = writeDataToLocalPath(data);
+		String localfp = FileOperationsUtil.storeLocalFile(data, ".input");
 
 		int port = MRMapTaskAttempt.startMapTask(input);
 
@@ -122,23 +122,6 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 			return false;
 		}
 		return true;
-	}
-
-	private String writeDataToLocalPath(byte[] data) {
-		String localfp = FileOperationsUtil.getRandomStringForLocalFile();
-		FileOutputStream os;
-		try {
-			os = new FileOutputStream(new File(localfp));
-			os.write(data);
-			os.close();
-			FileUtil.changeFilePermission(localfp);
-			return localfp;
-		} catch (FileNotFoundException e) {
-			LOG.warn("error writing to the file." + localfp, e);
-		} catch (IOException e) {
-			LOG.warn("IO exception while writing to the file.", e);
-		}
-		return null;
 	}
 
 	/**
