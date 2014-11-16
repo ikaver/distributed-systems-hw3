@@ -95,7 +95,7 @@ public class MapInstanceRunner extends UnicastRemoteObject implements
 	
 	private IMapper getMapperClass(MapWorkDescription input) {
 		IMapper mapper = null;
-		String jarPath = FileOperationsUtil.storeLocalFile(input.getJarFile());
+		String jarPath = FileOperationsUtil.storeLocalFile(input.getJarFile(), ".jar");
 		try {
 			File file = new File(jarPath);
 			ClassLoader loader = new URLClassLoader(new URL[] { file.toURI()

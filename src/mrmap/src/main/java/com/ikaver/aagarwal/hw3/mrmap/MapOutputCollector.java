@@ -32,7 +32,8 @@ public class MapOutputCollector implements IMapOutputCollector {
 
 	// TODO(ankit): Sort the data before storing.
 	public String flush() {
-		String path = FileOperationsUtil.getRandomStringForLocalFile();
+		String path = FileOperationsUtil.getRandomStringForLocalFile()
+				+ ".out";
 		File file = new File(path);
 
 		try {

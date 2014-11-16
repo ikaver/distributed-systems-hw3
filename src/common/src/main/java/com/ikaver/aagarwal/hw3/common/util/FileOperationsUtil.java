@@ -14,8 +14,8 @@ import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 public class FileOperationsUtil {
 
 	private static final Logger LOG = Logger.getLogger(FileOperationsUtil.class);
-
-	public static String storeLocalFile(byte[] data) {
+ 
+	public static String storeLocalFile(byte[] data, String extension) {
 		String localfp = FileOperationsUtil.getRandomStringForLocalFile();
 		try {
 			FileOutputStream os;
