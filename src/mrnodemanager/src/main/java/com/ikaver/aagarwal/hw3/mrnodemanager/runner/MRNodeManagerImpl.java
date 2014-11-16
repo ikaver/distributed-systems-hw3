@@ -1,8 +1,5 @@
 package com.ikaver.aagarwal.hw3.mrnodemanager.runner;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
@@ -25,7 +22,6 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.FileMetadata;
-import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.dfs.IDataNode;
 import com.ikaver.aagarwal.hw3.common.mrmap.IMapInstanceRunner;
@@ -196,16 +192,20 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 	}
 
 	public NodeState getNodeState() {
-		throw new UnsupportedOperationException("Not yet implemented :(");
+	  return new NodeState(workInProgress.size(), 0, 3, Runtime.getRuntime().availableProcessors());
 	}
 
-	public WorkerState getMapperState(int jobId, int partitionId) {
-		throw new UnsupportedOperationException("Not yet implemented :(");
-	}
+  public WorkerState getMapperState(MapWorkDescription workInfo)
+      throws RemoteException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	public WorkerState getReducerState(int jobId, int reducerId) {
-		throw new UnsupportedOperationException("Not yet implemented :(");
-	}
+  public WorkerState getReducerState(ReduceWorkDescription workInfo)
+      throws RemoteException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
 	public boolean terminateWorkers(int jobID) {
 		throw new UnsupportedOperationException("Not yet implemented :(");
@@ -215,12 +215,10 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 		throw new UnsupportedOperationException("Not yet implemented :(");
 	}
 
-  public int getAvailableSlots() throws RemoteException {
-    return 3;
-  }
-
   public void updateMappersReferences(List<SocketAddress> mapperAddr,
       List<MapperChunk> chunks) throws RemoteException {
     throw new UnsupportedOperationException("Not yet implemented :(");    
   }
+
+
 }

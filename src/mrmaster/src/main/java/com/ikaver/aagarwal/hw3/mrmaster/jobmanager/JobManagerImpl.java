@@ -94,7 +94,6 @@ IOnWorkCompletedHandler {
     Set<MapWorkDescription> mappers = new HashSet<MapWorkDescription>();
     List<MapperChunk> chunks = new ArrayList<MapperChunk>();
     for (int i = 0; i < numMappers; ++i) {
-      
       MapWorkDescription work = new MapWorkDescription(
           jobID, 
           new MapperChunk(
@@ -236,13 +235,12 @@ IOnWorkCompletedHandler {
   public void onMapperFailed(RunningJob job, MapperWorkerInfo info) {
     LOG.info(String.format("Mapper %s for job %d failed", 
         info.getNodeManagerAddress(), job.getJobID()));
-    MapWorkDescription newWork = new MapWorkDescription(info.getJobID(), 
-        info.getChunk(), info.getJarFile(), info.getMapperClass());
     HashSet<MapWorkDescription> workSet = new HashSet<MapWorkDescription>();
-    workSet.add(newWork);
+    workSet.add(info.getWorkDescription());
     Set<MapperWorkerInfo> newInfoSet = scheduler.runMappersForWork(workSet);
     for(MapperWorkerInfo newInfo : newInfoSet) {
-      info.copy(newInfo);
+      info.setState(newInfo.getState());
+      info.setNodeManagerAddress(newInfo.getNodeManagerAddress());
       LOG.info(String.format("Created new mapper %s for job %d",
           info.getNodeManagerAddress(), job.getJobID()));
     }
@@ -251,14 +249,12 @@ IOnWorkCompletedHandler {
   public void onReducerFailed(RunningJob job, ReducerWorkerInfo info) {
     LOG.info(String.format("Reducer %s for job %d failed", 
         info.getNodeManagerAddress(), job.getJobID()));
-    ReduceWorkDescription newWork = new ReduceWorkDescription(info.getJobID(), info.getReducerID(), 
-        info.getInputSources(), info.getMapperChunks(), info.getOutputFilePath(),
-        info.getJarFile());
     HashSet<ReduceWorkDescription> workSet = new HashSet<ReduceWorkDescription>();
-    workSet.add(newWork);
+    workSet.add(info.getWorkDescription());
     Set<ReducerWorkerInfo> newInfoSet = scheduler.runReducersForWork(workSet);
     for(ReducerWorkerInfo newInfo : newInfoSet) {
-      info.copy(newInfo);
+      info.setState(newInfo.getState());
+      info.setNodeManagerAddress(newInfo.getNodeManagerAddress());
       LOG.info(String.format("Created new reducer %s for job %d",
           info.getNodeManagerAddress(), job.getJobID()));
     }

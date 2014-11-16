@@ -58,7 +58,7 @@ public class JobTracker implements Runnable {
         }
         else {
           try {
-            info.setState(nm.getMapperState(info.getJobID(), info.getChunk().getPartitionID()));
+            info.setState(nm.getMapperState(info.getWorkDescription()));
           } catch (RemoteException e) {
             info.setState(WorkerState.FAILED);
             LOG.warn("Failed to get nm state", e);
@@ -93,7 +93,7 @@ public class JobTracker implements Runnable {
         }
         else {
           try {
-            info.setState(nm.getReducerState(info.getJobID(), info.getReducerID()));
+            info.setState(nm.getReducerState(info.getWorkDescription()));
             this.updateMappersReferences(nm);
           } catch (RemoteException e) {
             info.setState(WorkerState.FAILED);
@@ -122,7 +122,7 @@ public class JobTracker implements Runnable {
     List<MapperChunk> chunks = new ArrayList<MapperChunk>();
     for(MapperWorkerInfo mapper : mappers) {
       mapperAddress.add(mapper.getNodeManagerAddress());
-      chunks.add(mapper.getChunk());
+      chunks.add(mapper.getWorkDescription().getChunk());
     }
     nm.updateMappersReferences(mapperAddress, chunks);
   }

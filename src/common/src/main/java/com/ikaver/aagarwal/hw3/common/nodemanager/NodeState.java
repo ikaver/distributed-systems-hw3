@@ -9,15 +9,19 @@ public class NodeState implements Serializable {
   private final int numMappers;
   private final int numReducers;
   
-  private final int availableMappers;
-  private final int availableReducers;
+  private final int numProcessors;
+  private final int availableSlots;
   
-  public NodeState(int numMappers, int numReducers, int availableMappers,
-      int availableReducers) {
+  public NodeState(int numMappers, int numReducers,
+      int availableSlots, int numProcessors) {
     this.numMappers = numMappers;
     this.numReducers = numReducers;
-    this.availableMappers = availableMappers;
-    this.availableReducers = availableReducers;
+    this.availableSlots = availableSlots;
+    this.numProcessors = numProcessors;
+  }
+
+  public int getNumProcessors() {
+    return numProcessors;
   }
 
   public int getNumMappers() {
@@ -28,12 +32,8 @@ public class NodeState implements Serializable {
     return numReducers;
   }
 
-  public int getAvailableMappers() {
-    return availableMappers;
-  }
-
-  public int getAvailableReducers() {
-    return availableReducers;
+  public int getAvailableSlots() {
+    return availableSlots;
   }
   
   

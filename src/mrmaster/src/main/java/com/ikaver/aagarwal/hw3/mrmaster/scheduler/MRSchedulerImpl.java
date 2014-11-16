@@ -72,13 +72,10 @@ public class MRSchedulerImpl implements IMRScheduler {
           if(success) {
             LOG.info("Mapper started working: " + worker.sa);
             MapperWorkerInfo workerInfo = new MapperWorkerInfo(
-                workToDo.getJobID(),
+                workToDo,
                 worker.sa,
-                WorkerState.RUNNING,
-                workToDo.getChunk(),
-                workToDo.getJarFile(),
-                workToDo.getMapperClass()
-                );
+                WorkerState.RUNNING
+            );
             info.add(workerInfo);
           }
           else {
@@ -101,12 +98,9 @@ public class MRSchedulerImpl implements IMRScheduler {
   private MapperWorkerInfo mapperWorkerInfoForFailure(MapWorkDescription workToDo) {
     LOG.info("Failed to launch mapper. Creating failed worker for now");
     MapperWorkerInfo workerInfo = new MapperWorkerInfo(
-        workToDo.getJobID(),
+        workToDo,
         null,
-        WorkerState.WORKER_NOT_ASSIGNED,
-        workToDo.getChunk(),
-        workToDo.getJarFile(),
-        workToDo.getMapperClass()
+        WorkerState.WORKER_NOT_ASSIGNED
         );
     return workerInfo;
   }
@@ -122,27 +116,17 @@ public class MRSchedulerImpl implements IMRScheduler {
           worker.nm.doReduce(workToDo);
           LOG.info("Reducer started working: " + worker.sa);
           ReducerWorkerInfo workerInfo = new ReducerWorkerInfo(
-              workToDo.getJobID(),
+              workToDo,
               worker.sa,
-              WorkerState.RUNNING,
-              getNewReducerId(),
-              workToDo.getInputSources(),
-              workToDo.getMapperChunks(),
-              workToDo.getOutputFilePath(),
-              workToDo.getJarFile()
+              WorkerState.RUNNING
               );
           info.add(workerInfo);
         } catch (RemoteException e) {
           LOG.warn("Failed to launch reducer", e);
           ReducerWorkerInfo workerInfo = new ReducerWorkerInfo(
-              workToDo.getJobID(),
+              workToDo,
               null,
-              WorkerState.WORKER_NOT_ASSIGNED,
-              getNewReducerId(),
-              workToDo.getInputSources(),
-              workToDo.getMapperChunks(),
-              workToDo.getOutputFilePath(),
-              workToDo.getJarFile()
+              WorkerState.WORKER_NOT_ASSIGNED
               );
           info.add(workerInfo);
         }

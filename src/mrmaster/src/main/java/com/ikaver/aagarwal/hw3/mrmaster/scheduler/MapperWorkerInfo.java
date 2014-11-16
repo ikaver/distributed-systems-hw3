@@ -1,41 +1,45 @@
 package com.ikaver.aagarwal.hw3.mrmaster.scheduler;
 
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
-import com.ikaver.aagarwal.hw3.common.workers.MapperChunk;
+import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 
-public class MapperWorkerInfo extends WorkerInfo {
+public class MapperWorkerInfo {
+
+  private MapWorkDescription workDescription;
+  private SocketAddress nodeManagerAddress;
+  private WorkerState state;
   
-  private static final long serialVersionUID = 356190809164040891L;
+  public MapperWorkerInfo(MapWorkDescription work, SocketAddress socketAddress, WorkerState state) {
+    this.workDescription = work;
+    this.nodeManagerAddress = socketAddress;
+    this.state = state;
+  }
+
+  public MapWorkDescription getWorkDescription() {
+    return workDescription;
+  }
+
+  public void setWorkDescription(MapWorkDescription work) {
+    this.workDescription = work;
+  }
   
-  private final MapperChunk chunk;
-  private final byte [] jarFile;
-  private final String mapperClass;
-
-  public MapperWorkerInfo(int jobID, SocketAddress nodeManagerAddr, 
-      WorkerState state,
-      MapperChunk chunk,
-      byte [] jarFile,
-      String mapperClassPath) {
-    super(jobID, nodeManagerAddr, state);
-    if(chunk == null) throw new IllegalArgumentException("Chunk cannot be null");
-    if(jarFile == null) throw new IllegalArgumentException("Jar file cannot be null");
-    if(mapperClassPath == null) throw new IllegalArgumentException("Mapper class path cannot be null");
-    this.chunk = chunk;
-    this.jarFile = jarFile;
-    this.mapperClass = mapperClassPath;
+  public void setNodeManagerAddress(SocketAddress nodeManagerAddress) {
+    this.nodeManagerAddress = nodeManagerAddress;
   }
 
-  public byte [] getJarFile() {
-    return jarFile;
+  public SocketAddress getNodeManagerAddress() {
+    return nodeManagerAddress;
   }
 
-  public String getMapperClass() {
-    return mapperClass;
+  public WorkerState getState() {
+    return state;
   }
 
-  public MapperChunk getChunk() {
-    return chunk;
+  public void setState(WorkerState state) {
+    this.state = state;
   }
+    
+  
 
 }
