@@ -1,4 +1,4 @@
-package com.ikaver.aagarwal.hw3.mrrreduce;
+package com.ikaver.aagarwal.hw3.mrreduce;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;

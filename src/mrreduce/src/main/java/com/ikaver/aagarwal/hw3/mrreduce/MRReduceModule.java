@@ -1,4 +1,4 @@
-package com.ikaver.aagarwal.hw3.mrrreduce;
+package com.ikaver.aagarwal.hw3.mrreduce;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;

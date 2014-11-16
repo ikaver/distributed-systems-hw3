@@ -1,4 +1,4 @@
-package com.ikaver.aagarwal.hw3.mrrreduce;
+package com.ikaver.aagarwal.hw3.mrreduce;
 
 import com.beust.jcommander.Parameter;
 import com.ikaver.aagarwal.hw3.common.workers.flags.MRWorkerRunnerSettings;
