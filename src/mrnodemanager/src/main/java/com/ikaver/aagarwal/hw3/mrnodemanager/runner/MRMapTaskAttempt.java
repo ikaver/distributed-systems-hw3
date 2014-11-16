@@ -26,6 +26,11 @@ public class MRMapTaskAttempt {
 			Runtime.getRuntime().exec(
 					"java -jar mrmap-1.0-SNAPSHOT-jar-with-dependencies.jar "
 							+ " -port " + port);
+			try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {
+        LOGGER.warn("Interrupted", e);
+      }
 		} catch (IOException e) {
 			LOGGER.fatal("Error starting map task attempt at port: " + port, e);
 			return -1;
