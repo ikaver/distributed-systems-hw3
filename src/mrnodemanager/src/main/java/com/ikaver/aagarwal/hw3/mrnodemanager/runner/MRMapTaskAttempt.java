@@ -15,7 +15,6 @@ public class MRMapTaskAttempt {
 
 	private static final Logger LOGGER = Logger
 			.getLogger(MRMapTaskAttempt.class);
-	private static final String MR_MAP_ATTEMPT = "mr-map-attempt";
 
 	/**
 	 * Returns the port at which the remote object for task attempt is bound.
