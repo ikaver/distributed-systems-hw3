@@ -32,6 +32,9 @@ public class Definitions {
   //JobTracker
   public static final int TIME_TO_CHECK_FOR_NODE_MANAGER_STATE = 3;
   
+  //Node manager
+  public static final int WORKERS_PER_NODE = 2;
+  
   //DFS
   public static final String BASE_DIRECTORY = "/tmp/mrikav-ank-dfs/";
   // Local File system base directory
