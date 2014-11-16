@@ -3,10 +3,7 @@ package com.ikaver.aagarwal.hw3.mrnodemanager.runner;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.UnknownHostException;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -15,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.apache.log4j.Logger;
 
@@ -47,12 +46,14 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 		IMRNodeManager {
 
 	private final Logger LOG = Logger.getLogger(MRNodeManagerImpl.class);
-	
-	// Work in progress is a map between parition id and port at which the mapper task
+
+	// Work in progress is a map between parition id and port at which the
+	// mapper task
 	// is running.
 	private Map<MapWorkDescription, Integer> workInProgress;
-
 	private final SocketAddress masterAddress;
+    private final ScheduledExecutorService scheduler =
+			     Executors.newScheduledThreadPool(1);
 
 	@Inject
 	public MRNodeManagerImpl(
@@ -60,7 +61,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 			throws RemoteException {
 		super();
 		this.masterAddress = masterAddress;
-		this.workInProgress = new ConcurrentHashMap<MapWorkDescription, Integer> ();
+		this.workInProgress = new ConcurrentHashMap<MapWorkDescription, Integer>();
 	}
 
 	private static final long serialVersionUID = 1674990898801584371L;
@@ -78,8 +79,8 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 	@SuppressWarnings("resource")
 	public boolean doMap(MapWorkDescription input) {
 		LOG.info("Received a map request for "
-				+ input.getChunk().getInputFilePath()
-				+ " for the partition" + input.getChunk().getPartitionID());
+				+ input.getChunk().getInputFilePath() + " for the partition"
+				+ input.getChunk().getPartitionID());
 		String inputPath = input.getChunk().getInputFilePath();
 		// partition id is chunk id for now.
 		int chunk = input.getChunk().getPartitionID();
@@ -100,30 +101,33 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 			LOGGER.warn("error starting work instance");
 			return false;
 		}
-		
+
 		workInProgress.put(input, port);
 
 		LOGGER.info(String.format("Starting map runner at port: %d", port));
-		try {
-			IMapInstanceRunner runner = (IMapInstanceRunner) Naming
-					.lookup(String.format("//%s:%d/%s", "localhost", port,
-							Definitions.MR_MAP_RUNNER_SERVICE));
+        IMapInstanceRunner runner = MRMapFactory.mapInstanceFromPort(port);
+        
+        if (runner == null) {
+        	LOG.warn("Could not locate a running map instance at the port");
+        	return false;
+        }
 
+        try {
 			runner.runMapInstance(input, localfp);
-		} catch (MalformedURLException e) {
-			return false;
+			return true;
 		} catch (RemoteException e) {
-			return false;
-		} catch (NotBoundException e) {
+			LOG.info("Remote exception while running the map instance");
 			return false;
 		}
-		return true;
 	}
 
 	/**
 	 * Fetches data from DFS
-	 * @param inputPath is a path on the dfs.
-	 * @param chunk is the chunk which needs to be fetched.
+	 * 
+	 * @param inputPath
+	 *            is a path on the dfs.
+	 * @param chunk
+	 *            is the chunk which needs to be fetched.
 	 * @return
 	 */
 	private byte[] fetchData(String inputPath, int chunk) {
@@ -169,8 +173,9 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 	private SocketAddress getPreferredAddress(Set<SocketAddress> addresses) {
 		for (SocketAddress address : addresses) {
 			try {
-				LOGGER.info("Checking if " +  address.getHostname()
-						+ " " + InetAddress.getLocalHost().getHostName() + "matches..");
+				LOGGER.info("Checking if " + address.getHostname() + " "
+						+ InetAddress.getLocalHost().getHostName()
+						+ "matches..");
 				if (address.getHostname().equals(
 						InetAddress.getLocalHost().getHostName())) {
 					return address;
@@ -186,20 +191,30 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 		throw new UnsupportedOperationException("Not yet implemented :(");
 	}
 
-	public <K extends Serializable & Comparable<K>, V extends Serializable> List<MapperOutput<K, V>> dataForJob(
-			int jobID, MapperChunk chunk, int reducerID) {
-		throw new UnsupportedOperationException("Not yet implemented :(");
-	}
-
 	public NodeState getNodeState() {
 	  return new NodeState(workInProgress.size(), 0, 3, Runtime.getRuntime().availableProcessors());
 	}
 
-  public WorkerState getMapperState(MapWorkDescription workInfo)
-      throws RemoteException {
-    // TODO Auto-generated method stub
-    return null;
-  }
+
+	public WorkerState getMapperState(MapWorkDescription wd) {
+		if (workInProgress.get(wd) == null) {
+			LOG.info("No instance of mapper state found for" +
+					"map work description found corresponding");
+			return WorkerState.WORKER_DOESNT_EXIST;
+		}
+
+		int port = workInProgress.get(wd);
+		IMapInstanceRunner mapper = MRMapFactory.mapInstanceFromPort(port);
+		if (mapper == null) {
+			return WorkerState.FAILED;
+		} else {
+			try {
+				return mapper.getMapperState();
+			} catch (RemoteException e) {
+				return WorkerState.FAILED;
+			}
+		}
+	}
 
   public WorkerState getReducerState(ReduceWorkDescription workInfo)
       throws RemoteException {
@@ -215,10 +230,20 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 		throw new UnsupportedOperationException("Not yet implemented :(");
 	}
 
+	public int getAvailableSlots() throws RemoteException {
+		return 3;
+	}
+
   public void updateMappersReferences(List<SocketAddress> mapperAddr,
       List<MapperChunk> chunks) throws RemoteException {
-    throw new UnsupportedOperationException("Not yet implemented :(");    
+    // TODO Auto-generated method stub
+    
   }
 
+  public <K extends Serializable & Comparable<K>, V extends Serializable> List<MapperOutput<K, V>> dataForJob(
+      int jobID, MapperChunk chunk, int reducerID) throws RemoteException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
 }

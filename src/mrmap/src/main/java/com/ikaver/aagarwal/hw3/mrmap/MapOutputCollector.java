@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -40,9 +41,11 @@ public class MapOutputCollector implements IMapOutputCollector {
 			ObjectOutputStream os = new ObjectOutputStream(
 					new FileOutputStream(file));
 
-			for (int i = 0; i < data.size(); i++) {
-				os.writeObject(data.get(i));
-			}
+            // Sorting phase.
+			Collections.sort(data);
+
+			// Write the data list to the file.
+			os.writeObject(data);
 
 			os.flush();
 			os.close();
