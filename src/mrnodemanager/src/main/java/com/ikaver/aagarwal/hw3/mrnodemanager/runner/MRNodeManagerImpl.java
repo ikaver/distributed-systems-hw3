@@ -204,7 +204,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 	}
 
 	public boolean doReduce(ReduceWorkDescription input) throws RemoteException {
-		throw new UnsupportedOperationException("Not yet implemented :(");
+	  return false;
 	}
 
 	public NodeState getNodeState() {

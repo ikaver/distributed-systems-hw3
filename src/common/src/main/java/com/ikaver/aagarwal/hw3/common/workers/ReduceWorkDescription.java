@@ -11,16 +11,20 @@ public class ReduceWorkDescription implements Serializable {
 
   private final int jobID;
   private final int reducerID;
+  private final String reducerClass;
   private final byte [] jarFile;
   private final List<MapWorkDescription> mappers;
   private final List<SocketAddress> mapperAddresses;
   private final String outputFilePath;
 
   public ReduceWorkDescription(int jobID, int reducerID, 
+      String reducerClass,
       List<MapWorkDescription> mappers,
       List<SocketAddress> mapperAddresses,
       String outputFilePath,
       byte [] jarFile) {
+    if(reducerClass == null)
+      throw new IllegalArgumentException("Reducer class cannot be null");
     if(mappers == null) 
       throw new IllegalArgumentException("Mappers list cannot be null");
     if(mappers.size() == 0)
@@ -34,6 +38,7 @@ public class ReduceWorkDescription implements Serializable {
     this.mappers = mappers;
     this.mapperAddresses = mapperAddresses;
     this.outputFilePath = outputFilePath;
+    this.reducerClass = reducerClass;
     this.jarFile = jarFile;
   }
 
@@ -47,6 +52,10 @@ public class ReduceWorkDescription implements Serializable {
   
   public byte [] getJarFile() {
     return jarFile;
+  }
+
+  public String getReducerClass() {
+    return reducerClass;
   }
 
   public List<MapWorkDescription> getMappers() {
