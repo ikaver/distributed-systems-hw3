@@ -19,8 +19,10 @@ public class MRMapTaskAttempt {
 	 * is bound.
 	 */
 	public static int startMapTask(MapWorkDescription input) {
-
 		int port = SocketUtil.findFreePort();
+		
+
+		byte [] jar = input.getJarFile();
 
 		// TODO(ankit): Remove this!
 		ProcessBuilder builder = new ProcessBuilder("java", "-jar"

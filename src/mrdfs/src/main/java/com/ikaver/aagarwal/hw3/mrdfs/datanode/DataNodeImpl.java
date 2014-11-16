@@ -8,6 +8,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
+import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.dfs.IDataNode;
 
 public class DataNodeImpl extends UnicastRemoteObject implements IDataNode {
@@ -30,13 +31,13 @@ public class DataNodeImpl extends UnicastRemoteObject implements IDataNode {
   }
 
   public void saveFile(String filePath, int numChunk, byte[] data)
-      throws IOException, RemoteException {
+		  throws RemoteException, IOException {
     String filePathForFile = filePathForFile(filePath, numChunk);
     File file = new File(filePathForFile(filePath, numChunk));
     FileOutputStream fos = new FileOutputStream(file);
     fos.write(data);
     fos.close();    
-    Runtime.getRuntime().exec("chmod 777 " + filePathForFile);
+    FileUtil.changeFilePermission(filePathForFile);
   }
   
   public boolean alive() {

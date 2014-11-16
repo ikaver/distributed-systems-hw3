@@ -14,10 +14,10 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
@@ -25,13 +25,14 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.FileMetadata;
+import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.dfs.IDataNode;
 import com.ikaver.aagarwal.hw3.common.mrmap.IMapInstanceRunner;
 import com.ikaver.aagarwal.hw3.common.nodemanager.IMRNodeManager;
 import com.ikaver.aagarwal.hw3.common.nodemanager.NodeState;
+import com.ikaver.aagarwal.hw3.common.util.FileOperationsUtil;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
-import com.ikaver.aagarwal.hw3.common.util.StringUtil;
 import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.MapperChunk;
 import com.ikaver.aagarwal.hw3.common.workers.MapperOutput;
@@ -63,8 +64,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 			throws RemoteException {
 		super();
 		this.masterAddress = masterAddress;
-		// TODO(ankit): Guicify it.
-		this.workInProgress = new HashMap<MapWorkDescription, Integer> ();
+		this.workInProgress = new ConcurrentHashMap<MapWorkDescription, Integer> ();
 	}
 
 	private static final long serialVersionUID = 1674990898801584371L;
@@ -79,7 +79,6 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 	 * 
 	 * @return
 	 */
-	// TODO(ankit): Return a failure error code.
 	@SuppressWarnings("resource")
 	public boolean doMap(MapWorkDescription input) {
 		LOG.info("Received a map request for "
@@ -121,12 +120,13 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 	}
 
 	private String writeDataToLocalPath(byte[] data) {
-		String localfp = StringUtil.getRandomString();
+		String localfp = FileOperationsUtil.getRandomStringForLocalFile();
 		FileOutputStream os;
 		try {
 			os = new FileOutputStream(new File(localfp));
 			os.write(data);
 			os.close();
+			FileUtil.changeFilePermission(localfp);
 			return localfp;
 		} catch (FileNotFoundException e) {
 			LOG.warn("error writing to the file." + localfp, e);
