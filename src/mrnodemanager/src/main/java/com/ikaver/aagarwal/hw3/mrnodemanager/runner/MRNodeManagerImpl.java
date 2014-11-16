@@ -168,7 +168,7 @@ IMRNodeManager {
   }
 
   public List<KeyValuePair> dataForJob(MapWorkDescription mwd, ReduceWorkDescription rwd) {
-
+    LOG.info("Getting data for job: " + rwd + " " + mwd);
     WorkerState state = getMapperState(mwd);
     if (state != WorkerState.FINISHED) {
       LOG.error("Trying to fetch state from a worker which either has failed,"
@@ -183,16 +183,18 @@ IMRNodeManager {
     }
     int port = portObj.intValue();
     IMapInstanceRunner mapper = MRMapFactory.mapInstanceFromPort(port);
-
+        
     try {
       String outputPath = mapper.getMapOutputFilePath();
+      LOG.info("Got output file path of mapper: " + outputPath);
       ObjectInputStream os = new ObjectInputStream(new FileInputStream(
           new File(outputPath)));
 
       List<KeyValuePair> result = new ArrayList<KeyValuePair>();
-
       List<KeyValuePair> list = (List<KeyValuePair>) os.readObject();
 
+      LOG.info("Mapper output list size is " + list.size());
+      
       for (KeyValuePair kv : list) {
         if (kv.getKey().hashCode() % rwd.getNumReducers() == rwd.getReducerID()) {
           result.add(kv);
@@ -246,8 +248,8 @@ IMRNodeManager {
     int numMappers = mapWorkDescriptionToPortMapping.size();
     int numReducers = reduceWorkDescriptionToPortMapping.size();
     int availableSlots = Definitions.WORKERS_PER_NODE - numMappers - numReducers;
-    return new NodeState(mapWorkDescriptionToPortMapping.size(), 
-        reduceWorkDescriptionToPortMapping.size(), 
+    return new NodeState(numMappers, 
+        numReducers, 
         availableSlots,
         Runtime.getRuntime().availableProcessors());
   }
@@ -279,7 +281,7 @@ IMRNodeManager {
   }
 
   public WorkerState getReducerState(ReduceWorkDescription workInfo) {
-    if (mapWorkDescriptionToPortMapping.get(workInfo) == null) {
+    if (reduceWorkDescriptionToPortMapping.get(workInfo) == null) {
       LOG.info("No instance of mapper state found for"
           + "map work description found corresponding");
       return WorkerState.WORKER_DOESNT_EXIST;
