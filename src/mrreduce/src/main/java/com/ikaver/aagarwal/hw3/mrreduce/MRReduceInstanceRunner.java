@@ -1,4 +1,4 @@
-package com.ikaver.aagarwal.hw3.mrrreduce;
+package com.ikaver.aagarwal.hw3.mrreduce;
 
 import java.io.File;
 import java.io.IOException;
