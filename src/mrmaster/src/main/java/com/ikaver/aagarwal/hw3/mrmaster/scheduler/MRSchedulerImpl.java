@@ -62,7 +62,9 @@ public class MRSchedulerImpl implements IMRScheduler {
     for(MapWorkDescription workToDo : work) {
       NodeManagerWithSocketAddress worker = null;
       //try to find a worker
+      LOG.info("Trying to find node manager for mapper");
       worker = nodeManagerForMapperWork(workToDo);
+      LOG.info("Got node manager: " + worker);
       if(worker != null) {
         try {
           LOG.info("Will ask mapper to start work: " + worker.sa);
