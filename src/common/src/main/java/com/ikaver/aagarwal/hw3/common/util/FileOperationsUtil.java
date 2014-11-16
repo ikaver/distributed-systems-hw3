@@ -37,7 +37,7 @@ public class FileOperationsUtil {
 		String path;
 		do {
 			path = Definitions.LOCAL_FS_BASE_DIRECTORY
-				+ UUID.randomUUID().toString();
+					+ "/" + UUID.randomUUID().toString();
 			file = new  File(path);
 		} while(file.exists());
 		return path;
