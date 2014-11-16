@@ -66,8 +66,7 @@ public class MRReduceInstanceRunner extends UnicastRemoteObject implements
 				LOGGER.warn("error fetching data from node manager");
 				return false;
 			} else {
-				List<KeyValuePair> list = node.dataForJob(mwds.get(i),
-						rwd.getReducerID());
+				List<KeyValuePair> list = node.dataForJob(mwds.get(i), rwd);
 				// Aggregate all lists.
 				aggregate(list);
 			}

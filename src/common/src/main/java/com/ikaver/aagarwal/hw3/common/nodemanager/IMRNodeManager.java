@@ -43,11 +43,11 @@ public interface IMRNodeManager extends Remote {
 	 * Fetches data from a mapper corresponding to the map work. It is assumed that this
 	 * function is called only when all the mappers have finished executing.
 	 * @param mwd is the map work description.
-	 * @param reducerID
+	 * @param rwd is the reduce work description
 	 * @return
 	 */
 	public List<KeyValuePair> dataForJob(
-			MapWorkDescription mwd, int reducerID) throws RemoteException;
+			MapWorkDescription mwd, ReduceWorkDescription rwd) throws RemoteException;
 
 	/**
 	 * Returns the status and capacity of number of mappers and reducers.

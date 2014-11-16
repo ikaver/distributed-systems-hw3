@@ -11,13 +11,14 @@ public class ReduceWorkDescription implements Serializable {
 
   private final int jobID;
   private final int reducerID;
+  private final int numReducers;
   private final String reducerClass;
   private final byte [] jarFile;
   private final List<MapWorkDescription> mappers;
   private final List<SocketAddress> mapperAddresses;
   private final String outputFilePath;
 
-  public ReduceWorkDescription(int jobID, int reducerID, 
+  public ReduceWorkDescription(int jobID, int reducerID, int numReducers,
       String reducerClass,
       List<MapWorkDescription> mappers,
       List<SocketAddress> mapperAddresses,
@@ -35,6 +36,7 @@ public class ReduceWorkDescription implements Serializable {
       throw new IllegalArgumentException("Output file path cannot be null");
     this.jobID = jobID;
     this.reducerID = reducerID;
+    this.numReducers = numReducers;
     this.mappers = mappers;
     this.mapperAddresses = mapperAddresses;
     this.outputFilePath = outputFilePath;
@@ -60,6 +62,10 @@ public class ReduceWorkDescription implements Serializable {
 
   public List<MapWorkDescription> getMappers() {
     return mappers;
+  }
+  
+  public int getNumReducers() {
+    return numReducers;
   }
 
   public List<SocketAddress> getMapperAddresses() {

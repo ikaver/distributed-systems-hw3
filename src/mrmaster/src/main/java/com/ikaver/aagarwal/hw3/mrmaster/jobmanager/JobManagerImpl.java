@@ -127,6 +127,7 @@ IOnWorkCompletedHandler {
       ReduceWorkDescription work = new ReduceWorkDescription(
           jobID, 
           i,
+          job.getNumReducers(),
           job.getReducerClass(),
           mapperList,
           mapperAddresses, /* input sources, socket addresses of mappers */

@@ -167,7 +167,7 @@ IMRNodeManager {
     return null;
   }
 
-  public List<KeyValuePair> dataForJob(MapWorkDescription mwd, int reducerID) {
+  public List<KeyValuePair> dataForJob(MapWorkDescription mwd, ReduceWorkDescription rwd) {
 
     WorkerState state = getMapperState(mwd);
     if (state != WorkerState.FINISHED) {
@@ -176,7 +176,12 @@ IMRNodeManager {
       return null;
     }
 
-    int port = mapWorkDescriptionToPortMapping.get(mwd);
+    Integer portObj = mapWorkDescriptionToPortMapping.get(mwd);
+    if(portObj == null) {
+      LOG.warn("Mapper " + mwd + " is not running on this node!");
+      return null;
+    }
+    int port = portObj.intValue();
     IMapInstanceRunner mapper = MRMapFactory.mapInstanceFromPort(port);
 
     try {
@@ -189,7 +194,7 @@ IMRNodeManager {
       List<KeyValuePair> list = (List<KeyValuePair>) os.readObject();
 
       for (KeyValuePair kv : list) {
-        if (kv.getKey().hashCode() % reducerID == 0) {
+        if (kv.getKey().hashCode() % rwd.getNumReducers() == rwd.getReducerID()) {
           result.add(kv);
         }
       }
@@ -263,9 +268,6 @@ IMRNodeManager {
     } else {
       try {
         WorkerState state = mapper.getMapperState();
-        if(state == WorkerState.FINISHED) {
-          removeMapper(wd);
-        }
         return state;
       } catch (RemoteException e) {
         LOG.warn(String.format("Mapper %s failed (remote exception)",
@@ -304,6 +306,7 @@ IMRNodeManager {
   }
 
   public boolean terminateWorkers(int jobID) {
+    //TODO: implement
     throw new UnsupportedOperationException("Not yet implemented :(");
   }
 
@@ -313,7 +316,7 @@ IMRNodeManager {
 
   public void updateMappersReferences(List<SocketAddress> mapperAddr,
       List<MapperChunk> chunks) throws RemoteException {
-    // TODO Auto-generated method stub
+    //TODO: implement
   }
 
   private SocketAddress getRandomDataNode(Set<SocketAddress> datanodes) {
