@@ -79,6 +79,19 @@ public class JobMonitor {
     }
     return success;
   }
+  
+  public boolean shutdown() {
+    IJobManager manager = this.factory.getJobManager(masterAddr);
+    if(manager == null) return false;
+    
+    try {
+      manager.shutdown();
+    } catch (RemoteException e) {
+      LOG.info("Failed shutting down system", e);
+      return false;
+    }
+    return true;
+  }
 
   public JobInfoForClient getJobInfo(int jobID) {
     IJobManager manager = this.factory.getJobManager(masterAddr);

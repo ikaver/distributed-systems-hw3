@@ -69,4 +69,10 @@ public interface IMRNodeManager extends Remote {
 	 */
 	public WorkerState getReducerState(ReduceWorkDescription workInfo) throws RemoteException;
 	
+	/**
+	 * Shuts down the node manager, terminates all mappers and reducers currently running.
+	 * @throws RemoteException
+	 */
+	public void shutdown() throws RemoteException;
+	
 }

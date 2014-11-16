@@ -19,5 +19,6 @@ public interface IJobManager extends Remote {
   public boolean terminate(int jobID) throws RemoteException;
   public JobInfoForClient getJobInfo(int jobID) throws RemoteException;
   public List<FinishedJob> finishedJobs() throws RemoteException;
+  public void shutdown() throws RemoteException;
   
 }

@@ -51,5 +51,9 @@ public class JobManagerMockImpl extends UnicastRemoteObject implements IJobManag
   public List<FinishedJob> finishedJobs() throws RemoteException {
     return new ArrayList<FinishedJob>();
   }
-  
+
+  public void shutdown() throws RemoteException {
+    System.exit(0);
+  }
+    
 }
