@@ -8,6 +8,7 @@ public class Definitions {
   public static final String DFS_SERVICE = "DFS";
   public static final String DATA_NODE_SERVICE = "DataNode";
   public static final String MR_MAP_RUNNER_SERVICE = "MrMapRunner";
+  public static final String MR_REDUCE_RUNNER_SERVICE = "MrReduceRunner";
   
   //annotations
   public static final String MASTER_SOCKET_ADDR_ANNOTATION = "MasterSocketAddr";

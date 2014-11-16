@@ -11,7 +11,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 import org.apache.log4j.Logger;
 
-import com.ikaver.aagarwal.hw3.common.mrmap.ICollector;
+import com.ikaver.aagarwal.hw3.common.mrcollector.ICollector;
 import com.ikaver.aagarwal.hw3.common.mrmap.IMapInstanceRunner;
 import com.ikaver.aagarwal.hw3.common.util.FileOperationsUtil;
 import com.ikaver.aagarwal.hw3.common.workers.IMapper;

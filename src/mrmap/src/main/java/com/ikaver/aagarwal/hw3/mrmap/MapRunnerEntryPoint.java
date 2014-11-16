@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 
 import com.beust.jcommander.JCommander;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
+import com.ikaver.aagarwal.hw3.common.workers.flags.MRWorkerRunnerSettings;
 
 public class MapRunnerEntryPoint {
 	
@@ -16,7 +17,7 @@ public class MapRunnerEntryPoint {
 
 	public static void main(String args[]) throws RemoteException,
 			MalformedURLException {
-		MapRunnerSettings settings = new MapRunnerSettings();
+		MRWorkerRunnerSettings settings = new MRWorkerRunnerSettings();
 		JCommander cmd = new JCommander(settings);
 		cmd.parse(args);
 

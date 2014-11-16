@@ -1,6 +1,6 @@
 package com.ikaver.aagarwal.hw3.common.examples;
 
-import com.ikaver.aagarwal.hw3.common.mrmap.ICollector;
+import com.ikaver.aagarwal.hw3.common.mrcollector.ICollector;
 import com.ikaver.aagarwal.hw3.common.workers.IMapper;
 
 /**
