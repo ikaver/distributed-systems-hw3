@@ -174,7 +174,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 				LOG.warn("Remote exception while reading data.", e);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				LOG.warn("Error while fetching data from the disk.", e);
+				LOG.warn("Error while fetching data from the dfs.", e);
 			}
 		}
 
