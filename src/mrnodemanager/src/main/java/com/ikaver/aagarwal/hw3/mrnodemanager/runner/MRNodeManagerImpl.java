@@ -99,6 +99,11 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 		String localfp = writeDataToLocalPath(data);
 
 		int port = MRMapTaskAttempt.startMapTask(input);
+
+		if (port == -1) {
+			LOGGER.warn("error starting work instance");
+			return false;
+		}
 		
 		workInProgress.put(input, port);
 

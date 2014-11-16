@@ -24,16 +24,12 @@ public class MRMapTaskAttempt {
 	public static int startMapTask(MapWorkDescription input) {
 		int port = SocketUtil.findFreePort();
 		
-		// TODO(ankit): Remove this!
-		ProcessBuilder builder = new ProcessBuilder("java", "-jar"
-				,"mrmap-1.0-SNAPSHOT-jar-with-dependencies.jar", "-port", port + "",
-				">", getStdoutRedirectionFile(input), "2>", getStderrRedirectionFile(input));
-
-		try {
-			Process process = builder.start();
+        try {
+			Runtime.getRuntime().exec("java -jar mrmap-1.0-SNAPSHOT-jar-with-dependencies.jar " +
+					" -port "+ port + " > "  + getStdoutRedirectionFile(input) +
+					" 2> " + getStderrRedirectionFile(input));
 		} catch (IOException e) {
-			LOGGER.fatal("Error starting map task attempt at port: " + port);
-			e.printStackTrace();
+			LOGGER.fatal("Error starting map task attempt at port: " + port, e);
 			return -1;
 		}
 		return port;
