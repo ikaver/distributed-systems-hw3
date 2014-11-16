@@ -69,4 +69,25 @@ public class ReduceWorkDescription implements Serializable {
   public String getOutputFilePath() {
     return outputFilePath;
   }
+  
+	@Override
+	public boolean equals(Object obj) {
+	  if (obj == null) return false;
+		if (obj instanceof ReduceWorkDescription) {
+			ReduceWorkDescription work = (ReduceWorkDescription) obj;
+			if (getJobID() != work.getJobID())
+				return false;
+			if (getReducerID() != work.getReducerID())
+				return false;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return new Integer(this.getJobID()).hashCode() * 59 + new Integer(getReducerID()).hashCode();
+	}
+
 }
