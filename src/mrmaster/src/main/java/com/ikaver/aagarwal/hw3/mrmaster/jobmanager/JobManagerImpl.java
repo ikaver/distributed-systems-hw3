@@ -23,6 +23,7 @@ import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
 import com.ikaver.aagarwal.hw3.common.nodemanager.IMRNodeManager;
+import com.ikaver.aagarwal.hw3.common.nodemanager.NodeManagerFactory;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.MapperChunk;
@@ -33,7 +34,6 @@ import com.ikaver.aagarwal.hw3.mrmaster.jobtracker.IOnWorkerFailedHandler;
 import com.ikaver.aagarwal.hw3.mrmaster.jobtracker.JobTracker;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.IMRScheduler;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.MapperWorkerInfo;
-import com.ikaver.aagarwal.hw3.mrmaster.scheduler.NodeManagerFactory;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.ReducerWorkerInfo;
 
 public class JobManagerImpl extends UnicastRemoteObject implements IJobManager, IOnWorkerFailedHandler,

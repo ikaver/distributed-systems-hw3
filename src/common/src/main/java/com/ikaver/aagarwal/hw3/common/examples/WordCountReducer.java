@@ -1,5 +1,6 @@
 package com.ikaver.aagarwal.hw3.common.examples;
 
+import com.ikaver.aagarwal.hw3.common.mrcollector.ICollector;
 import com.ikaver.aagarwal.hw3.common.workers.IReducer;
 
 /**
@@ -7,9 +8,7 @@ import com.ikaver.aagarwal.hw3.common.workers.IReducer;
  */
 public class WordCountReducer implements IReducer {
 
-	public void reduce() {
-	  //TODO: implement
-		System.out.println("Reduce function called.");
+	public void reduce(ICollector collector) {
+		
 	}
-
 }

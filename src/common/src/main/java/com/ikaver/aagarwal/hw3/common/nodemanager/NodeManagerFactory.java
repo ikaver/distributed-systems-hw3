@@ -1,4 +1,4 @@
-package com.ikaver.aagarwal.hw3.mrmaster.scheduler;
+package com.ikaver.aagarwal.hw3.common.nodemanager;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;

@@ -15,7 +15,7 @@ public interface IMRReduceInstanceRunner extends Remote {
 	/**
 	 * Runs a reduce instance
 	 */
-	public void runReduceInstance(ReduceWorkDescription rwd) throws RemoteException;
+	public boolean runReduceInstance(ReduceWorkDescription rwd) throws RemoteException;
 
 	/**
 	 * Enum indicating state of the reducer task.

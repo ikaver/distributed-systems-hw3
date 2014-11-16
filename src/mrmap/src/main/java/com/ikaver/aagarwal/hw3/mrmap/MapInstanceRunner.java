@@ -70,7 +70,7 @@ public class MapInstanceRunner extends UnicastRemoteObject implements
 
 			// Flush the data to a file and return the path where it is
 			// being stored.
-			if (mapWorkState.getOutputPath() != null) {
+			if (mapWorkState.getOutputPath() == null) {
 				mapWorkState.setState(WorkerState.FAILED);
 			} else {
 				mapWorkState.setState(WorkerState.FINISHED);

@@ -9,12 +9,12 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import com.ikaver.aagarwal.hw3.common.nodemanager.IMRNodeManager;
+import com.ikaver.aagarwal.hw3.common.nodemanager.NodeManagerFactory;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.common.workers.MapperChunk;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 import com.ikaver.aagarwal.hw3.mrmaster.jobmanager.RunningJob;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.MapperWorkerInfo;
-import com.ikaver.aagarwal.hw3.mrmaster.scheduler.NodeManagerFactory;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.ReducerWorkerInfo;
 
 public class JobTracker implements Runnable {
