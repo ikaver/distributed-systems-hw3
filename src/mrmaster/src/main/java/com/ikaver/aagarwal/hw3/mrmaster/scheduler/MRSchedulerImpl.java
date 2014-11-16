@@ -159,18 +159,25 @@ public class MRSchedulerImpl implements IMRScheduler {
       LOG.warn("Failed to communicate with DFS", e);
     }
     if(metadata == null) {
+      LOG.warn("Couldn't find metadata for work: " + work);
       return null;
     }
     else{
+      LOG.info("Searching for mappers with data for work: " + work);
       //get nodes that actually have chunk locally
       Set<SocketAddress> nodeManagersForChunk 
       = metadata.getNumChunkToAddr().get(work.getChunk().getPartitionID());
+      
+      for(SocketAddress addr : nodeManagersForChunk) {
+        LOG.info("NM has the data: " + addr);
+      }
       
       this.nodeInfoLock.readLock().lock();
       //get intersection of available nodes and nodes that have chunk.
       nodeManagersForChunk.retainAll(this.nodeInfo.keySet());
       //select the best node manager
       SocketAddress selectedNode = selectNodeFromSet(nodeManagersForChunk);
+      LOG.info("Selected node for work: " + work + " is: " + selectedNode);
       this.nodeInfoLock.readLock().unlock();
       
       IMRNodeManager nm = NodeManagerFactory.nodeManagerFromSocketAddress(selectedNode);
