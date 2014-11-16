@@ -19,3 +19,7 @@ cd ..
 cd mrclient
 mvn clean
 mvn assembly:assembly -DdescriptorId=jar-with-dependencies
+cd ..
+cd mrreduce
+mvn clean
+mvn assembly:assembly -DdescriptorId=jar-with-dependencies

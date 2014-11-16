@@ -8,10 +8,10 @@ import java.rmi.RemoteException;
 import org.apache.log4j.Logger;
 
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
+import com.ikaver.aagarwal.hw3.common.dfs.DFSFactory;
 import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
-import com.ikaver.aagarwal.hw3.mrdfs.master.DFSFactory;
 
 public class FileUploader {
   
