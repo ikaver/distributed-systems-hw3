@@ -1,6 +1,6 @@
 package com.ikaver.aagarwal.hw3.common.workers;
 
-import com.ikaver.aagarwal.hw3.common.mrmap.ICollector;
+import com.ikaver.aagarwal.hw3.common.mrcollector.ICollector;
 
 /**
  * Interface which must be extended by a mapper class of the

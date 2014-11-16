@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import org.apache.log4j.Logger;
 
@@ -165,33 +163,6 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 		return null;
 	}
 
-	private SocketAddress getRandomDataNode(Set<SocketAddress> datanodes) {
-		List<SocketAddress> list = new ArrayList<SocketAddress>(datanodes);
-		Collections.shuffle(list);
-		return list.get(0);
-	}
-
-	private SocketAddress getPreferredAddress(Set<SocketAddress> addresses) {
-		for (SocketAddress address : addresses) {
-			try {
-				LOGGER.info("Checking if " + address.getHostname() + " "
-						+ InetAddress.getLocalHost().getHostName()
-						+ "matches..");
-				if (address.getHostname().equals(
-						InetAddress.getLocalHost().getHostName())) {
-					return address;
-				}
-			} catch (UnknownHostException e) {
-				LOG.warn("Error looking up hostname.");
-			}
-		}
-		return null;
-	}
-
-	public boolean doReduce(ReduceWorkDescription input) throws RemoteException {
-		throw new UnsupportedOperationException("Not yet implemented :(");
-	}
-
 	public List<KeyValuePair> dataForJob(MapWorkDescription mwd, int reducerID) {
 
 		WorkerState state = getMapperState(mwd);
@@ -230,7 +201,10 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 					+ "really fucked up.");
 			return null;
 		}
+	}
 
+	public boolean doReduce(ReduceWorkDescription input) throws RemoteException {
+		throw new UnsupportedOperationException("Not yet implemented :(");
 	}
 
 	public NodeState getNodeState() {
@@ -268,10 +242,6 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 		throw new UnsupportedOperationException("Not yet implemented :(");
 	}
 
-	public void startReducerWork(int jobID, int reducerID) {
-		throw new UnsupportedOperationException("Not yet implemented :(");
-	}
-
 	public int getAvailableSlots() throws RemoteException {
 		return 3;
 	}
@@ -285,5 +255,28 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 	public WorkerState getReducerState(int jobId, int reducerId)
 			throws RemoteException {
 		return WorkerState.WORKER_DOESNT_EXIST;
+	}
+
+	private SocketAddress getRandomDataNode(Set<SocketAddress> datanodes) {
+		List<SocketAddress> list = new ArrayList<SocketAddress>(datanodes);
+		Collections.shuffle(list);
+		return list.get(0);
+	}
+	
+	private SocketAddress getPreferredAddress(Set<SocketAddress> addresses) {
+		for (SocketAddress address : addresses) {
+			try {
+				LOGGER.info("Checking if " + address.getHostname() + " "
+						+ InetAddress.getLocalHost().getHostName()
+						+ "matches..");
+				if (address.getHostname().equals(
+						InetAddress.getLocalHost().getHostName())) {
+					return address;
+				}
+			} catch (UnknownHostException e) {
+				LOG.warn("Error looking up hostname.");
+			}
+		}
+		return null;
 	}
 }
