@@ -68,17 +68,23 @@ public class MRSchedulerImpl implements IMRScheduler {
       if(worker != null) {
         try {
           LOG.info("Will ask mapper to start work: " + worker.sa);
-          worker.nm.doMap(workToDo);
-          LOG.info("Mapper started working: " + worker.sa);
-          MapperWorkerInfo workerInfo = new MapperWorkerInfo(
-              workToDo.getJobID(),
-              worker.sa,
-              WorkerState.RUNNING,
-              workToDo.getChunk(),
-              workToDo.getJarFile(),
-              workToDo.getMapperClass()
-              );
-          info.add(workerInfo);
+          boolean success = worker.nm.doMap(workToDo);
+          if(success) {
+            LOG.info("Mapper started working: " + worker.sa);
+            MapperWorkerInfo workerInfo = new MapperWorkerInfo(
+                workToDo.getJobID(),
+                worker.sa,
+                WorkerState.RUNNING,
+                workToDo.getChunk(),
+                workToDo.getJarFile(),
+                workToDo.getMapperClass()
+                );
+            info.add(workerInfo);
+          }
+          else {
+            LOG.info("Mapper return false, failed to start working...");
+            info.add(mapperWorkerInfoForFailure(workToDo));
+          } 
         } catch (RemoteException e) {
           LOG.warn("Failed to launch mapper", e);
           info.add(mapperWorkerInfoForFailure(workToDo));
