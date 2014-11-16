@@ -25,4 +25,8 @@ public enum WorkerState {
 	 * Indicates if the the worker can be garbage collected.
 	 */
 	GARBAGE_COLLECT,
+	/**
+	 * Indicates that the worker whose state is being requested doesn't exist.
+	 */
+	WORKER_DOESNT_EXIST,
 }

@@ -61,7 +61,7 @@ public interface IMRNodeManager extends Remote {
 	 * @param jobId
 	 * @param partitionId
 	 */
-	public WorkerState getMapperState(int jobId, int partitionId) throws RemoteException;
+	public WorkerState getMapperState(MapWorkDescription mwd) throws RemoteException;
 
 	/**
 	 * Returns an enum indicating state of the reducer.

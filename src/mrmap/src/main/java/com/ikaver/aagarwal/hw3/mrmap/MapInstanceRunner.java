@@ -62,9 +62,14 @@ public class MapInstanceRunner extends UnicastRemoteObject implements
 				mapper.map(record.toString(), (ICollector)moc);
 			}
 
+			// Set the output path before you set the state. Otherwise,
+			// it can lead to a subtle concurrency bug where you try to
+			// access the path which has not yet been set while the map
+			// state has been set.
+			mapWorkState.setOutputPath(moc.flush());
+
 			// Flush the data to a file and return the path where it is
 			// being stored.
-			mapWorkState.setOutputPath(moc.flush());
 			if (mapWorkState.getOutputPath() != null) {
 				mapWorkState.setState(WorkerState.FAILED);
 			} else {
