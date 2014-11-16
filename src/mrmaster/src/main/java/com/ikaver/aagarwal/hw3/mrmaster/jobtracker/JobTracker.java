@@ -46,7 +46,8 @@ public class JobTracker implements Runnable {
 
   public void queryMappers() {
     for(MapperWorkerInfo info : job.getMappers()) {
-      if(info.getState() == WorkerState.WORKER_NOT_ASSIGNED) {
+      if(info.getState() == WorkerState.WORKER_NOT_ASSIGNED
+          || info.getState() == WorkerState.WORKER_DOESNT_EXIST) {
         //ask scheduler to assign a worker
         this.onWorkerFailedHandler.onMapperFailed(job, info);
       }
@@ -83,7 +84,8 @@ public class JobTracker implements Runnable {
 
   public void queryReducers() {
     for(ReducerWorkerInfo info : job.getReducers()) {
-      if(info.getState() == WorkerState.WORKER_NOT_ASSIGNED) {
+      if(info.getState() == WorkerState.WORKER_NOT_ASSIGNED 
+          || info.getState() == WorkerState.WORKER_DOESNT_EXIST) {
         this.onWorkerFailedHandler.onReducerFailed(job, info);
       }
       else if(info.getState() == WorkerState.RUNNING) {
