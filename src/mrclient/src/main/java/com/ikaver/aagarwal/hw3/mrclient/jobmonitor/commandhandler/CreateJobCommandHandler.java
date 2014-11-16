@@ -37,6 +37,7 @@ public class CreateJobCommandHandler implements ICommandHandler {
       System.out.println("Failed to create job, check your config file");
     }
     
+    System.out.println("Submitting job to the MR master...");
     if(job != null) {
       JobInfoForClient jobInfo = monitor.createJob(job);
       if(jobInfo == null) {
