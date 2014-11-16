@@ -26,6 +26,7 @@ import com.ikaver.aagarwal.hw3.common.dfs.FileMetadata;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.dfs.IDataNode;
 import com.ikaver.aagarwal.hw3.common.mrmap.IMapInstanceRunner;
+import com.ikaver.aagarwal.hw3.common.mrreduce.IMRReduceInstanceRunner;
 import com.ikaver.aagarwal.hw3.common.nodemanager.IMRNodeManager;
 import com.ikaver.aagarwal.hw3.common.nodemanager.NodeState;
 import com.ikaver.aagarwal.hw3.common.objects.KeyValuePair;
@@ -51,7 +52,8 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 	// Work in progress is a map between parition id and port at which the
 	// mapper task
 	// is running.
-	private Map<MapWorkDescription, Integer> workDescriptionToPortMapping;
+	private final Map<MapWorkDescription, Integer> mapWorkDescriptionToPortMapping;
+	private final Map<ReduceWorkDescription, Integer> reduceWorkDescriptionToPortMapping;
 	private final SocketAddress masterAddress;
 
 	@Inject
@@ -60,7 +62,8 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 			throws RemoteException {
 		super();
 		this.masterAddress = masterAddress;
-		this.workDescriptionToPortMapping = new ConcurrentHashMap<MapWorkDescription, Integer>();
+		this.mapWorkDescriptionToPortMapping = new ConcurrentHashMap<MapWorkDescription, Integer>();
+		this.reduceWorkDescriptionToPortMapping = new ConcurrentHashMap<ReduceWorkDescription, Integer>();
 	}
 
 	private static final long serialVersionUID = 1674990898801584371L;
@@ -101,7 +104,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 			return false;
 		}
 
-		workDescriptionToPortMapping.put(input, port);
+		mapWorkDescriptionToPortMapping.put(input, port);
 
 		LOGGER.info(String.format("Starting map runner at port: %d", port));
 		IMapInstanceRunner runner = MRMapFactory.mapInstanceFromPort(port);
@@ -150,8 +153,10 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 				IDataNode datanode = DataNodeFactory
 						.dataNodeFromSocketAddress(preferredNode);
 				byte[] data = null;
-				if(datanode != null) data = datanode.getFile(inputPath, chunk);
-				if(data != null) return data;
+				if (datanode != null)
+					data = datanode.getFile(inputPath, chunk);
+				if (data != null)
+					return data;
 			} catch (RemoteException e) {
 				LOG.warn("Remote exception while reading data.", e);
 			} catch (IOException e) {
@@ -171,7 +176,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 			return null;
 		}
 
-		int port = workDescriptionToPortMapping.get(mwd);
+		int port = mapWorkDescriptionToPortMapping.get(mwd);
 		IMapInstanceRunner mapper = MRMapFactory.mapInstanceFromPort(port);
 
 		try {
@@ -202,63 +207,99 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 		}
 	}
 
-	public boolean doReduce(ReduceWorkDescription input) throws RemoteException {
-	  return false;
+	public boolean doReduce(ReduceWorkDescription rwd) throws RemoteException {
+		int port = MRReduceTaskAttempt.startReduceTask(
+				masterAddress.getHostname(), masterAddress.getPort());
+
+		if (port == -1) {
+			LOGGER.warn("error starting work instance");
+			return false;
+		}
+
+		reduceWorkDescriptionToPortMapping.put(rwd, port);
+
+		LOGGER.info(String.format("Starting reduce runner at port: %d", port));
+
+		IMRReduceInstanceRunner runner = MRReduceFactory
+				.reduceInstanceFromPort(port);
+
+		if (runner == null) {
+			LOG.warn("Could not locate a running map instance at the port");
+			return false;
+		}
+
+		try {
+			runner.runReduceInstance(rwd);
+			return true;
+		} catch (RemoteException e) {
+			LOG.info("Remote exception while running the map instance");
+			return false;
+		}
 	}
 
 	public NodeState getNodeState() {
-		return new NodeState(workDescriptionToPortMapping.size(), 0, 3, Runtime
-				.getRuntime().availableProcessors());
+		return new NodeState(mapWorkDescriptionToPortMapping.size(), 0, 3,
+				Runtime.getRuntime().availableProcessors());
 	}
 
 	public WorkerState getMapperState(MapWorkDescription wd) {
-		if (workDescriptionToPortMapping.get(wd) == null) {
+		if (mapWorkDescriptionToPortMapping.get(wd) == null) {
 			LOG.info("No instance of mapper state found for"
 					+ "map work description found corresponding");
 			return WorkerState.WORKER_DOESNT_EXIST;
 		}
 
-		int port = workDescriptionToPortMapping.get(wd);
+		int port = mapWorkDescriptionToPortMapping.get(wd);
 		IMapInstanceRunner mapper = MRMapFactory.mapInstanceFromPort(port);
 		if (mapper == null) {
-		  LOG.warn(String.format("Mapper %s failed", wd));
+			LOG.warn(String.format("Mapper %s failed", wd));
 			return WorkerState.FAILED;
 		} else {
 			try {
 				return mapper.getMapperState();
 			} catch (RemoteException e) {
-		     LOG.warn(String.format("Mapper %s failed (remote exception)", wd));
+				LOG.warn(String.format("Mapper %s failed (remote exception)",
+						wd));
 				return WorkerState.FAILED;
 			}
 		}
 	}
 
-	public WorkerState getReducerState(ReduceWorkDescription workInfo)
-			throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+	public WorkerState getReducerState(ReduceWorkDescription workInfo) {
+		int port = reduceWorkDescriptionToPortMapping.get(workInfo);
+		IMRReduceInstanceRunner reducer = MRReduceFactory
+				.reduceInstanceFromPort(port);
+		if (reducer == null) {
+			LOG.warn("No reducer found corresponding to the port " + port);
+			return WorkerState.WORKER_DOESNT_EXIST;
+		}
+		try {
+			return reducer.getReducerState();
+		} catch (RemoteException e) {
+			LOG.warn("Remote exception while trying to fetch reducer state", e);
+			return WorkerState.FAILED;
+		}
 	}
 
 	public boolean terminateWorkers(int jobID) {
 		throw new UnsupportedOperationException("Not yet implemented :(");
 	}
-	
-  public void shutdown() throws RemoteException {
-    
-  }
+
+	public void shutdown() throws RemoteException {
+		System.exit(0);
+	}
 
 	public void updateMappersReferences(List<SocketAddress> mapperAddr,
 			List<MapperChunk> chunks) throws RemoteException {
 		// TODO Auto-generated method stub
 	}
 
-
 	private SocketAddress getRandomDataNode(Set<SocketAddress> datanodes) {
 		List<SocketAddress> list = new ArrayList<SocketAddress>(datanodes);
 		Collections.shuffle(list);
 		return list.get(0);
 	}
-	
+
 	private SocketAddress getPreferredAddress(Set<SocketAddress> addresses) {
 		for (SocketAddress address : addresses) {
 			try {
@@ -275,6 +316,5 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 		}
 		return null;
 	}
-
 
 }
