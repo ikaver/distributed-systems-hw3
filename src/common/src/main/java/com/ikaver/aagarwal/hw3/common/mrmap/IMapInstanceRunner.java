@@ -21,7 +21,7 @@ public interface IMapInstanceRunner extends Remote {
 	/**
 	 * Enum indicating state of the mapper task.
 	 */
-	public WorkerState getMapperState();
+	public WorkerState getMapperState() throws RemoteException;
 	/**
 	 * Die! Kill yourself.
 	 */
@@ -30,5 +30,5 @@ public interface IMapInstanceRunner extends Remote {
 	/**
 	 * Path of the local file where the output of the map task has been dumped.
 	 */
-	public String getMapOutputFilePath();
+	public String getMapOutputFilePath() throws RemoteException;
 }
