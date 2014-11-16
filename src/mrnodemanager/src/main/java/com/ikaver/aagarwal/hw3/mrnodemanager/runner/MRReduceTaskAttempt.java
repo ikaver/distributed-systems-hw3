@@ -24,7 +24,7 @@ public class MRReduceTaskAttempt {
 
 		try {
 			Runtime.getRuntime().exec(
-					"java -jar mrmap-1.0-SNAPSHOT-jar-with-dependencies.jar "
+					"java -jar mrreduce-1.0-SNAPSHOT-jar-with-dependencies.jar "
 							+ " -port " + port
 							+ " -masterIP " + masterIP
 							+ " -masterPort " + masterPort );
