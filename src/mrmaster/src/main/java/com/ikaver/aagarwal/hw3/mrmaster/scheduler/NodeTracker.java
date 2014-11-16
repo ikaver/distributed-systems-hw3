@@ -32,23 +32,27 @@ public class NodeTracker implements Runnable {
   
   private void getStateFromNodeManagers() {
     this.nodeInfoLock.writeLock().lock();
-    for(SocketAddress addr : allNodes) {
-      IMRNodeManager nm = NodeManagerFactory.nodeManagerFromSocketAddress(addr);
-      if(nm == null) {
-        nodeInfo.remove(addr);
-      }
-      else {
-        int availableSlots = -1;
-        try {
-          availableSlots = nm.getAvailableSlots();
-          nodeInfo.put(addr, new NodeInformation(addr, 1, availableSlots));
-        } catch (RemoteException e) {
-          LOG.warn("Failed to communicate with node manager", e);
+    try{
+      for(SocketAddress addr : allNodes) {
+        IMRNodeManager nm = NodeManagerFactory.nodeManagerFromSocketAddress(addr);
+        if(nm == null) {
           nodeInfo.remove(addr);
+        }
+        else {
+          int availableSlots = -1;
+          try {
+            availableSlots = nm.getAvailableSlots();
+            nodeInfo.put(addr, new NodeInformation(addr, 1, availableSlots));
+          } catch (RemoteException e) {
+            LOG.warn("Failed to communicate with node manager", e);
+            nodeInfo.remove(addr);
+          }
         }
       }
     }
-    this.nodeInfoLock.writeLock().unlock();
+    finally {
+      this.nodeInfoLock.writeLock().unlock();
+    }
   }
 
 }

@@ -110,7 +110,8 @@ IOnWorkCompletedHandler {
     LOG.info("Asking scheduler to schedule mappers");
     // schedule the mappers
     Set<MapperWorkerInfo> mapWorkers = scheduler.runMappersForWork(mappers);
-
+    LOG.info("Got mapper workers for job: " + mapWorkers.size());
+    
     // create reducers
     List<SocketAddress> mapperAddresses = new ArrayList<SocketAddress>();
     Set<ReduceWorkDescription> reducers = new HashSet<ReduceWorkDescription>();
@@ -134,7 +135,7 @@ IOnWorkCompletedHandler {
     Set<ReducerWorkerInfo> reduceWorkers = scheduler
         .runReducersForWork(reducers);
     for(ReducerWorkerInfo workerInfo : reduceWorkers) {
-      LOG.info(String.format("Got mapper address for job %d: %s", jobID, 
+      LOG.info(String.format("Got reducer address for job %d: %s", jobID, 
           workerInfo.getNodeManagerAddress()));
     }
 
