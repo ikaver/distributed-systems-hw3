@@ -50,13 +50,14 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
       @Named(Definitions.DFS_REPLICATION_FACTOR_ANNOTATION) Integer replicationFactor, 
       @Named(Definitions.DFS_MAP_FILE_TO_METADATA_ANNOTATION) Map<String, FileMetadata> fileToMetadata,
       @Named(Definitions.DFS_DATA_NODES_ANNOTATION) Set<SocketAddress> dataNodes,
-      @Named(Definitions.DFS_DATA_NODES_SET_LOCK_ANNOTATION) ReadWriteLock dataNodesLock) throws RemoteException {
+      @Named(Definitions.DFS_DATA_NODES_SET_LOCK_ANNOTATION) ReadWriteLock dataNodesLock,
+      @Named(Definitions.DFS_MAP_FILE_TO_METADATA_LOCK_ANNOTATION)ReadWriteLock metadataLock) throws RemoteException {
     super();
     this.filePathToMetadata = fileToMetadata;
     this.replicationFactor = replicationFactor;
     this.dataNodes = dataNodes;
     this.dataNodesLock = dataNodesLock;
-    this.metadataLock = new ReentrantReadWriteLock();
+    this.metadataLock = metadataLock;
     //Start node tracker service (keeps track of node performance).
     this.nodeTrackerService = Executors.newScheduledThreadPool(1);
     DataNodeTracker tracker = new DataNodeTracker(dataNodes, dataNodesLock, this);

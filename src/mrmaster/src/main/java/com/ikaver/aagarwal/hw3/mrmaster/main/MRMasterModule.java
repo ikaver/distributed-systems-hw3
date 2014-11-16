@@ -26,12 +26,14 @@ import com.ikaver.aagarwal.hw3.mrmaster.scheduler.NodeInformation;
 
 public class MRMasterModule extends AbstractModule {
 
+  private Set<SocketAddress> dataNodes;
   private Set<SocketAddress> nodes;
   private Set<SocketAddress> availableNodes;
   
   public MRMasterModule(Set<SocketAddress> nodes) {
     this.nodes = nodes;
     this.availableNodes = new HashSet<SocketAddress>(nodes);
+    this.dataNodes = new HashSet<SocketAddress>(nodes);
   }
   
   @Override
@@ -42,20 +44,25 @@ public class MRMasterModule extends AbstractModule {
     bind(IJobValidator.class).to(JobValidatorImpl.class);
     
     //Master DFS setup
-    ReadWriteLock dfsLock = new ReentrantReadWriteLock();
+    ReadWriteLock dfsDataNodesLock = new ReentrantReadWriteLock();
+    ReadWriteLock dfsMapLock = new ReentrantReadWriteLock();
     HashMap<String, FileMetadata> dfsMap = new HashMap<String, FileMetadata>();
     bind(ReadWriteLock.class)
       .annotatedWith(Names.named(Definitions.DFS_DATA_NODES_SET_LOCK_ANNOTATION))
-      .toInstance(dfsLock);
+      .toInstance(dfsDataNodesLock);
+    bind(ReadWriteLock.class)
+    .annotatedWith(Names.named(Definitions.DFS_MAP_FILE_TO_METADATA_LOCK_ANNOTATION))
+    .toInstance(dfsMapLock);
     bind(new TypeLiteral<Map<String, FileMetadata>>(){})
       .annotatedWith(Names.named(Definitions.DFS_MAP_FILE_TO_METADATA_ANNOTATION))
       .toInstance(dfsMap);
     bind(new TypeLiteral<Set<SocketAddress>>(){})
       .annotatedWith(Names.named(Definitions.DFS_DATA_NODES_ANNOTATION))
-      .toInstance(nodes);
+      .toInstance(dataNodes);
     bind(Integer.class)
       .annotatedWith(Names.named(Definitions.DFS_REPLICATION_FACTOR_ANNOTATION))
       .toInstance(Definitions.REPLICATION_FACTOR);
+
     
     //Job manager setup
     JobsState jobsState = new JobsState();

@@ -20,6 +20,7 @@ public class Definitions {
   public static final String DFS_MAP_FILE_TO_METADATA_ANNOTATION = "DFSMapFileToMetadata";
   public static final String DFS_DATA_NODES_ANNOTATION = "DFSDataNodes";
   public static final String DFS_DATA_NODES_SET_LOCK_ANNOTATION = "DFSDataNodesLock";
+  public static final String DFS_MAP_FILE_TO_METADATA_LOCK_ANNOTATION = "DFSMapFileToMetadataLock";
   
   //Scheduler
   public static final int SCHEDULER_TIME_TO_CHECK_FOR_NODES_STATE = 3;
