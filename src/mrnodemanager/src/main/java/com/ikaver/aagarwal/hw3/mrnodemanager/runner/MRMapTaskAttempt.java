@@ -26,13 +26,11 @@ public class MRMapTaskAttempt {
 		
 		// TODO(ankit): Remove this!
 		ProcessBuilder builder = new ProcessBuilder("java", "-jar"
-				,"mrmap-1.0-SNAPSHOT-jar-with-dependencies.jar", "-port", port + "");
-
-		builder.redirectOutput(new File(getStdoutRedirectionFile(input)));
-		builder.redirectError(new File(getStderrRedirectionFile(input)));
+				,"mrmap-1.0-SNAPSHOT-jar-with-dependencies.jar", "-port", port + "",
+				">", getStdoutRedirectionFile(input), "2>", getStderrRedirectionFile(input));
 
 		try {
-			builder.start();
+			Process process = builder.start();
 		} catch (IOException e) {
 			LOGGER.fatal("Error starting map task attempt at port: " + port);
 			e.printStackTrace();
