@@ -53,6 +53,7 @@ public class MapWorkDescription implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
+	  if (obj == null) return false;
 		if (obj instanceof MapWorkDescription) {
 			MapWorkDescription work = (MapWorkDescription) obj;
 			if (getJobID() != work.getJobID())
@@ -67,7 +68,7 @@ public class MapWorkDescription implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return this.getJobID() * 59 + getChunk().getPartitionID();
+		return new Integer(this.getJobID()).hashCode() * 59 + new Integer(getChunk().getPartitionID()).hashCode();
 	}
 
 }
