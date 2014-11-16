@@ -115,18 +115,20 @@ IOnWorkCompletedHandler {
     
     // create reducers
     List<SocketAddress> mapperAddresses = new ArrayList<SocketAddress>();
+    List<MapWorkDescription> mapperList = new ArrayList<MapWorkDescription>();
     Set<ReduceWorkDescription> reducers = new HashSet<ReduceWorkDescription>();
     for (MapperWorkerInfo mapWorker : mapWorkers) {
       LOG.info(String.format("Got mapper address for job %d: %s", jobID, 
           mapWorker.getNodeManagerAddress()));
+      mapperList.add(mapWorker.getWorkDescription());
       mapperAddresses.add(mapWorker.getNodeManagerAddress());
     }
     for (int i = 0; i < job.getNumReducers(); ++i) {
       ReduceWorkDescription work = new ReduceWorkDescription(
           jobID, 
           i,
+          mapperList,
           mapperAddresses, /* input sources, socket addresses of mappers */
-          chunks, /* Mapper chunks */
           job.getOutputFilePath(),
           job.getJarFile()
           );
