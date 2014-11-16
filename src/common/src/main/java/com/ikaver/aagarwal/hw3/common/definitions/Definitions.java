@@ -22,6 +22,9 @@ public class Definitions {
   public static final String DFS_DATA_NODES_SET_LOCK_ANNOTATION = "DFSDataNodesLock";
   public static final String DFS_MAP_FILE_TO_METADATA_LOCK_ANNOTATION = "DFSMapFileToMetadataLock";
   
+  //jobmanager
+  public static final int MAX_WORKER_RETRIES_BEFORE_CANCELLING_JOB = 5;
+  
   //Scheduler
   public static final int SCHEDULER_TIME_TO_CHECK_FOR_NODES_STATE = 3;
   
@@ -30,10 +33,8 @@ public class Definitions {
   
   //DFS
   public static final String BASE_DIRECTORY = "/tmp/mrikav-ank-dfs/";
-  
   // Local File system base directory
   public static final String LOCAL_FS_BASE_DIRECTORY = "/tmp/mrikav-ank-local";
-
   public static final int REPLICATION_FACTOR = 2;
   public static final int SIZE_OF_CHUNK = (1 << 19); //512KB
   public static final int NUM_DFS_READ_RETRIES = 3;
