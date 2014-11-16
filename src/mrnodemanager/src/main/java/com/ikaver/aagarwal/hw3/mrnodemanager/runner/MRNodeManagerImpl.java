@@ -228,7 +228,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements
 	}
 
   public int getAvailableSlots() throws RemoteException {
-    throw new UnsupportedOperationException("Not yet implemented :(");
+    return 3;
   }
 
   public void updateMappersReferences(List<SocketAddress> mapperAddr,
