@@ -54,6 +54,8 @@ IMRNodeManager {
   // is running.
   private final Map<MapWorkDescription, Integer> mapWorkDescriptionToPortMapping;
   private final Map<ReduceWorkDescription, Integer> reduceWorkDescriptionToPortMapping;
+  private final Map<MapWorkDescription, Integer> runningMappers;
+  private final Map<ReduceWorkDescription, Integer> runningReducers;
   private final SocketAddress masterAddress;
 
   @Inject
@@ -64,6 +66,8 @@ IMRNodeManager {
     this.masterAddress = masterAddress;
     this.mapWorkDescriptionToPortMapping = new ConcurrentHashMap<MapWorkDescription, Integer>();
     this.reduceWorkDescriptionToPortMapping = new ConcurrentHashMap<ReduceWorkDescription, Integer>();
+    this.runningMappers = new ConcurrentHashMap<MapWorkDescription, Integer>();
+    this.runningReducers = new ConcurrentHashMap<ReduceWorkDescription, Integer>();
   }
 
   private static final long serialVersionUID = 1674990898801584371L;
@@ -105,6 +109,7 @@ IMRNodeManager {
     }
 
     mapWorkDescriptionToPortMapping.put(input, port);
+    runningMappers.put(input, port);
 
     LOGGER.info(String.format("Starting map runner at port: %d", port));
     IMapInstanceRunner runner = MRMapFactory.mapInstanceFromPort(port);
@@ -209,7 +214,7 @@ IMRNodeManager {
       return null;
     } catch (ClassNotFoundException e) {
       LOG.error("If you notice this in your error logs, something is"
-          + "really fucked up.");
+          + "really bad.");
       return null;
     }
   }
@@ -224,6 +229,7 @@ IMRNodeManager {
     }
 
     reduceWorkDescriptionToPortMapping.put(rwd, port);
+    runningReducers.put(rwd, port);
 
     LOGGER.info(String.format("Starting reduce runner at port: %d", port));
 
@@ -245,8 +251,8 @@ IMRNodeManager {
   }
 
   public NodeState getNodeState() {
-    int numMappers = mapWorkDescriptionToPortMapping.size();
-    int numReducers = reduceWorkDescriptionToPortMapping.size();
+    int numMappers = runningMappers.size();
+    int numReducers = runningReducers.size();
     int availableSlots = Definitions.WORKERS_PER_NODE - numMappers - numReducers;
     return new NodeState(numMappers, 
         numReducers, 
@@ -270,6 +276,9 @@ IMRNodeManager {
     } else {
       try {
         WorkerState state = mapper.getMapperState();
+        if(state == WorkerState.FINISHED || state == WorkerState.FAILED) {
+          this.removeMapper(wd);
+        }
         return state;
       } catch (RemoteException e) {
         LOG.warn(String.format("Mapper %s failed (remote exception)",
@@ -296,8 +305,8 @@ IMRNodeManager {
     }
     try {
       WorkerState state = reducer.getReducerState();
-      if(state == WorkerState.FINISHED) {
-        removeReducer(workInfo);
+      if(state == WorkerState.FINISHED || state == WorkerState.FAILED) {
+        this.removeReducer(workInfo);
       }
       return state;
     } catch (RemoteException e) {
@@ -328,11 +337,11 @@ IMRNodeManager {
   }
   
   private void removeMapper(MapWorkDescription wd) {
-    this.mapWorkDescriptionToPortMapping.remove(wd);
+    this.runningMappers.remove(wd);
   }
 
   private void removeReducer(ReduceWorkDescription wd) {
-    this.reduceWorkDescriptionToPortMapping.remove(wd);
+    this.runningReducers.remove(wd);
   }
 
   private SocketAddress getPreferredAddress(Set<SocketAddress> addresses) {
