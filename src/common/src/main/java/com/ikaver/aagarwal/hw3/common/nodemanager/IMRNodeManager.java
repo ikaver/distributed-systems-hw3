@@ -30,9 +30,6 @@ public interface IMRNodeManager extends Remote {
 	 */
 	public boolean doReduce(ReduceWorkDescription input) throws RemoteException;
 	
-	public void updateMappersReferences(List<SocketAddress> mapperAddr, 
-	    List<MapperChunk> chunks) throws RemoteException;
-	
 	/**
 	 * Terminates all workers working for job with jobID (jobID).
 	 * @param jobID

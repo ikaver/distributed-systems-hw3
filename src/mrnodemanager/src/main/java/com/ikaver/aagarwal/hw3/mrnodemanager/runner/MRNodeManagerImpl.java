@@ -11,10 +11,13 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 
@@ -37,6 +40,7 @@ import com.ikaver.aagarwal.hw3.common.workers.MapperChunk;
 import com.ikaver.aagarwal.hw3.common.workers.ReduceWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 import com.ikaver.aagarwal.hw3.mrdfs.datanode.DataNodeFactory;
+import com.ikaver.aagarwal.hw3.mrnodemanager.util.MapInstanceRunnerFactory;
 
 /**
  * A task manager manages a "slave" node. Following are the responsibilities of
@@ -46,6 +50,8 @@ import com.ikaver.aagarwal.hw3.mrdfs.datanode.DataNodeFactory;
  */
 public class MRNodeManagerImpl extends UnicastRemoteObject implements
 IMRNodeManager {
+
+  private static final long serialVersionUID = 1674990898801584371L;
 
   private final Logger LOG = Logger.getLogger(MRNodeManagerImpl.class);
 
@@ -58,6 +64,9 @@ IMRNodeManager {
   private final Map<ReduceWorkDescription, Integer> runningReducers;
   private final SocketAddress masterAddress;
 
+  private final ReadWriteLock mappersLock;
+  private final ReadWriteLock reducersLock;
+
   @Inject
   public MRNodeManagerImpl(
       @Named(Definitions.MASTER_SOCKET_ADDR_ANNOTATION) SocketAddress masterAddress)
@@ -68,11 +77,10 @@ IMRNodeManager {
     this.reduceWorkDescriptionToPortMapping = new ConcurrentHashMap<ReduceWorkDescription, Integer>();
     this.runningMappers = new ConcurrentHashMap<MapWorkDescription, Integer>();
     this.runningReducers = new ConcurrentHashMap<ReduceWorkDescription, Integer>();
-  }
 
-  private static final long serialVersionUID = 1674990898801584371L;
-  private static final Logger LOGGER = Logger
-      .getLogger(MRNodeManagerImpl.class);
+    this.mappersLock = new ReentrantReadWriteLock();
+    this.reducersLock = new ReentrantReadWriteLock();
+  }
 
   /**
    * Following is the sequence of operations which should be executed by the
@@ -104,14 +112,16 @@ IMRNodeManager {
     int port = MRMapTaskAttempt.startMapTask(input);
 
     if (port == -1) {
-      LOGGER.warn("error starting work instance");
+      LOG.warn("error starting work instance");
       return false;
     }
 
+    this.mappersLock.writeLock().lock();
     mapWorkDescriptionToPortMapping.put(input, port);
     runningMappers.put(input, port);
+    this.mappersLock.writeLock().unlock();
 
-    LOGGER.info(String.format("Starting map runner at port: %d", port));
+    LOG.info(String.format("Starting map runner at port: %d", port));
     IMapInstanceRunner runner = MRMapFactory.mapInstanceFromPort(port);
 
     if (runner == null) {
@@ -181,14 +191,17 @@ IMRNodeManager {
       return null;
     }
 
+    this.mappersLock.readLock().lock();
     Integer portObj = mapWorkDescriptionToPortMapping.get(mwd);
+    this.mappersLock.readLock().unlock();
+
     if(portObj == null) {
       LOG.warn("Mapper " + mwd + " is not running on this node!");
       return null;
     }
     int port = portObj.intValue();
     IMapInstanceRunner mapper = MRMapFactory.mapInstanceFromPort(port);
-        
+
     try {
       String outputPath = mapper.getMapOutputFilePath();
       LOG.info("Got output file path of mapper: " + outputPath);
@@ -199,7 +212,7 @@ IMRNodeManager {
       List<KeyValuePair> list = (List<KeyValuePair>) os.readObject();
 
       LOG.info("Mapper output list size is " + list.size());
-      
+
       for (KeyValuePair kv : list) {
         if (kv.getKey().hashCode() % rwd.getNumReducers() == rwd.getReducerID()) {
           result.add(kv);
@@ -224,14 +237,16 @@ IMRNodeManager {
         masterAddress.getHostname(), masterAddress.getPort());
 
     if (port == -1) {
-      LOGGER.warn("error starting work instance");
+      LOG.warn("error starting work instance");
       return false;
     }
 
+    this.reducersLock.writeLock().lock();
     reduceWorkDescriptionToPortMapping.put(rwd, port);
     runningReducers.put(rwd, port);
+    this.reducersLock.readLock().unlock();
 
-    LOGGER.info(String.format("Starting reduce runner at port: %d", port));
+    LOG.info(String.format("Starting reduce runner at port: %d", port));
 
     IMRReduceInstanceRunner runner = MRReduceFactory
         .reduceInstanceFromPort(port);
@@ -251,8 +266,12 @@ IMRNodeManager {
   }
 
   public NodeState getNodeState() {
+    this.mappersLock.readLock().lock();
     int numMappers = runningMappers.size();
+    this.mappersLock.readLock().unlock();
+    this.reducersLock.readLock().lock();
     int numReducers = runningReducers.size();
+    this.reducersLock.readLock().unlock();
     int availableSlots = Definitions.WORKERS_PER_NODE - numMappers - numReducers;
     return new NodeState(numMappers, 
         numReducers, 
@@ -261,73 +280,168 @@ IMRNodeManager {
   }
 
   public WorkerState getMapperState(MapWorkDescription wd) {
-    if (mapWorkDescriptionToPortMapping.get(wd) == null) {
+    mappersLock.readLock().lock();
+    Integer portOfMapper = mapWorkDescriptionToPortMapping.get(wd);
+    mappersLock.readLock().unlock();
+    if (portOfMapper == null) {
       LOG.info("No instance of mapper state found for"
           + "map work description found corresponding");
       return WorkerState.WORKER_DOESNT_EXIST;
     }
 
-    int port = mapWorkDescriptionToPortMapping.get(wd);
+    WorkerState mapperState = WorkerState.FAILED;
+    int port = portOfMapper.intValue();
     IMapInstanceRunner mapper = MRMapFactory.mapInstanceFromPort(port);
-    if (mapper == null) {
-      this.removeMapper(wd);
-      LOG.warn(String.format("Mapper %s failed", wd));
-      return WorkerState.FAILED;
-    } else {
+    if (mapper != null) { 
       try {
-        WorkerState state = mapper.getMapperState();
-        if(state == WorkerState.FINISHED || state == WorkerState.FAILED) {
-          this.removeMapper(wd);
-        }
-        return state;
+        mapperState = mapper.getMapperState();
       } catch (RemoteException e) {
-        LOG.warn(String.format("Mapper %s failed (remote exception)",
-            wd));
-        removeMapper(wd);
-        return WorkerState.FAILED;
+        LOG.warn(String.format("Mapper %s failed (remote exception)",wd));
       }
     }
+    if(mapperState == WorkerState.FAILED || mapperState == WorkerState.FINISHED) {
+      mappersLock.writeLock().lock();
+      this.removeMapper(wd);
+      mappersLock.writeLock().unlock();
+    }
+    return mapperState;
   }
 
-  public WorkerState getReducerState(ReduceWorkDescription workInfo) {
-    if (reduceWorkDescriptionToPortMapping.get(workInfo) == null) {
+  public WorkerState getReducerState(ReduceWorkDescription wd) {
+    reducersLock.readLock().lock();
+    Integer portOfReducer = reduceWorkDescriptionToPortMapping.get(wd);
+    reducersLock.readLock().unlock();
+    if (portOfReducer == null) {
       LOG.info("No instance of mapper state found for"
-          + "map work description found corresponding");
+          + "reduce work description found corresponding");
       return WorkerState.WORKER_DOESNT_EXIST;
     }
-    int port = reduceWorkDescriptionToPortMapping.get(workInfo);
-    IMRReduceInstanceRunner reducer = MRReduceFactory
-        .reduceInstanceFromPort(port);
-    if (reducer == null) {
-      removeReducer(workInfo);
-      LOG.warn(String.format("Reducer %s failed", workInfo));
-      return WorkerState.FAILED;
-    }
-    try {
-      WorkerState state = reducer.getReducerState();
-      if(state == WorkerState.FINISHED || state == WorkerState.FAILED) {
-        this.removeReducer(workInfo);
+
+    WorkerState reducerState = WorkerState.FAILED;
+    int port = portOfReducer.intValue();
+    IMRReduceInstanceRunner reducer = MRReduceFactory.reduceInstanceFromPort(port);
+    if (reducer != null) { 
+      try {
+        reducerState = reducer.getReducerState();
+      } catch (RemoteException e) {
+        LOG.warn(String.format("Mapper %s failed (remote exception)",wd));
       }
-      return state;
-    } catch (RemoteException e) {
-      removeReducer(workInfo);
-      LOG.warn("Remote exception while trying to fetch reducer state", e);
-      return WorkerState.FAILED;
     }
+    if(reducerState == WorkerState.FAILED || reducerState == WorkerState.FINISHED) {
+      reducersLock.writeLock().lock();
+      this.removeReducer(wd);
+      reducersLock.writeLock().unlock();
+    }
+    return reducerState;
   }
 
   public boolean terminateWorkers(int jobID) {
-    //TODO: implement
-    throw new UnsupportedOperationException("Not yet implemented :(");
+    this.mappersLock.writeLock().lock();
+    boolean success = false;
+    try{
+      Set<MapWorkDescription> mappers = 
+          new HashSet<MapWorkDescription>(this.mapWorkDescriptionToPortMapping.keySet());
+      for(MapWorkDescription mapperWork : mappers) {
+        if(mapperWork.getJobID() == jobID) {
+          Integer portObj = this.mapWorkDescriptionToPortMapping.get(mapperWork);
+          if(portObj != null) {
+            int port = portObj.intValue();
+            IMapInstanceRunner mapper = MRMapFactory.mapInstanceFromPort(port);
+            if(mapper != null) {
+              try {
+                mapper.die();
+                removeMapper(mapperWork);
+                success = true;
+              } catch (RemoteException e) {
+                LOG.warn("Failed communicating with mapper", e);
+              }
+            }
+          }
+        }
+      }
+    }
+    finally{
+      this.mappersLock.writeLock().unlock();
+    }
+
+    this.reducersLock.writeLock().lock();
+    try{
+      Set<ReduceWorkDescription> reducers = 
+          new HashSet<ReduceWorkDescription>(this.reduceWorkDescriptionToPortMapping.keySet());
+      for(ReduceWorkDescription reducerWork : reducers) {
+        if(reducerWork.getJobID() == jobID) {
+          Integer portObj = this.mapWorkDescriptionToPortMapping.get(reducerWork);
+          if(portObj != null) {
+            int port = portObj.intValue();
+            IMRReduceInstanceRunner reducer = MRReduceFactory.reduceInstanceFromPort(port);
+            if(reducer != null) {
+              try {
+                reducer.die();
+                removeReducer(reducerWork);
+                success = true;
+              } catch (RemoteException e) {
+                LOG.warn("Failed communicating with mapper", e);
+              }
+            }
+          }
+        }
+      }
+    }
+    finally{
+      this.reducersLock.writeLock().unlock();
+    }
+    return success;
   }
 
   public void shutdown() throws RemoteException {
-    System.exit(0);
-  }
+    this.mappersLock.writeLock().lock();
+    try{
+      Set<MapWorkDescription> mappers = 
+          new HashSet<MapWorkDescription>(this.mapWorkDescriptionToPortMapping.keySet());
+      for(MapWorkDescription mapperWork : mappers) {
+        Integer portObj = this.mapWorkDescriptionToPortMapping.get(mapperWork);
+        if(portObj != null) {
+          int port = portObj.intValue();
+          IMapInstanceRunner mapper = MRMapFactory.mapInstanceFromPort(port);
+          if(mapper != null) {
+            try {
+              mapper.die();
+              removeMapper(mapperWork);
+            } catch (RemoteException e) {
+              LOG.warn("Failed communicating with mapper", e);
+            }
+          }
+        }
+      }
+    }
+    finally{
+      this.mappersLock.writeLock().unlock();
+    }
 
-  public void updateMappersReferences(List<SocketAddress> mapperAddr,
-      List<MapperChunk> chunks) throws RemoteException {
-    //TODO: implement
+    this.reducersLock.writeLock().lock();
+    try{
+      Set<ReduceWorkDescription> reducers = 
+          new HashSet<ReduceWorkDescription>(this.reduceWorkDescriptionToPortMapping.keySet());
+      for(ReduceWorkDescription reducerWork : reducers) {
+        Integer portObj = this.mapWorkDescriptionToPortMapping.get(reducerWork);
+        if(portObj != null) {
+          int port = portObj.intValue();
+          IMRReduceInstanceRunner reducer = MRReduceFactory.reduceInstanceFromPort(port);
+          if(reducer != null) {
+            try {
+              reducer.die();
+              removeReducer(reducerWork);
+            } catch (RemoteException e) {
+              LOG.warn("Failed communicating with mapper", e);
+            }
+          }
+
+        }
+      }
+    }
+    finally{
+      this.reducersLock.writeLock().unlock();
+    }
   }
 
   private SocketAddress getRandomDataNode(Set<SocketAddress> datanodes) {
@@ -335,7 +449,7 @@ IMRNodeManager {
     Collections.shuffle(list);
     return list.get(0);
   }
-  
+
   private void removeMapper(MapWorkDescription wd) {
     this.runningMappers.remove(wd);
   }
@@ -347,7 +461,7 @@ IMRNodeManager {
   private SocketAddress getPreferredAddress(Set<SocketAddress> addresses) {
     for (SocketAddress address : addresses) {
       try {
-        LOGGER.info("Checking if " + address.getHostname() + " "
+        LOG.info("Checking if " + address.getHostname() + " "
             + InetAddress.getLocalHost().getHostName()
             + "matches..");
         if (address.getHostname().equals(
