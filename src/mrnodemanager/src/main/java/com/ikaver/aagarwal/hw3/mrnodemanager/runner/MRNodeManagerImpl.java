@@ -302,6 +302,16 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
       this.removeMapper(wd);
       mappersLock.writeLock().unlock();
     }
+
+    if (mapperState == WorkerState.FAILED) {
+    	this.mapWorkDescriptionToPortMapping.remove(wd);
+
+    	try {
+			mapper.die();
+		} catch (RemoteException e) {
+			LOG.error("Remote exception while trying to kill a failed reducer.");
+		}
+    }
     return mapperState;
   }
 
@@ -329,6 +339,14 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
       reducersLock.writeLock().lock();
       this.removeReducer(wd);
       reducersLock.writeLock().unlock();
+    }
+    if (reducerState == WorkerState.FAILED) {
+    	this.reduceWorkDescriptionToPortMapping.remove(wd);
+    	try {
+			reducer.die();
+		} catch (RemoteException e) {
+			LOG.warn("Remote exception when trying to kill a remote reducer.");
+		}
     }
     return reducerState;
   }
