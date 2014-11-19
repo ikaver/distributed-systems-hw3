@@ -9,7 +9,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
-import com.ikaver.aagarwal.hw3.common.mrmap.IMapInstanceRunner;
 import com.ikaver.aagarwal.hw3.common.mrreduce.IMRReduceInstanceRunner;
 
 /**

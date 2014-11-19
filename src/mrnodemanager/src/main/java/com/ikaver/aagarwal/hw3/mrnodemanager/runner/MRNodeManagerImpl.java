@@ -36,7 +36,6 @@ import com.ikaver.aagarwal.hw3.common.objects.KeyValuePair;
 import com.ikaver.aagarwal.hw3.common.util.FileOperationsUtil;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
-import com.ikaver.aagarwal.hw3.common.workers.MapperChunk;
 import com.ikaver.aagarwal.hw3.common.workers.ReduceWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 import com.ikaver.aagarwal.hw3.mrdfs.datanode.DataNodeFactory;
@@ -48,8 +47,7 @@ import com.ikaver.aagarwal.hw3.mrnodemanager.util.MapInstanceRunnerFactory;
  * mapper and reducer tasks. 2. Periodically updates master with the status of
  * the map reduce job assigned to it.
  */
-public class MRNodeManagerImpl extends UnicastRemoteObject implements
-IMRNodeManager {
+public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeManager {
 
   private static final long serialVersionUID = 1674990898801584371L;
 
@@ -370,7 +368,7 @@ IMRNodeManager {
           new HashSet<ReduceWorkDescription>(this.reduceWorkDescriptionToPortMapping.keySet());
       for(ReduceWorkDescription reducerWork : reducers) {
         if(reducerWork.getJobID() == jobID) {
-          Integer portObj = this.mapWorkDescriptionToPortMapping.get(reducerWork);
+          Integer portObj = this.reduceWorkDescriptionToPortMapping.get(reducerWork);
           if(portObj != null) {
             int port = portObj.intValue();
             IMRReduceInstanceRunner reducer = MRReduceFactory.reduceInstanceFromPort(port);
@@ -423,7 +421,7 @@ IMRNodeManager {
       Set<ReduceWorkDescription> reducers = 
           new HashSet<ReduceWorkDescription>(this.reduceWorkDescriptionToPortMapping.keySet());
       for(ReduceWorkDescription reducerWork : reducers) {
-        Integer portObj = this.mapWorkDescriptionToPortMapping.get(reducerWork);
+        Integer portObj = this.reduceWorkDescriptionToPortMapping.get(reducerWork);
         if(portObj != null) {
           int port = portObj.intValue();
           IMRReduceInstanceRunner reducer = MRReduceFactory.reduceInstanceFromPort(port);
@@ -435,7 +433,6 @@ IMRNodeManager {
               LOG.warn("Failed communicating with mapper", e);
             }
           }
-
         }
       }
     }
@@ -474,5 +471,4 @@ IMRNodeManager {
     }
     return null;
   }
-
 }

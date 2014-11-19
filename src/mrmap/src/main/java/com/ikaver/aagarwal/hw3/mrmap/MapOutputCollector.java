@@ -35,11 +35,10 @@ public class MapOutputCollector implements IMapOutputCollector {
 	public String flush() {
 		String path = FileOperationsUtil.getRandomStringForLocalFile()
 				+ ".out";
-		File file = new File(path);
 
 		try {
 			ObjectOutputStream os = new ObjectOutputStream(
-					new FileOutputStream(file));
+					new FileOutputStream(path));
 
             // Sorting phase.
 			Collections.sort(data);
@@ -55,10 +54,10 @@ public class MapOutputCollector implements IMapOutputCollector {
 			data.clear();
 
 		} catch (FileNotFoundException e) {
-			LOG.fatal("unable to create the random file" + file);
+			LOG.fatal("unable to create the random file" + path);
 			return null;
 		} catch (IOException e) {
-			LOG.fatal("Error writing to the file" + file);
+			LOG.fatal("Error writing to the file" + path);
 			return null;
 		}
 
