@@ -13,9 +13,10 @@ import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
  */
 public interface IMRReduceInstanceRunner extends Remote {
 	/**
-	 * Runs a reduce instance
+	 * Runs a reduce instance. One can call into {@code #getReducerState()}
+	 * to check the current state of the reduce instance.
 	 */
-	public boolean runReduceInstance(ReduceWorkDescription rwd) throws RemoteException;
+	public void runReduceInstance(ReduceWorkDescription rwd) throws RemoteException;
 
 	/**
 	 * Enum indicating state of the reducer task.
