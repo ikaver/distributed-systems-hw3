@@ -36,14 +36,14 @@ public class MRReduceRunner implements Runnable {
 
 	public MRReduceRunner(ReduceWorkDescription rwd, SocketAddress masterAddress) {
 		this.rwd = rwd;
-		this.state = WorkerState.RUNNING;
+		this.setState(WorkerState.RUNNING);
 		this.aggregator = new HashMap<String, List<String>>();
 		this.masterAddress = masterAddress;
 	}
 
 	public void run() {
 		// TODO Auto-generated method stub
-		state = WorkerState.RUNNING;
+		setState(WorkerState.RUNNING);
 
 		List<MapWorkDescription> mwds = rwd.getMappers();
 		List<SocketAddress> mapperAddresses = rwd.getMapperAddresses();
@@ -52,7 +52,7 @@ public class MRReduceRunner implements Runnable {
 			IMRNodeManager node = NodeManagerFactory
 					.nodeManagerFromSocketAddress(mapperAddresses.get(i));
 			if (node == null) {
-				state = WorkerState.FAILED;
+				setState(WorkerState.FAILED);
 				LOGGER.warn("error fetching data from node manager");
 				return;
 			} else {
@@ -61,7 +61,7 @@ public class MRReduceRunner implements Runnable {
 					list = node.dataForJob(mwds.get(i), rwd);
 					aggregate(list);
 				} catch (RemoteException e) {
-					state = WorkerState.FAILED;
+					setState(WorkerState.FAILED);
 					LOGGER.warn("Encountered remote exception while"
 							+ "trying to fetch data from a node.");
 				}
@@ -70,6 +70,11 @@ public class MRReduceRunner implements Runnable {
 		}
 
 		IReducer reducer = getReducerClass(rwd);
+		if (reducer == null) {
+			LOGGER.warn("Unable to fetch class from the jar file.");
+			setState(WorkerState.FAILED);
+			return;
+		}
 		IMRReducerCollector collector = new MRReducerCollector();
 
 		for (String key : aggregator.keySet()) {
@@ -80,7 +85,7 @@ public class MRReduceRunner implements Runnable {
 
 		if (dfs == null) {
 			LOGGER.error("Error communicating with the master node.");
-			state = WorkerState.FAILED;
+			setState(WorkerState.FAILED);
 			return;
 		}
 		byte[] data = collector.getData();
@@ -89,10 +94,10 @@ public class MRReduceRunner implements Runnable {
 			dfs.createFile(getReducerPartitionName(rwd), data.length,
 					data.length);
 			dfs.saveFile(getReducerPartitionName(rwd), 0, data);
-			state = WorkerState.FINISHED;
+			setState(WorkerState.FINISHED);
 			return;
 		} catch (RemoteException e) {
-			state = WorkerState.FAILED;
+			setState(WorkerState.FAILED);
 			LOGGER.error("Error saving reducer output to a file", e);
 			return;
 		}
@@ -141,7 +146,15 @@ public class MRReduceRunner implements Runnable {
 	}
 
 	public WorkerState getReducerState() throws RemoteException {
+		return getState();
+	}
+
+	public WorkerState getState() {
 		return state;
+	}
+
+	public synchronized void setState(WorkerState state) {
+		this.state = state;
 	}
 
 }
