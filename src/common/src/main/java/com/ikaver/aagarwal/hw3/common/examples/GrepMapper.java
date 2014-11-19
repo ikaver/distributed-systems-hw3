@@ -5,7 +5,7 @@ import com.ikaver.aagarwal.hw3.common.workers.IMapper;
 
 public class GrepMapper implements IMapper {
   
-  private static String TARGET_PATTERN = "DSFTW";
+  private static String TARGET_PATTERN = "DS-FTW";
 
   public void map(String record, ICollector collector) {
     String cleanRecord = record.trim();
