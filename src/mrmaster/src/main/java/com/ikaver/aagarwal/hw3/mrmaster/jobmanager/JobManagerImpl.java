@@ -256,6 +256,28 @@ public void onAllMappersFinished(RunningJob job) {
 public void onAllReducersFinished(RunningJob job) {
   LOG.info(String.format("All reducers finished for job: " + job.getJobID()));
   job.shutdown();
+  for(MapperWorkerInfo workerInfo : job.getMappers()) {
+    SocketAddress nmAddr = workerInfo.getNodeManagerAddress();
+    IMRNodeManager nm = NodeManagerFactory.nodeManagerFromSocketAddress(nmAddr);
+    if(nm != null) {
+      try {
+        nm.terminateWorkers(job.getJobID());
+      } catch (RemoteException e) {
+        LOG.warn("Failed to communicate with NM", e);
+      }
+    }
+  }
+  for(ReducerWorkerInfo workerInfo : job.getReducers()) {
+    SocketAddress nmAddr = workerInfo.getNodeManagerAddress();
+    IMRNodeManager nm = NodeManagerFactory.nodeManagerFromSocketAddress(nmAddr);
+    if(nm != null) {
+      try {
+        nm.terminateWorkers(job.getJobID());
+      } catch (RemoteException e) {
+        LOG.warn("Failed to communicate with NM", e);
+      }
+    }
+  }
   this.jobsState.onJobFinished(job.getJobID(), true);
 }
 
