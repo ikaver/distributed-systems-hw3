@@ -78,7 +78,12 @@ public class MRReduceRunner implements Runnable {
 		IMRReducerCollector collector = new MRReducerCollector();
 
 		for (String key : aggregator.keySet()) {
-			reducer.reduce(collector, key, aggregator.get(key));
+			try {
+				reducer.reduce(collector, key, aggregator.get(key));
+			} catch (Exception e) {
+				setState(WorkerState.FAILED);
+				return;
+			}
 		}
 
 		IDFS dfs = DFSFactory.dfsFromSocketAddress(masterAddress);

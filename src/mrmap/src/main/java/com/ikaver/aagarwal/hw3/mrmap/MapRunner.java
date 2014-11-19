@@ -51,7 +51,12 @@ public class MapRunner implements Runnable {
     try {
       while (fis.read(record) != -1) {
         String recordStr = new String(record);
-        mapper.map(recordStr, (ICollector)moc);
+        try {
+        	mapper.map(recordStr, (ICollector)moc);
+        } catch(Exception e) {
+        	mapWorkState.setState(WorkerState.FAILED);
+        	return;
+        }
       }
 
       // Set the output path before you set the state. Otherwise,
