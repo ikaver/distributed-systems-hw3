@@ -448,7 +448,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
               reducer.die();
               removeReducer(reducerWork);
             } catch (RemoteException e) {
-              LOG.warn("Failed communicating with mapper", e);
+              LOG.warn("Failed communicating with reducer", e);
             }
           }
         }
