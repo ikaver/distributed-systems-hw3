@@ -6,9 +6,9 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
@@ -37,7 +37,7 @@ public class MRReduceRunner implements Runnable {
 	public MRReduceRunner(ReduceWorkDescription rwd, SocketAddress masterAddress) {
 		this.rwd = rwd;
 		this.setState(WorkerState.RUNNING);
-		this.aggregator = new HashMap<String, List<String>>();
+		this.aggregator = new TreeMap<String, List<String>>();
 		this.masterAddress = masterAddress;
 	}
 
