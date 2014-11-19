@@ -19,3 +19,7 @@ cd ..
 cd mrclient
 /usr/local/netbeans-7.2.1/java/maven/bin/mvn clean
 /usr/local/netbeans-7.2.1/java/maven/bin/mvn assembly:assembly -DdescriptorId=jar-with-dependencies
+cd ..
+cd mrreduce
+/usr/local/netbeans-7.2.1/java/maven/bin/mvn clean
+/usr/local/netbeans-7.2.1/java/maven/bin/mvn assembly:assembly -DdescriptorId=jar-with-dependencies
