@@ -38,6 +38,7 @@ public class FileDownloader {
         if(data != null) {
           fos.write(data);
           fos.close();
+          System.out.println("File downloaded successfully!");
         }
         else {
           System.out.println("Failed to find file " + filePath + " in DFS");
