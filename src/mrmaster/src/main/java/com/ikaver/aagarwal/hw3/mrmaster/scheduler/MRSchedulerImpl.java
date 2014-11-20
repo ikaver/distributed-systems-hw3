@@ -209,10 +209,13 @@ public class MRSchedulerImpl implements IMRScheduler {
     SocketAddress selectedAddr = null;
     double highestScore = -1;
     for(SocketAddress node : nodes) {
-      double scoreForNode = scoreForNode(this.nodeInfo.get(node));
-      if(selectedAddr == null || scoreForNode > highestScore) {
-        highestScore = scoreForNode;
-        selectedAddr = node;
+      NodeInformation info = this.nodeInfo.get(node);
+      if(info != null && info.getAvailableSlots() > 0) {
+        double scoreForNode = scoreForNode(info);
+        if(selectedAddr == null || scoreForNode > highestScore) {
+          highestScore = scoreForNode;
+          selectedAddr = node;
+        }
       }
     }
     return selectedAddr;
