@@ -206,7 +206,6 @@ IOnWorkCompletedHandler {
           nm.shutdown();
         }
         catch(RemoteException e) {
-          LOG.warn("Failed to communicate with NM " + addr, e);
         }
       }
     }
