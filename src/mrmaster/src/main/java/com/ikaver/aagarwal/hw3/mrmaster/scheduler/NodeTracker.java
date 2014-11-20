@@ -1,6 +1,7 @@
 package com.ikaver.aagarwal.hw3.mrmaster.scheduler;
 
 import java.rmi.RemoteException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -18,6 +19,7 @@ public class NodeTracker implements Runnable {
 
   private Map<SocketAddress, NodeInformation> nodeInfo;
   private Set<SocketAddress> allNodes;
+  private Set<SocketAddress> failedNodes;
   private ReadWriteLock nodeInfoLock;
 
   public NodeTracker(Map<SocketAddress, NodeInformation> nodeInfo,
@@ -26,6 +28,7 @@ public class NodeTracker implements Runnable {
     this.nodeInfo = nodeInfo;
     this.allNodes = allNodes;
     this.nodeInfoLock = nodeInfoLock;
+    this.failedNodes = new HashSet<SocketAddress>();
   }
 
   public void run() {
@@ -39,6 +42,7 @@ public class NodeTracker implements Runnable {
         IMRNodeManager nm = NodeManagerFactory.nodeManagerFromSocketAddress(addr);
         if(nm == null) {
           nodeInfo.remove(addr);
+          failedNodes.add(addr);
         }
         else {
           try {
@@ -46,13 +50,20 @@ public class NodeTracker implements Runnable {
             if(state != null) {
               nodeInfo.put(addr, new NodeInformation(addr, 
                   state.getNumProcessors(), state.getAvailableSlots()));
+              if(failedNodes.contains(addr)) {
+                failedNodes.remove(addr);
+              }
             }
             else {
               nodeInfo.remove(addr);
+              failedNodes.add(addr);
             } 
           } catch (RemoteException e) {
-            LOG.warn("Failed to communicate with node manager", e);
+            if(!failedNodes.contains(addr)) {
+              LOG.warn("Failed to communicate with NM " + addr, e);
+            }
             nodeInfo.remove(addr);
+            failedNodes.add(addr);
           }
         }
       }
