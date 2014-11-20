@@ -39,7 +39,6 @@ import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.ReduceWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 import com.ikaver.aagarwal.hw3.mrdfs.datanode.DataNodeFactory;
-import com.ikaver.aagarwal.hw3.mrnodemanager.util.MapInstanceRunnerFactory;
 
 /**
  * A task manager manages a "slave" node. Following are the responsibilities of

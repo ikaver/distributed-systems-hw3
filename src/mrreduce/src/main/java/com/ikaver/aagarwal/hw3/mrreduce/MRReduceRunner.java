@@ -158,7 +158,7 @@ public class MRReduceRunner implements Runnable {
 		return state;
 	}
 
-	public synchronized void setState(WorkerState state) {
+	private synchronized void setState(WorkerState state) {
 		this.state = state;
 	}
 
