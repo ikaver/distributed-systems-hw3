@@ -55,6 +55,8 @@ public class MapRunner implements Runnable {
 
 		byte[] data = fetchData(inputPath, chunk);
 
+		// TODO(ankit): Remove this weird I/O. why? This is redundant
+		// and is a legacy of a bad design choice which I made.
 		if (data == null) {
 			LOGGER.warn("Error fetching data from dfs for " + inputPath
 					+ " for chunk" + chunk);
