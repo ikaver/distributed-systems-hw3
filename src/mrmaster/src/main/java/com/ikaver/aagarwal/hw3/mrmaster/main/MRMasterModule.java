@@ -28,11 +28,9 @@ public class MRMasterModule extends AbstractModule {
 
   private Set<SocketAddress> dataNodes;
   private Set<SocketAddress> nodes;
-  private Set<SocketAddress> availableNodes;
   
   public MRMasterModule(Set<SocketAddress> nodes) {
     this.nodes = nodes;
-    this.availableNodes = new HashSet<SocketAddress>(nodes);
     this.dataNodes = new HashSet<SocketAddress>(nodes);
   }
   
