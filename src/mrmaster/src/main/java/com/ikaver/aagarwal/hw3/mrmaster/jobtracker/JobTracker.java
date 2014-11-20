@@ -41,8 +41,7 @@ public class JobTracker implements Runnable {
 
   public void queryMappers() {
     for(MapperWorkerInfo info : job.getMappers()) {
-      if(info.getState() == WorkerState.WORKER_NOT_ASSIGNED
-          || info.getState() == WorkerState.WORKER_DOESNT_EXIST) {
+      if(info.getState() == WorkerState.WORKER_NOT_ASSIGNED) {
         //ask scheduler to assign a worker
         this.onWorkerFailedHandler.onMapperNotAssignedFound(job, info);
       }
@@ -54,18 +53,22 @@ public class JobTracker implements Runnable {
         }
         else {
           try {
-            info.setState(nm.getMapperState(info.getWorkDescription()));
+            WorkerState state = nm.getMapperState(info.getWorkDescription());
+            info.setState(state);
+            if(info.getState() == null) info.setState(WorkerState.FAILED);
+           // LOG.info("Got state " + info.getState() + " from mapper " 
+           // + info.getNodeManagerAddress() + " " 
+           //     + info.getWorkDescription().getChunk().getPartitionID());
           } catch (RemoteException e) {
             info.setState(WorkerState.FAILED);
             LOG.warn("Failed to get nm state", e);
           }
-          if(info.getState() == WorkerState.FINISHED
-              && !job.getFinishedMappers().contains(info)) {
-            this.onWorkCompletedHandler.onMapperFinished(job, info);
-          }
         }
       }
-      else if(info.getState() == WorkerState.FAILED) {
+      else if(info.getState() == WorkerState.FAILED
+          || info.getState() == WorkerState.WORKER_DOESNT_EXIST
+          || info.getState() == null) {
+        info.setState(WorkerState.FAILED);
         //ask scheduler to create a new mapper
         this.onWorkerFailedHandler.onMapperFailed(job, info);
       }
@@ -83,8 +86,7 @@ public class JobTracker implements Runnable {
 
   public void queryReducers() {
     for(ReducerWorkerInfo info : job.getReducers()) {
-      if(info.getState() == WorkerState.WORKER_NOT_ASSIGNED 
-          || info.getState() == WorkerState.WORKER_DOESNT_EXIST) {
+      if(info.getState() == WorkerState.WORKER_NOT_ASSIGNED) {
         this.onWorkerFailedHandler.onReducerFailed(job, info);
       }
       else if(info.getState() == WorkerState.RUNNING) {
@@ -94,18 +96,19 @@ public class JobTracker implements Runnable {
         }
         else {
           try {
-            info.setState(nm.getReducerState(info.getWorkDescription()));
+            WorkerState state = nm.getReducerState(info.getWorkDescription());
+            info.setState(state);
+            if(info.getState() == null) info.setState(WorkerState.FAILED);
           } catch (RemoteException e) {
             info.setState(WorkerState.FAILED);
             LOG.warn("Failed to get nm state", e);
           }
-          if(info.getState() == WorkerState.FINISHED
-              && !job.getFinishedReducers().contains(info)) {
-            this.onWorkCompletedHandler.onReducerFinished(job, info);
-          }
         }
       }
-      else if(info.getState() == WorkerState.FAILED) {
+      else if(info.getState() == WorkerState.FAILED 
+          || info.getState() == WorkerState.WORKER_DOESNT_EXIST  
+          || info.getState() == null) {
+        info.setState(WorkerState.FAILED);
         this.onWorkerFailedHandler.onReducerFailed(job, info);
       }
       else if(info.getState() == WorkerState.FINISHED
@@ -114,7 +117,7 @@ public class JobTracker implements Runnable {
       }
     }
     if(job.getAmountOfReducers() == job.getAmountOfFinishedReducers()
-        && !notifiedReducersCompleted) {
+        && !notifiedReducersCompleted && job.getMappersFinished()) {
       this.onWorkCompletedHandler.onAllReducersFinished(job);
       this.notifiedReducersCompleted = true;
     }

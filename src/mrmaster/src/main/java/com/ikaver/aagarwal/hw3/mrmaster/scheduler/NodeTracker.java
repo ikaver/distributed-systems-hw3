@@ -58,12 +58,13 @@ public class NodeTracker implements Runnable {
               nodeInfo.remove(addr);
               failedNodes.add(addr);
             } 
-          } catch (RemoteException e) {
+          } 
+          catch (RemoteException e) {
             if(!failedNodes.contains(addr)) {
               LOG.warn("Failed to communicate with NM " + addr, e);
+              failedNodes.add(addr);
             }
             nodeInfo.remove(addr);
-            failedNodes.add(addr);
           }
         }
       }

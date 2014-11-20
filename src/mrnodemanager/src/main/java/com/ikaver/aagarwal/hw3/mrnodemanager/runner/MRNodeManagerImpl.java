@@ -236,12 +236,16 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
     }
 
     if (mapperState == WorkerState.FAILED) {
+      LOG.info("Mapper with job ID: " + wd.getJobID() + " and  partition " 
+          + wd.getChunk().getPartitionID() + " failed.");
+      mappersLock.writeLock().lock();
       this.mapWorkDescriptionToPortMapping.remove(wd);
-
+      this.removeMapper(wd);
+      mappersLock.writeLock().unlock();
       try {
         if(mapper != null) mapper.die();
       } catch (RemoteException e) {
-        LOG.error("Remote exception while trying to kill a failed reducer.");
+        LOG.error("Remote exception while trying to kill a failed mapper.");
       }
     }
     return mapperState;
@@ -273,7 +277,10 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
       reducersLock.writeLock().unlock();
     }
     if (reducerState == WorkerState.FAILED) {
+      LOG.info("Reducer with id " + wd.getJobID() + " " + wd.getReducerID() + " failed.");
+      reducersLock.writeLock().lock();
       this.reduceWorkDescriptionToPortMapping.remove(wd);
+      reducersLock.writeLock().unlock();
       try {
         if(reducer != null) reducer.die();
       } catch (RemoteException e) {

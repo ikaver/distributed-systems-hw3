@@ -113,46 +113,15 @@ IOnWorkCompletedHandler {
     Set<MapperWorkerInfo> mapWorkers = scheduler.runMappersForWork(mappers);
     LOG.info("Got mapper workers for job: " + mapWorkers.size());
 
-    // create reducers
-    List<SocketAddress> mapperAddresses = new ArrayList<SocketAddress>();
-    List<MapWorkDescription> mapperList = new ArrayList<MapWorkDescription>();
-    Set<ReduceWorkDescription> reducers = new HashSet<ReduceWorkDescription>();
-    for (MapperWorkerInfo mapWorker : mapWorkers) {
-      LOG.info(String.format("Got mapper address for job %d: %s", jobID, 
-          mapWorker.getNodeManagerAddress()));
-      mapperList.add(mapWorker.getWorkDescription());
-      mapperAddresses.add(mapWorker.getNodeManagerAddress());
-    }
-    for (int i = 0; i < job.getNumReducers(); ++i) {
-      ReduceWorkDescription work = new ReduceWorkDescription(
-          jobID, 
-          i,
-          job.getNumReducers(),
-          job.getReducerClass(),
-          mapperList,
-          mapperAddresses, /* input sources, socket addresses of mappers */
-          job.getOutputFilePath(),
-          job.getJarFile()
-          );
-      reducers.add(work);
-    }
-    LOG.info("Will ask scheduler to schedule reduces for job " + jobID);
-    // schedule the reducers
-    Set<ReducerWorkerInfo> reduceWorkers = scheduler
-        .runReducersForWork(reducers);
-    for(ReducerWorkerInfo workerInfo : reduceWorkers) {
-      LOG.info(String.format("Got reducer address for job %d: %s", jobID, 
-          workerInfo.getNodeManagerAddress()));
-    }
-
     // create the running job
+    int numReducers = Math.min(job.getNumReducers(), Definitions.MAX_NUMBER_OF_REDUCERS);
     ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    RunningJob runningJob = new RunningJob(jobID, job.getJobName(), scheduler);
+    RunningJob runningJob = new RunningJob(jobID, job.getJobName(), scheduler, 
+        mapWorkers.size(), numReducers, job);
     JobTracker tracker = new JobTracker(runningJob, this, this);
     scheduler.scheduleAtFixedRate(tracker, 0,
         Definitions.TIME_TO_CHECK_FOR_NODE_MANAGER_STATE, TimeUnit.SECONDS);
     runningJob.getMappers().addAll(mapWorkers);
-    runningJob.getReducers().addAll(reduceWorkers);
     jobsState.addJob(runningJob);
     LOG.info("Created job tracker for job with ID: " + runningJob.getJobID());
     return getJobInfo(jobID);
@@ -236,20 +205,52 @@ IOnWorkCompletedHandler {
    */
 
   public void onMapperFinished(RunningJob job, MapperWorkerInfo info) {
-    LOG.info(String.format("Mapper %s finished for job: %d", 
-        info.getNodeManagerAddress(), job.getJobID()));
+    LOG.info(String.format("Mapper (%s, %d) finished for job: %d", 
+        info.getNodeManagerAddress(), 
+        info.getWorkDescription().getChunk().getPartitionID(), job.getJobID()));
     job.getFinishedMappers().add(info);
   }
 
   public void onReducerFinished(RunningJob job, ReducerWorkerInfo info) {
-    LOG.info(String.format("Reducer %s finished for job: %d", 
-        info.getNodeManagerAddress(), job.getJobID()));
+    LOG.info(String.format("Reducer (%s,%d) finished for job: %d", 
+        info.getNodeManagerAddress(), info.getWorkDescription().getReducerID(),
+        job.getJobID()));
     job.getFinishedReducers().add(info);
   }
 
   public void onAllMappersFinished(RunningJob job) {
-    //nothing to do here
     LOG.info(String.format("All mappers finished for job: " + job.getJobID()));
+    // create reducers
+    List<SocketAddress> mapperAddresses = new ArrayList<SocketAddress>();
+    List<MapWorkDescription> mapperList = new ArrayList<MapWorkDescription>();
+    Set<ReduceWorkDescription> reducers = new HashSet<ReduceWorkDescription>();
+    for (MapperWorkerInfo mapWorker : job.getMappers()) {
+      mapperList.add(mapWorker.getWorkDescription());
+      mapperAddresses.add(mapWorker.getNodeManagerAddress());
+    }
+    for (int i = 0; i < job.getAmountOfReducers(); ++i) {
+      ReduceWorkDescription work = new ReduceWorkDescription(
+          job.getJobID(), 
+          i,
+          job.getAmountOfReducers(),
+          job.getJobConfig().getReducerClass(),
+          mapperList,
+          mapperAddresses, /* input sources, socket addresses of mappers */
+          job.getJobConfig().getOutputFilePath(),
+          job.getJobConfig().getJarFile()
+          );
+      reducers.add(work);
+    }
+    LOG.info("Will ask scheduler to schedule reduces for job " + job.getJobID());
+    // schedule the reducers
+    Set<ReducerWorkerInfo> reduceWorkers = scheduler
+        .runReducersForWork(reducers);
+    for(ReducerWorkerInfo workerInfo : reduceWorkers) {
+      LOG.info(String.format("Got reducer address for job %d: %s", job.getJobID(), 
+          workerInfo.getNodeManagerAddress()));
+    }
+    job.getReducers().addAll(reduceWorkers);
+    job.setMappersFinished(true);
   }
 
   public void onAllReducersFinished(RunningJob job) {

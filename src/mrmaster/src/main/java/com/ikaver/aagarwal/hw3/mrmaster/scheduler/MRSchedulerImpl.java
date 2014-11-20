@@ -35,7 +35,6 @@ public class MRSchedulerImpl implements IMRScheduler {
   private Set<SocketAddress> allNodes;
   private ReadWriteLock nodeInfoLock;
   private ScheduledExecutorService scheduler;
-  private int currentReducerID;
 
   private static final Logger LOG = Logger.getLogger(MRSchedulerImpl.class);
 
