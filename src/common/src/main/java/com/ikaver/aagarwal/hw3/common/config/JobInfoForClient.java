@@ -26,15 +26,6 @@ public class JobInfoForClient implements Serializable {
     this.numReducersCompleted = numReducersCompleted;
   }
 
-  public JobInfoForClient(int jobID, JobConfig job) {
-    this.jobID = jobID;
-    this.jobName = job.getJobName();
-    this.numMappers = job.getNumMappers();
-    this.numReducers = job.getNumReducers();
-    this.numMappersCompleted = 0;
-    this.numReducersCompleted = 0;
-  }
-
   public int getJobID() {
     return jobID;
   }

@@ -16,11 +16,7 @@ public class JobConfig implements Serializable {
   private String mapperClass;
   private String reducerClass;
   
-  private int numMappers;
   private int numReducers;
-  
-  private String masterIP;
-  private int masterPort;
   
   public JobConfig() {
     
@@ -54,20 +50,8 @@ public class JobConfig implements Serializable {
     return reducerClass;
   }
   
-  public int getNumMappers() {
-    return numMappers;
-  }
-  
   public int getNumReducers() {
     return numReducers;
-  }
-  
-  public String getMasterIP() {
-    return masterIP;
-  }
-  
-  public int getMasterPort() {
-    return masterPort;
   }
   
   public void setJobName(String jobName) {
@@ -98,20 +82,8 @@ public class JobConfig implements Serializable {
     this.reducerClass = reducerClass;
   }
   
-  public void setNumMappers(int numMappers) {
-    this.numMappers = numMappers;
-  }
-  
   public void setNumReducers(int numReducers) {
     this.numReducers = numReducers;
-  }
-  
-  public void setMasterIP(String masterIP) {
-    this.masterIP = masterIP;
-  }
-  
-  public void setMasterPort(int masterPort) {
-    this.masterPort = masterPort;
   }
   
   @Override
