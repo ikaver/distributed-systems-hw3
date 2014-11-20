@@ -94,6 +94,8 @@ public class MRReduceRunner implements Runnable {
 			return;
 		}
 		byte[] data = collector.getData();
+		LOGGER.info("Size of data (in bytes) for reducer " + rwd.getReducerID()
+				+ "is " + data.length);
 
 		try {
 			dfs.createFile(getReducerPartitionName(rwd), data.length,
