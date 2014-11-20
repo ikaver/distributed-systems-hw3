@@ -87,8 +87,6 @@ public class JobMonitor {
     try {
       manager.shutdown();
     } catch (RemoteException e) {
-      LOG.info("Failed shutting down system", e);
-      return false;
     }
     return true;
   }
