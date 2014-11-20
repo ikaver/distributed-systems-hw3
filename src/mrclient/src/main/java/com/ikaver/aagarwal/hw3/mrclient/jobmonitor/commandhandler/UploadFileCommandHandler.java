@@ -2,7 +2,7 @@ package com.ikaver.aagarwal.hw3.mrclient.jobmonitor.commandhandler;
 
 import com.ikaver.aagarwal.hw3.common.commandhandler.ICommandHandler;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
-import com.ikaver.aagarwal.hw3.mrclient.fileuploader.FileUploader;
+import com.ikaver.aagarwal.hw3.mrclient.dfs.FileUploader;
 
 public class UploadFileCommandHandler implements ICommandHandler {
     

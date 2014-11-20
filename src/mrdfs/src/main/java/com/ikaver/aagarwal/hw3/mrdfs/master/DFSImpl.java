@@ -111,6 +111,36 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
     return success;
   }
 
+  public byte [] getFile(String filePath, int numChunk) throws RemoteException {
+    byte [] data = null;
+    this.metadataLock.readLock().lock();
+    FileMetadata metadata = this.filePathToMetadata.get(filePath);
+    this.metadataLock.readLock().unlock();
+    
+    Set<SocketAddress> dataNodesAddr = metadata.getNumChunkToAddr().get(numChunk);
+    SocketAddress addr = getRandomDataNode(dataNodesAddr);
+    IDataNode datanode = DataNodeFactory
+        .dataNodeFromSocketAddress(addr);
+    if(datanode == null) return null;
+    try {
+      data = datanode.getFile(filePath, numChunk);
+    } 
+    catch(RemoteException e) {
+      LOG.warn("Failed to read file from data node", e);
+    }
+    catch (IOException e) {
+      LOG.warn("Failed to read file from data node", e);
+    }
+    return data;
+  }
+  
+  private SocketAddress getRandomDataNode(Set<SocketAddress> dataNodes) {
+    if(dataNodes == null || dataNodes.size() == 0) return null;
+    List<SocketAddress> list = new ArrayList<SocketAddress>(dataNodes);
+    Collections.shuffle(list);
+    return list.get(0);
+  } 
+  
   /**
    * Writes the new file with path filePath and contents file.
    * Assumes that you currently have the write lock.

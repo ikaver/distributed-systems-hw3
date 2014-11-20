@@ -9,5 +9,6 @@ public interface IDFS extends Remote {
   public boolean createFile(String filePath, int recordSize, long totalFileSize) throws RemoteException;
   public boolean saveFile(String filePath, int numChunk, byte [] file) throws RemoteException;
   public boolean containsFile(String filePath) throws RemoteException;
+  public byte [] getFile(String filePath, int numChunk) throws RemoteException;
   
 }
