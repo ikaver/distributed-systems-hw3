@@ -79,8 +79,8 @@ def set_up_args():
   parser.add_argument("--compile_local", type=bool, default=False);
   parser.add_argument("--compile_ghc", type=bool, default=False);
 
-  parser.add_argument("--dfs_base_path", type=str, default='/tmp/mrikav-ank-dfs/');
-  parser.add_argument("--localfs_base_path", type=str, default='/tmp/mrikav-ank-local');
+  parser.add_argument("--dfs_base_path", type=str, default='/tmp/ankitaga-ikaveror-mr-dfs/');
+  parser.add_argument("--localfs_base_path", type=str, default='/tmp/ankitaga-ikaveror-mr-local');
   parser.add_argument("--rwd", type=str, help='Remote server working directory i.e.'
      + 'the directory into which the files have to be copied.');
   return parser.parse_args();
