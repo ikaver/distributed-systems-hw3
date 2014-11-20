@@ -59,13 +59,13 @@ public class MRReduceRunner implements Runnable {
 				List<KeyValuePair> list;
 				try {
 					list = node.dataForJob(mwds.get(i), rwd);
-					aggregate(list);
+					aggregate(list); //aggregate all lists
 				} catch (RemoteException e) {
 					setState(WorkerState.FAILED);
 					LOGGER.warn("Encountered remote exception while"
 							+ "trying to fetch data from a node.");
+					return;
 				}
-				// Aggregate all lists.
 			}
 		}
 
