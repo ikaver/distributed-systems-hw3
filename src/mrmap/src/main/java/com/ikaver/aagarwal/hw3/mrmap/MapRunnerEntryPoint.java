@@ -1,11 +1,14 @@
 package com.ikaver.aagarwal.hw3.mrmap;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 
 import com.beust.jcommander.JCommander;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
@@ -15,11 +18,14 @@ public class MapRunnerEntryPoint {
 	
 	private static final Logger LOGGER = Logger.getLogger(MapRunnerEntryPoint.class);
 
-	public static void main(String args[]) throws RemoteException,
-			MalformedURLException {
+	public static void main(String args[]) throws IOException {
 		MRWorkerRunnerSettings settings = new MRWorkerRunnerSettings();
 		JCommander cmd = new JCommander(settings);
 		cmd.parse(args);
+
+		FileAppender appender = new FileAppender(new PatternLayout(PatternLayout.DEFAULT_CONVERSION_PATTERN),
+				"log.mapper." + settings.getPort());
+		Logger.getRootLogger().addAppender(appender);
 
 		MapInstanceRunner runner = new MapInstanceRunner();
 
