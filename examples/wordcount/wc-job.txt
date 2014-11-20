@@ -1,11 +1,11 @@
 {
 	"config" : {
-		"job-name" : "MyJob",
+		"job-name" : "WCJob",
 		"bundle-path" : "/Users/Kaver/Courses/CMU/fall14/15640-ds/projects/hw3/src/common/target/common-1.0-SNAPSHOT.jar",
 		"map-class" : "com.ikaver.aagarwal.hw3.common.examples.WordCountMapper",
 		"reduce-class" : "com.ikaver.aagarwal.hw3.common.examples.WordCountReducer",
 		"input-file-path" : "test.txt",
-		"output-file-path" : "op.txt",
+		"output-file-path" : "wc-out",
 		"num-reducers" : 2,
 		"record-size" : 7
 	}
