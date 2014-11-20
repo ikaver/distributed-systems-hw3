@@ -13,7 +13,7 @@ def create_dir(sftp, dir_path):
   try:
     sftp.mkdir(dir_path);
     sftp.chmod(dir_path, 0777);
-  except IOError:  
+  except IOError: 
     print "Working directory exists. Skipping..";
 
 def copy_files(remote, username, password, source_paths, rwd, dfs_dir, localfs_dir):
@@ -43,8 +43,10 @@ def copy_files(remote, username, password, source_paths, rwd, dfs_dir, localfs_d
     destination = destination + get_file_name(source_path);
     print "Destination file path: {0}".format(destination);
     sftp.put(source_path, destination);
-    sftp.chmod(destination, 0777);
-
+    try:
+      sftp.chmod(destination, 0777);
+    except IOError:
+      print "Permission denied exception while changing file permissions. Ideally, this shouldn't affect system functioning.";
   sftp.close();
 
  
