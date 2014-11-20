@@ -59,6 +59,10 @@ public class JobTracker implements Runnable {
             info.setState(WorkerState.FAILED);
             LOG.warn("Failed to get nm state", e);
           }
+          if(info.getState() == WorkerState.FINISHED
+              && !job.getFinishedMappers().contains(info)) {
+            this.onWorkCompletedHandler.onMapperFinished(job, info);
+          }
         }
       }
       else if(info.getState() == WorkerState.FAILED) {
@@ -94,6 +98,10 @@ public class JobTracker implements Runnable {
           } catch (RemoteException e) {
             info.setState(WorkerState.FAILED);
             LOG.warn("Failed to get nm state", e);
+          }
+          if(info.getState() == WorkerState.FINISHED
+              && !job.getFinishedReducers().contains(info)) {
+            this.onWorkCompletedHandler.onReducerFinished(job, info);
           }
         }
       }
