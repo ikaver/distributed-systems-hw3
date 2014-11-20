@@ -25,6 +25,7 @@ public class Definitions {
   
   //jobmanager
   public static final int MAX_WORKER_RETRIES_BEFORE_CANCELLING_JOB = 5;
+  public static final int MAX_NUMBER_OF_REDUCERS = 50;
   
   //Scheduler
   public static final int SCHEDULER_TIME_TO_CHECK_FOR_NODES_STATE = 3;
