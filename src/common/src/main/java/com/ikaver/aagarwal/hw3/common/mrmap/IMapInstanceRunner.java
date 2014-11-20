@@ -11,12 +11,9 @@ public interface IMapInstanceRunner extends Remote {
 	/**
 	 * Run the map instance.
 	 * @param input
-	 * @param localFilePath is the path of the local file on which
-	 *    the mapper should act upon.
 	 * @throws RemoteException
 	 */
-	public void runMapInstance(MapWorkDescription input,
-			String localFilePath) throws RemoteException;
+	public void runMapInstance(MapWorkDescription input) throws RemoteException;
 
 	/**
 	 * Enum indicating state of the mapper task.

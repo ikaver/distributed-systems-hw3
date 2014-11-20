@@ -20,7 +20,7 @@ public class MapWorkState {
 	public WorkerState getState() {
 		return state;
 	}
-	public void setState(WorkerState state) {
+	public synchronized void setState(WorkerState state) {
 		this.state = state;
 	}
 }

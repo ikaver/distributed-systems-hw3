@@ -14,6 +14,7 @@ import com.google.inject.Injector;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.mrreduce.IMRReduceInstanceRunner;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
+import com.ikaver.aagarwal.hw3.common.workers.flags.MRWorkerRunnerSettings;
 
 /**
  * Entry point for an instance which runs a "reduce" instance.
@@ -25,7 +26,7 @@ public class MRReduceEntryPoint {
 
 	public static void main(String args[]) throws IOException {
 
-		MRReduceSettings settings = new MRReduceSettings();
+		MRWorkerRunnerSettings settings = new MRWorkerRunnerSettings();
 
 		JCommander cmd = new JCommander(settings);
 		cmd.parse(args);

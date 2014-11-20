@@ -19,13 +19,16 @@ public class MRMapTaskAttempt {
 	/**
 	 * Returns the port at which the remote object for task attempt is bound.
 	 */
-	public static int startMapTask(MapWorkDescription input) {
+	public static int startMapTask(MapWorkDescription input,
+			String masterIP, int masterPort) {
 		int port = SocketUtil.findFreePort();
 
 		try {
 			Runtime.getRuntime().exec(
 					"java -jar mrmap-1.0-SNAPSHOT-jar-with-dependencies.jar "
-							+ " -port " + port);
+							+ " -port " + port
+							+ " -masterIP " + masterIP
+							+ " -masterPort " + masterPort );
 			try {
         Thread.sleep(1000);
       } catch (InterruptedException e) {

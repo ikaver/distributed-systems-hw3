@@ -5,12 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -24,21 +21,15 @@ import org.apache.log4j.Logger;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
-import com.ikaver.aagarwal.hw3.common.dfs.DFSFactory;
-import com.ikaver.aagarwal.hw3.common.dfs.FileMetadata;
-import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
-import com.ikaver.aagarwal.hw3.common.dfs.IDataNode;
 import com.ikaver.aagarwal.hw3.common.mrmap.IMapInstanceRunner;
 import com.ikaver.aagarwal.hw3.common.mrreduce.IMRReduceInstanceRunner;
 import com.ikaver.aagarwal.hw3.common.nodemanager.IMRNodeManager;
 import com.ikaver.aagarwal.hw3.common.nodemanager.NodeState;
 import com.ikaver.aagarwal.hw3.common.objects.KeyValuePair;
-import com.ikaver.aagarwal.hw3.common.util.FileOperationsUtil;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.ReduceWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
-import com.ikaver.aagarwal.hw3.mrdfs.datanode.DataNodeFactory;
 
 /**
  * A task manager manages a "slave" node. Following are the responsibilities of
@@ -89,24 +80,9 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
    */
   @SuppressWarnings("resource")
   public boolean doMap(MapWorkDescription input) {
-    LOG.info("Received a map request for "
-        + input.getChunk().getInputFilePath() + " for the partition"
-        + input.getChunk().getPartitionID());
-    String inputPath = input.getChunk().getInputFilePath();
-    // partition id is chunk id for now.
-    int chunk = input.getChunk().getPartitionID();
 
-    byte[] data = fetchData(inputPath, chunk);
-
-    if (data == null) {
-      LOG.warn("Error fetching data from dfs for " + inputPath
-          + " for chunk" + chunk);
-      return false;
-    }
-
-    String localfp = FileOperationsUtil.storeLocalFile(data, ".input");
-
-    int port = MRMapTaskAttempt.startMapTask(input);
+    int port = MRMapTaskAttempt.startMapTask(input, masterAddress.getHostname(),
+    		masterAddress.getPort());
 
     if (port == -1) {
       LOG.warn("error starting work instance");
@@ -127,7 +103,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
     }
 
     try {
-      runner.runMapInstance(input, localfp);
+      runner.runMapInstance(input);
       return true;
     } catch (RemoteException e) {
       LOG.info("Remote exception while running the map instance");
@@ -135,49 +111,6 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
     }
   }
 
-  /**
-   * Fetches data from DFS
-   * 
-   * @param inputPath
-   *            is a path on the dfs.
-   * @param chunk
-   *            is the chunk which needs to be fetched.
-   * @return
-   */
-  private byte[] fetchData(String inputPath, int chunk) {
-    int numTries = 0;
-
-    while (numTries < Definitions.NUM_DFS_READ_RETRIES) {
-      numTries++;
-      try {
-        IDFS dfs = DFSFactory.dfsFromSocketAddress(masterAddress);
-        FileMetadata metadata = dfs.getMetadata(inputPath);
-
-        // Get the list of dataodes corresponding to the chunk.
-        Set<SocketAddress> datanodes = metadata.getNumChunkToAddr()
-            .get(chunk);
-
-        SocketAddress preferredNode = getPreferredAddress(datanodes);
-
-        if (preferredNode == null) {
-          preferredNode = getRandomDataNode(datanodes);
-        }
-        IDataNode datanode = DataNodeFactory
-            .dataNodeFromSocketAddress(preferredNode);
-        byte[] data = null;
-        if (datanode != null)
-          data = datanode.getFile(inputPath, chunk);
-        if (data != null)
-          return data;
-      } catch (RemoteException e) {
-        LOG.warn("Remote exception while reading data.", e);
-      } catch (IOException e) {
-        LOG.warn("Error while fetching data from the dfs.", e);
-      }
-    }
-
-    return null;
-  }
 
   public List<KeyValuePair> dataForJob(MapWorkDescription mwd, ReduceWorkDescription rwd) {
     LOG.info("Getting data for job: " + rwd + " " + mwd);
@@ -459,13 +392,6 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
     System.exit(0);
   }
 
-  private SocketAddress getRandomDataNode(Set<SocketAddress> datanodes) {
-    if(datanodes == null || datanodes.size() == 0) return null;
-    List<SocketAddress> list = new ArrayList<SocketAddress>(datanodes);
-    Collections.shuffle(list);
-    return list.get(0);
-  }
-
   private void removeMapper(MapWorkDescription wd) {
     this.runningMappers.remove(wd);
   }
@@ -474,20 +400,4 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
     this.runningReducers.remove(wd);
   }
 
-  private SocketAddress getPreferredAddress(Set<SocketAddress> addresses) {
-    for (SocketAddress address : addresses) {
-      try {
-        LOG.info("Checking if " + address.getHostname() + " "
-            + InetAddress.getLocalHost().getHostName()
-            + "matches..");
-        if (address.getHostname().equals(
-            InetAddress.getLocalHost().getHostName())) {
-          return address;
-        }
-      } catch (UnknownHostException e) {
-        LOG.warn("Error looking up hostname.");
-      }
-    }
-    return null;
-  }
 }

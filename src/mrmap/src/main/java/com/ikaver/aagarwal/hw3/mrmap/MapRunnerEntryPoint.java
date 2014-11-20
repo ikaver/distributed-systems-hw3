@@ -1,9 +1,7 @@
 package com.ikaver.aagarwal.hw3.mrmap;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.rmi.Naming;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 
 import org.apache.log4j.FileAppender;
@@ -12,6 +10,7 @@ import org.apache.log4j.PatternLayout;
 
 import com.beust.jcommander.JCommander;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
+import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.common.workers.flags.MRWorkerRunnerSettings;
 
 public class MapRunnerEntryPoint {
@@ -27,7 +26,11 @@ public class MapRunnerEntryPoint {
 				"log.mapper." + settings.getPort());
 		Logger.getRootLogger().addAppender(appender);
 
-		MapInstanceRunner runner = new MapInstanceRunner();
+		// TODO(ankit): Guicify it.
+		SocketAddress masterAddress = new SocketAddress(settings.getMasterIP(),
+				settings.getMasterPort());
+
+		MapInstanceRunner runner = new MapInstanceRunner(masterAddress);
 
 		LocateRegistry.createRegistry(settings.getPort());
 
