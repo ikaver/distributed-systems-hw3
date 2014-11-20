@@ -20,6 +20,11 @@ public class BuggyWordCountMapper {
 	 * to demonstrate the functionalities of our code.
 	 */
 	private void doEvilStuff() {
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// Do nothing.
+		}
 		System.exit(1);
 	}
 
