@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
+import com.ikaver.aagarwal.hw3.common.config.JobConfig;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.MapperWorkerInfo;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.ReducerWorkerInfo;
@@ -25,9 +26,14 @@ public class RunningJob {
   private Set<MapperWorkerInfo> mappers;
   private Set<ReducerWorkerInfo> reducers;
   private int numFailures;
+  private int numMappers;
+  private int numReducers;
+  private boolean mappersFinished;
+  private JobConfig jobConfig;
   private ExecutorService taskTrackerService;
 
-  public RunningJob(int jobID, String jobName, ExecutorService service) {
+  public RunningJob(int jobID, String jobName, ExecutorService service,
+      int numMappers, int numReducers, JobConfig jobConfig) {
     this.jobID = jobID;
     this.jobName = jobName;
     this.mappers = new HashSet<MapperWorkerInfo>();
@@ -35,7 +41,11 @@ public class RunningJob {
     this.finishedMappers = new HashSet<MapperWorkerInfo>();
     this.finishedReducers = new HashSet<ReducerWorkerInfo>();
     this.taskTrackerService = service;
+    this.jobConfig = jobConfig;
+    this.numMappers = numMappers;
+    this.numReducers = numReducers;
     this.numFailures = 0;
+    this.mappersFinished = false;
   }
   
   public Set<MapperWorkerInfo> getFinishedMappers() {
@@ -67,11 +77,15 @@ public class RunningJob {
   }
   
   public int getAmountOfMappers() {
-    return this.getMappers().size();
+    return this.numMappers;
   }
   
   public int getAmountOfReducers() {
-    return this.getReducers().size();
+    return this.numReducers;
+  }
+  
+  public JobConfig getJobConfig() {
+    return this.jobConfig;
   }
   
   public int getNumFailures() {
@@ -80,6 +94,14 @@ public class RunningJob {
   
   public void setNumFailures(int numFailures) {
     this.numFailures = numFailures;
+  }
+  
+  public void setMappersFinished(boolean mappersFinished) {
+    this.mappersFinished = mappersFinished;
+  }
+  
+  public boolean getMappersFinished() {
+    return mappersFinished;
   }
   
   public int getAmountOfFinishedMappers() {
