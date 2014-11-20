@@ -1,11 +1,12 @@
 package com.ikaver.aagarwal.hw3.mrreduce;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.rmi.Naming;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 
 import com.beust.jcommander.JCommander;
 import com.google.inject.Guice;
@@ -22,14 +23,17 @@ public class MRReduceEntryPoint {
 	private static final Logger LOGGER = Logger
 			.getLogger(MRReduceEntryPoint.class);
 
-	public static void main(String args[]) throws RemoteException,
-			MalformedURLException {
+	public static void main(String args[]) throws IOException {
 
 		MRReduceSettings settings = new MRReduceSettings();
 
 		JCommander cmd = new JCommander(settings);
 		cmd.parse(args);
 		
+		FileAppender appender = new FileAppender(new PatternLayout(PatternLayout.DEFAULT_CONVERSION_PATTERN),
+				"log.reducer." + settings.getPort());
+		Logger.getRootLogger().addAppender(appender);
+
 		SocketAddress masterAddress = new SocketAddress(settings.getMasterIP(),
 				settings.getMasterPort());
 
