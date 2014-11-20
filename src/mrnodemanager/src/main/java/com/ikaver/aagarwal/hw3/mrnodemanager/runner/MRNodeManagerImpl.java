@@ -456,6 +456,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
     finally{
       this.reducersLock.writeLock().unlock();
     }
+    System.exit(0);
   }
 
   private SocketAddress getRandomDataNode(Set<SocketAddress> datanodes) {
