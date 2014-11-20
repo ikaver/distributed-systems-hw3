@@ -34,14 +34,14 @@ public class Definitions {
   public static final int TIME_TO_CHECK_FOR_NODE_MANAGER_STATE = 3;
   
   //Node manager
-  public static final int WORKERS_PER_NODE = 2;
+  public static final int WORKERS_PER_NODE = 5;
   
   //DFS
   public static final String BASE_DIRECTORY = "/tmp/ankitaga-ikaveror-mr-dfs/";
   // Local File system base directory
   public static final String LOCAL_FS_BASE_DIRECTORY = "/tmp/ankitaga-ikaveror-mr-local";
-  public static final int REPLICATION_FACTOR = 2;
-  public static final int SIZE_OF_CHUNK = (1 << 19); //512KB
+  public static final int REPLICATION_FACTOR = 3;
+  public static final int SIZE_OF_CHUNK = (1 << 20); //32MB
   public static final int NUM_DFS_READ_RETRIES = 3;
 
   public static final int NODE_MANAGER_SERVICE_PORT = 3000;
