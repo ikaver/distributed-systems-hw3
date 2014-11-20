@@ -151,7 +151,7 @@ public class MRReduceRunner implements Runnable {
 	}
 
 	private String getReducerPartitionName(ReduceWorkDescription rwd) {
-		return String.format("%s-%d-reduce.io", rwd.getOutputFilePath(),
+		return String.format("%s-%d.out", rwd.getOutputFilePath(),
 				rwd.getReducerID());
 	}
 
