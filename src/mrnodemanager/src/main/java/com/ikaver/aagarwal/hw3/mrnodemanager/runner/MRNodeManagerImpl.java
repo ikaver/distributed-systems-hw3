@@ -459,6 +459,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
   }
 
   private SocketAddress getRandomDataNode(Set<SocketAddress> datanodes) {
+    if(datanodes == null || datanodes.size() == 0) return null;
     List<SocketAddress> list = new ArrayList<SocketAddress>(datanodes);
     Collections.shuffle(list);
     return list.get(0);
