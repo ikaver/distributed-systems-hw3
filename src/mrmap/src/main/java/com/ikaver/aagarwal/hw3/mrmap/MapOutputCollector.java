@@ -1,6 +1,5 @@
 package com.ikaver.aagarwal.hw3.mrmap;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
