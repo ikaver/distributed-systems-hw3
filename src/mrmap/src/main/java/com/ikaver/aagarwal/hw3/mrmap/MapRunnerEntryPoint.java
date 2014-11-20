@@ -10,6 +10,7 @@ import org.apache.log4j.PatternLayout;
 
 import com.beust.jcommander.JCommander;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
+import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.common.workers.flags.MRWorkerRunnerSettings;
 
@@ -23,12 +24,14 @@ public class MapRunnerEntryPoint {
 		cmd.parse(args);
 
 		FileAppender appender = new FileAppender(new PatternLayout(PatternLayout.DEFAULT_CONVERSION_PATTERN),
-				"log.mapper." + settings.getPort());
+				logFileForPort(settings.getPort()));
 		Logger.getRootLogger().addAppender(appender);
 
 		// TODO(ankit): Guicify it.
 		SocketAddress masterAddress = new SocketAddress(settings.getMasterIP(),
 				settings.getMasterPort());
+		
+		FileUtil.changeFilePermission(logFileForPort(settings.getMasterPort()));
 
 		MapInstanceRunner runner = new MapInstanceRunner(masterAddress);
 
@@ -39,5 +42,9 @@ public class MapRunnerEntryPoint {
 						settings.getPort()), runner);
 
 		LOGGER.info("Logger is now running on port" + settings.getPort());
+	}
+
+	private static String logFileForPort(int port) {
+		return "log.mapper." + port;
 	}
 }

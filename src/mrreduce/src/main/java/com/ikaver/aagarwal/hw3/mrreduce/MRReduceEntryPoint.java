@@ -1,6 +1,7 @@
 package com.ikaver.aagarwal.hw3.mrreduce;
 
 import java.io.IOException;
+import java.io.ObjectInputStream.GetField;
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
 
@@ -12,6 +13,7 @@ import com.beust.jcommander.JCommander;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
+import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.mrreduce.IMRReduceInstanceRunner;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.common.workers.flags.MRWorkerRunnerSettings;
@@ -32,7 +34,10 @@ public class MRReduceEntryPoint {
 		cmd.parse(args);
 		
 		FileAppender appender = new FileAppender(new PatternLayout(PatternLayout.DEFAULT_CONVERSION_PATTERN),
-				"log.reducer." + settings.getPort());
+				getLogFileForPort(settings.getPort()));
+
+		FileUtil.changeFilePermission(getLogFileForPort(settings.getPort()));
+
 		Logger.getRootLogger().addAppender(appender);
 
 		SocketAddress masterAddress = new SocketAddress(settings.getMasterIP(),
@@ -51,6 +56,10 @@ public class MRReduceEntryPoint {
 
 		LOGGER.info("Logger is now running on port" + settings.getPort());
 
+	}
+	
+	public static String getLogFileForPort(int port) {
+		return "log.reducer." + port;
 	}
 
 }
