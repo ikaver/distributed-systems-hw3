@@ -1,6 +1,9 @@
 import argparse;
 import getpass;
+import os;
 import paramiko;
+import sys;
+
 
 def get_file_name(path):
   return path.split("/")[-1];
@@ -71,6 +74,9 @@ def set_up_args():
 
   parser.add_argument("--skip_copy", type=bool, default=False);
 
+  parser.add_argument("--compile_local", type=bool, default=False);
+  parser.add_argument("--compile_ghc", type=bool, default=False);
+
   parser.add_argument("--dfs_base_path", type=str, default='/tmp/mrikav-ank-dfs/');
   parser.add_argument("--localfs_base_path", type=str, default='/tmp/mrikav-ank-local');
   parser.add_argument("--rwd", type=str, help='Remote server working directory i.e.'
@@ -137,9 +143,24 @@ def setup_slaves(args, username, password):
     script_args = "{0} {1} {2}".format(args.slave_port,args.master_ip , args.master_port); 
     setup(args.rwd, 'run_slave.sh', ip, username, password, script_args);
  
+def compile(args):
+  script_file = '';
+  if (args.compile_local):
+    script_file = 'localbuildall.sh';
+  elif(args.compile_ghc):
+    script_file = 'ghcbuildall.sh';
+  else:
+    print "Skipping compilation step.";
+    return;
+
+  cmd = 'cd ..; sh {0}; cd scripts/'.format(script_file);
+  print "Executing command {0}".format(cmd);
+  os.system(cmd);
+
 def main():
   args = set_up_args(); 
   [username, password] = get_login_credentials();
+  compile(args);
 
   if (args.kill_all):
     print "** Terminating the system **";
