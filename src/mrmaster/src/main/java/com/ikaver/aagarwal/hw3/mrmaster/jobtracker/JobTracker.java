@@ -53,9 +53,12 @@ public class JobTracker implements Runnable {
         }
         else {
           try {
-            info.setState(nm.getMapperState(info.getWorkDescription()));
+            WorkerState state = nm.getMapperState(info.getWorkDescription());
+            info.setState(state);
             if(info.getState() == null) info.setState(WorkerState.FAILED);
-            LOG.info("Got state " + info.getState() + " from mapper " + info.getNodeManagerAddress() + " " + info.getWorkDescription().getChunk().getPartitionID());
+           // LOG.info("Got state " + info.getState() + " from mapper " 
+           // + info.getNodeManagerAddress() + " " 
+           //     + info.getWorkDescription().getChunk().getPartitionID());
           } catch (RemoteException e) {
             info.setState(WorkerState.FAILED);
             LOG.warn("Failed to get nm state", e);
@@ -93,7 +96,8 @@ public class JobTracker implements Runnable {
         }
         else {
           try {
-            info.setState(nm.getReducerState(info.getWorkDescription()));
+            WorkerState state = nm.getReducerState(info.getWorkDescription());
+            info.setState(state);
             if(info.getState() == null) info.setState(WorkerState.FAILED);
           } catch (RemoteException e) {
             info.setState(WorkerState.FAILED);
