@@ -1,8 +1,6 @@
 {
 	"config" : {
 		"job-name" : "MyJob",
-		"master-ip" : "127.0.0.1",
-		"master-port" : 3001,
 		"bundle-path" : "/Users/Kaver/Courses/CMU/fall14/15640-ds/projects/hw3/src/common/target/common-1.0-SNAPSHOT.jar",
 		"map-class" : "com.ikaver.aagarwal.hw3.common.examples.WordCountMapper",
 		"reduce-class" : "com.ikaver.aagarwal.hw3.common.examples.WordCountReducer",
