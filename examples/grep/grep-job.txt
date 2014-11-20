@@ -4,7 +4,7 @@
 		"bundle-path" : "/Users/Kaver/Courses/CMU/fall14/15640-ds/projects/hw3/src/common/target/common-1.0-SNAPSHOT.jar",
 		"map-class" : "com.ikaver.aagarwal.hw3.common.examples.GrepMapper",
 		"reduce-class" : "com.ikaver.aagarwal.hw3.common.examples.IdentityReducer",
-		"input-file-path" : "grep1.txt",
+		"input-file-path" : "grep.txt",
 		"output-file-path" : "grep-out",
 		"num-reducers" : 2,
 		"record-size" : 21
