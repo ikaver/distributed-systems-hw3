@@ -8,7 +8,6 @@
 		"reduce-class" : "com.ikaver.aagarwal.hw3.common.examples.WordCountReducer",
 		"input-file-path" : "test.txt",
 		"output-file-path" : "op.txt",
-		"num-mappers" : 2,
 		"num-reducers" : 2,
 		"record-size" : 7
 	}
