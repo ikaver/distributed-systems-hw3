@@ -18,6 +18,7 @@ public class JobMonitorCommandHandlerFactory implements ICommandHandlerFactory {
   private static final String JOB_INFO = "info";
   private static final String TERMINATE_JOB = "terminate";
   private static final String UPLOAD_FILE = "upload";
+  private static final String DOWNLOAD_FILE = "download";
   private static final String LIST_FINISHED_JOBS = "finished";
   private static final String SHUTDOWN = "shutdown";
 
@@ -39,6 +40,7 @@ public class JobMonitorCommandHandlerFactory implements ICommandHandlerFactory {
     commandHandlers.put(TERMINATE_JOB, new TerminateJobCommandHandler(monitor));
     commandHandlers.put(LIST_FINISHED_JOBS, new ListFinishedJobsCommandHandler(monitor));
     commandHandlers.put(UPLOAD_FILE, new UploadFileCommandHandler(masterSocketAddress));
+    commandHandlers.put(DOWNLOAD_FILE, new DownloadFileCommandHandler(masterSocketAddress));
     commandHandlers.put(SHUTDOWN, new ShutdownCommandHandler(monitor));
     return commandHandlers;
   }

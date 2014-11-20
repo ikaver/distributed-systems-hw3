@@ -29,6 +29,6 @@ public class UploadFileCommandHandler implements ICommandHandler {
   }
 
   public String helpString() {
-    return "<INPUT-FILE-PATH> <DESTINATION-PATH>";
+    return "<INPUT-FILE-PATH> <DESTINATION-PATH> <INPUT-FILE-RECORD-SIZE>" ;
   }
 }
