@@ -44,7 +44,7 @@ public class JobTracker implements Runnable {
       if(info.getState() == WorkerState.WORKER_NOT_ASSIGNED
           || info.getState() == WorkerState.WORKER_DOESNT_EXIST) {
         //ask scheduler to assign a worker
-        this.onWorkerFailedHandler.onMapperFailed(job, info);
+        this.onWorkerFailedHandler.onMapperNotAssignedFound(job, info);
       }
       else if(info.getState() == WorkerState.RUNNING) {
         //query the mapper for its state

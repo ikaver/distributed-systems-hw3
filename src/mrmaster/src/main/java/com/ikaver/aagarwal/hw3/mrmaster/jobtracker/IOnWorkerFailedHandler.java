@@ -8,5 +8,7 @@ public interface IOnWorkerFailedHandler {
 
   public void onMapperFailed(RunningJob job, MapperWorkerInfo info);
   public void onReducerFailed(RunningJob job, ReducerWorkerInfo info);
+  public void onMapperNotAssignedFound(RunningJob job, MapperWorkerInfo info);
+  public void onReducerNotAssignedFound(RunningJob job, ReducerWorkerInfo info);
   
 }

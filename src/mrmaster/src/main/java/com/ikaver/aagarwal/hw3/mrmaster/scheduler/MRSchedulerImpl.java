@@ -89,7 +89,9 @@ public class MRSchedulerImpl implements IMRScheduler {
         }
       }
       else {
-        info.add(mapperWorkerInfoForFailure(workToDo));
+        info.add(new MapperWorkerInfo(
+            workToDo, null, WorkerState.WORKER_NOT_ASSIGNED
+        ));
       }
       
     }
@@ -101,7 +103,7 @@ public class MRSchedulerImpl implements IMRScheduler {
     MapperWorkerInfo workerInfo = new MapperWorkerInfo(
         workToDo,
         null,
-        WorkerState.WORKER_NOT_ASSIGNED
+        WorkerState.FAILED
         );
     return workerInfo;
   }
@@ -129,7 +131,7 @@ public class MRSchedulerImpl implements IMRScheduler {
             ReducerWorkerInfo workerInfo = new ReducerWorkerInfo(
                 workToDo,
                 null,
-                WorkerState.WORKER_NOT_ASSIGNED
+                WorkerState.FAILED
                 );
             info.add(workerInfo);
           }
@@ -138,10 +140,18 @@ public class MRSchedulerImpl implements IMRScheduler {
           ReducerWorkerInfo workerInfo = new ReducerWorkerInfo(
               workToDo,
               null,
-              WorkerState.WORKER_NOT_ASSIGNED
+              WorkerState.FAILED
               );
           info.add(workerInfo);
         }
+      }
+      else {
+        ReducerWorkerInfo workerInfo = new ReducerWorkerInfo(
+            workToDo,
+            null,
+            WorkerState.WORKER_NOT_ASSIGNED
+            );
+        info.add(workerInfo);
       }
     }
     return info;
@@ -226,24 +236,24 @@ public class MRSchedulerImpl implements IMRScheduler {
    */
   private NodeManagerWithSocketAddress nodeManagerForReducer() {
     this.nodeInfoLock.readLock().lock();
-    List<SocketAddress> dataNodesList = new ArrayList<SocketAddress>(this.nodeInfo.keySet());
+    List<SocketAddress> nmList = new ArrayList<SocketAddress>(this.nodeInfo.keySet());
     this.nodeInfoLock.readLock().unlock();
-    Collections.shuffle(dataNodesList);
+    Collections.shuffle(nmList);
     
+    this.nodeInfoLock.readLock().lock();
     SocketAddress randomAddr = null;
-    if(dataNodesList.size() > 0) randomAddr = dataNodesList.get(0);
+    for(int i = 0; i < nmList.size(); ++i) {
+      NodeInformation info = this.nodeInfo.get(nmList.get(i));
+      if(info.getAvailableSlots() > 0) {
+        randomAddr = nmList.get(i);
+        break;
+      }
+    }
+    this.nodeInfoLock.readLock().unlock();
     IMRNodeManager availableNodeManager = NodeManagerFactory.nodeManagerFromSocketAddress(randomAddr);
     if(availableNodeManager != null)
       return new NodeManagerWithSocketAddress(availableNodeManager, randomAddr);
     else return null;
-  }
-
-  /**
-   * Returns a unique id for a new reducer job
-   * @return a new reducer id
-   */
-  private int getNewReducerId() {
-    return ++this.currentReducerID;
   }
 
   private class NodeManagerWithSocketAddress {

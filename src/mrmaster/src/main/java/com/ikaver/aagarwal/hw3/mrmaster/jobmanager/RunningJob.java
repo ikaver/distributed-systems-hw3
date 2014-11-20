@@ -82,26 +82,6 @@ public class RunningJob {
     this.numFailures = numFailures;
   }
   
-  public int getAmountOfUnassignedMappers() {
-    int numAssignedMappers = 0;
-    for(MapperWorkerInfo info : getMappers()) {
-      if(info.getState() == WorkerState.WORKER_NOT_ASSIGNED) {
-        ++numAssignedMappers;
-      }
-    }
-    return numAssignedMappers;
-  }
-  
-  public int getAmountOfUnassignedReducers() {
-    int numAssignedReducers = 0;
-    for(ReducerWorkerInfo info : getReducers()) {
-      if(info.getState() == WorkerState.WORKER_NOT_ASSIGNED) {
-        ++numAssignedReducers;
-      }
-    }
-    return numAssignedReducers;
-  }
-  
   public int getAmountOfFinishedMappers() {
     int numMappersCompleted = 0;
     for(MapperWorkerInfo info : getMappers()) {

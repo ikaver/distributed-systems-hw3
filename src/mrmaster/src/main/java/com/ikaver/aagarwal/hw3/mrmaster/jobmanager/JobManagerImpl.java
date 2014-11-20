@@ -279,6 +279,31 @@ IOnWorkCompletedHandler {
     }
     this.jobsState.onJobFinished(job.getJobID(), true);
   }
+  
+  public void onMapperNotAssignedFound(RunningJob job, MapperWorkerInfo info) {
+    HashSet<MapWorkDescription> workSet = new HashSet<MapWorkDescription>();
+    workSet.add(info.getWorkDescription());
+    Set<MapperWorkerInfo> newInfoSet = scheduler.runMappersForWork(workSet);
+    for(MapperWorkerInfo newInfo : newInfoSet) {
+      info.setState(newInfo.getState());
+      info.setNodeManagerAddress(newInfo.getNodeManagerAddress());
+      LOG.info(String.format("Created new mapper %s for job %d",
+          info.getNodeManagerAddress(), job.getJobID()));
+    }
+  }
+
+  public void onReducerNotAssignedFound(RunningJob job, ReducerWorkerInfo info) {
+    HashSet<ReduceWorkDescription> workSet = new HashSet<ReduceWorkDescription>();
+    workSet.add(info.getWorkDescription());
+    Set<ReducerWorkerInfo> newInfoSet = scheduler.runReducersForWork(workSet);
+    for(ReducerWorkerInfo newInfo : newInfoSet) {
+      info.setState(newInfo.getState());
+      info.setNodeManagerAddress(newInfo.getNodeManagerAddress());
+      LOG.info(String.format("Created new reducer %s for job %d",
+          info.getNodeManagerAddress(), job.getJobID()));
+    }
+  }
+
 
   /*
    * IOnWorkerFailedHandler methods
@@ -293,17 +318,7 @@ IOnWorkCompletedHandler {
       this.onJobFailed(job);
     }
     else {
-      LOG.info(String.format("Mapper %s for job %d failed", 
-          info.getNodeManagerAddress(), job.getJobID()));
-      HashSet<MapWorkDescription> workSet = new HashSet<MapWorkDescription>();
-      workSet.add(info.getWorkDescription());
-      Set<MapperWorkerInfo> newInfoSet = scheduler.runMappersForWork(workSet);
-      for(MapperWorkerInfo newInfo : newInfoSet) {
-        info.setState(newInfo.getState());
-        info.setNodeManagerAddress(newInfo.getNodeManagerAddress());
-        LOG.info(String.format("Created new mapper %s for job %d",
-            info.getNodeManagerAddress(), job.getJobID()));
-      }
+      onMapperNotAssignedFound(job, info);
     }
   }
 
@@ -316,15 +331,7 @@ IOnWorkCompletedHandler {
       this.onJobFailed(job);
     }
     else {
-      HashSet<ReduceWorkDescription> workSet = new HashSet<ReduceWorkDescription>();
-      workSet.add(info.getWorkDescription());
-      Set<ReducerWorkerInfo> newInfoSet = scheduler.runReducersForWork(workSet);
-      for(ReducerWorkerInfo newInfo : newInfoSet) {
-        info.setState(newInfo.getState());
-        info.setNodeManagerAddress(newInfo.getNodeManagerAddress());
-        LOG.info(String.format("Created new reducer %s for job %d",
-            info.getNodeManagerAddress(), job.getJobID()));
-      }
+      onReducerNotAssignedFound(job, info);
     }
   }
 

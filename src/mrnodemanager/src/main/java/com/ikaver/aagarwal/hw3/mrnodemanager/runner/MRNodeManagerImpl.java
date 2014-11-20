@@ -202,7 +202,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
     this.reducersLock.readLock().lock();
     int numReducers = runningReducers.size();
     this.reducersLock.readLock().unlock();
-    int availableSlots = Definitions.WORKERS_PER_NODE - numMappers - numReducers;
+    int availableSlots = Math.max(0, Definitions.WORKERS_PER_NODE - numMappers - numReducers);
     return new NodeState(numMappers, 
         numReducers, 
         availableSlots,
