@@ -208,13 +208,13 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
       List<KeyValuePair> result = new ArrayList<KeyValuePair>();
       List<KeyValuePair> list = (List<KeyValuePair>) os.readObject();
 
-      LOG.info("For reducer: " + rwd.getReducerID() + " mapper output list size is " + list.size());
-
       for (KeyValuePair kv : list) {
-        if (kv.getKey().hashCode() % rwd.getNumReducers() == rwd.getReducerID()) {
+        if ((Math.abs(kv.getKey().hashCode()) % rwd.getNumReducers()) == rwd.getReducerID()) {
           result.add(kv);
         }
       }
+      LOG.info("For reducer: " + rwd.getReducerID() + " mapper output list size is " + result.size());
+      
       return result;
     } catch (FileNotFoundException e) {
       LOG.error("The local file specified by the mapper doesn't exist.");
