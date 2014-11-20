@@ -26,11 +26,11 @@ public class NodeManagerFactory {
     try {
       return (IMRNodeManager) Naming.lookup (url);
     } catch (MalformedURLException e) {
-      LOG.info("Bad URL", e);
+      LOG.debug("Bad URL", e);
     } catch (RemoteException e) {
-      LOG.info("Remote connection refused to url "+ url, e);
+      LOG.debug("Failed to communicate with node manager", e);
     } catch (NotBoundException e) {
-      LOG.info("Not bound", e);
+      LOG.debug("Not bound", e);
     }
     return null;
   }
