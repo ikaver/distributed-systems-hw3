@@ -169,8 +169,7 @@ public class MapRunner implements Runnable {
 					preferredNode = getRandomDataNode(datanodes);
 				}
 
-				IDataNode datanode = DataNodeFactory
-						.dataNodeFromSocketAddress(preferredNode);
+				IDataNode datanode = DataNodeFactory.dataNodeFromSocketAddress(preferredNode);
 
 				byte[] data = null;
 				if (datanode != null)
