@@ -29,7 +29,7 @@ public class FinishedJob implements Serializable {
   
   @Override
   public String toString() {
-    return String.format("[ID: %d, Name: %s, Success: %b", getJobID(), 
+    return String.format("[ID: %d, Name: %s, Success: %b]", getJobID(), 
         getJobName(), isFinishedSuccessfully());
   }
   
