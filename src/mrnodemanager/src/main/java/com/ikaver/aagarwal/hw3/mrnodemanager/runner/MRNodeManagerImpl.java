@@ -242,7 +242,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
     this.reducersLock.writeLock().lock();
     reduceWorkDescriptionToPortMapping.put(rwd, port);
     runningReducers.put(rwd, port);
-    this.reducersLock.readLock().unlock();
+    this.reducersLock.writeLock().unlock();
 
     LOG.info(String.format("Starting reduce runner at port: %d", port));
 
