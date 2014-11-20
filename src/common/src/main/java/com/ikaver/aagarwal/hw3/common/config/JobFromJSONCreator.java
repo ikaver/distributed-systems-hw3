@@ -37,14 +37,11 @@ public class JobFromJSONCreator {
     JSONObject obj = new JSONObject(json);
     JSONObject config = obj.getJSONObject(CONFIG_OBJECT);
     String jobName = config.getString(JOB_NAME);
-    String masterIP = config.getString(MASTER_IP);
-    int masterPort = config.getInt(MASTER_PORT);
     String mapperClass = config.getString(MAP_CLASS_NAME);
     String reducerClass = config.getString(REDUCE_CLASS_NAME);
     String bundlePath = config.getString(BUNDLE_PATH);
     String inputFilePath = config.getString(INPUT_FILE_PATH);
     String outputFilePath = config.getString(OUTPUT_FILE_PATH);
-    int numMappers = config.getInt(NUM_MAPPERS);
     int numReducers = config.getInt(NUM_REDUCERS);
     int recordSize = config.getInt(RECORD_SIZE);
     
@@ -57,14 +54,11 @@ public class JobFromJSONCreator {
     JobConfig job = new JobConfig();
         
     job.setJobName(jobName);
-    job.setMasterIP(masterIP);
-    job.setMasterPort(masterPort);
     job.setJarFile(data);
     job.setMapperClass(mapperClass);
     job.setReducerClass(reducerClass);
     job.setInputFilePath(inputFilePath);
     job.setOutputFilePath(outputFilePath);
-    job.setNumMappers(numMappers);
     job.setNumReducers(numReducers);
     job.setRecordSize(recordSize);
     

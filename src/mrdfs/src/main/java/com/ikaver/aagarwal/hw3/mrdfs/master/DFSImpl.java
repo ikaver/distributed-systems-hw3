@@ -124,7 +124,7 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
         dataNodesForFile);
     if(saveSuccessful) {
       metadata.getNumChunkToAddr().put(numChunk, dataNodesForFile);
-      LOG.warn(String.format("Saved file (%s %d) successfully", 
+      LOG.info(String.format("Saved file (%s %d) successfully", 
           metadata.getFileName(), numChunk));
     }
     else {

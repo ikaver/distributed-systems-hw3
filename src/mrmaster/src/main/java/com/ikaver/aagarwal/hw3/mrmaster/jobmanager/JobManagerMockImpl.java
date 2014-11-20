@@ -25,7 +25,7 @@ public class JobManagerMockImpl extends UnicastRemoteObject implements IJobManag
   }
 
   public JobInfoForClient createJob(JobConfig job) throws RemoteException {
-    JobInfoForClient jobInfo = new JobInfoForClient(this.getNewID(), job);
+    JobInfoForClient jobInfo = new JobInfoForClient(this.getNewID(), job.getJobName(), 4, job.getNumReducers(), 0, 0);
     jobIDToJobInfo.put(jobInfo.getJobID(), jobInfo);
     return jobInfo;
   }

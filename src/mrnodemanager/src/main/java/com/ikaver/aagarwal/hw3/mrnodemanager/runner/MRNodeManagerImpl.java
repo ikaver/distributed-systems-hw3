@@ -208,7 +208,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
       List<KeyValuePair> result = new ArrayList<KeyValuePair>();
       List<KeyValuePair> list = (List<KeyValuePair>) os.readObject();
 
-      LOG.info("Mapper output list size is " + list.size());
+      LOG.info("For reducer: " + rwd.getReducerID() + " mapper output list size is " + list.size());
 
       for (KeyValuePair kv : list) {
         if (kv.getKey().hashCode() % rwd.getNumReducers() == rwd.getReducerID()) {
@@ -241,7 +241,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
     this.reducersLock.writeLock().lock();
     reduceWorkDescriptionToPortMapping.put(rwd, port);
     runningReducers.put(rwd, port);
-    this.reducersLock.readLock().unlock();
+    this.reducersLock.writeLock().unlock();
 
     LOG.info(String.format("Starting reduce runner at port: %d", port));
 
@@ -303,13 +303,13 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
     }
 
     if (mapperState == WorkerState.FAILED) {
-    	this.mapWorkDescriptionToPortMapping.remove(wd);
+      this.mapWorkDescriptionToPortMapping.remove(wd);
 
-    	try {
-			mapper.die();
-		} catch (RemoteException e) {
-			LOG.error("Remote exception while trying to kill a failed reducer.");
-		}
+      try {
+        mapper.die();
+      } catch (RemoteException e) {
+        LOG.error("Remote exception while trying to kill a failed reducer.");
+      }
     }
     return mapperState;
   }
@@ -340,12 +340,12 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
       reducersLock.writeLock().unlock();
     }
     if (reducerState == WorkerState.FAILED) {
-    	this.reduceWorkDescriptionToPortMapping.remove(wd);
-    	try {
-			reducer.die();
-		} catch (RemoteException e) {
-			LOG.warn("Remote exception when trying to kill a remote reducer.");
-		}
+      this.reduceWorkDescriptionToPortMapping.remove(wd);
+      try {
+        reducer.die();
+      } catch (RemoteException e) {
+        LOG.warn("Remote exception when trying to kill a remote reducer.");
+      }
     }
     return reducerState;
   }
@@ -395,7 +395,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
                 removeReducer(reducerWork);
                 success = true;
               } catch (RemoteException e) {
-                LOG.warn("Failed communicating with mapper", e);
+                LOG.warn("Failed communicating with reducer", e);
               }
             }
           }
