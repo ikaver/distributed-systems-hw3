@@ -203,8 +203,10 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
     //this nodes).
     List<SocketAddress> dataNodesList = new ArrayList<SocketAddress>(this.dataNodes);
     this.dataNodesLock.readLock().unlock();
+    //shuffle the list so we don't store the same file on the same data node.
     Collections.shuffle(dataNodesList);
 
+    //make a map metadata --> num chunk of all of the files that need to be replicated
     List<Pair<FileMetadata, Integer>> filesThatNeedToBeReplicated = new ArrayList<Pair<FileMetadata, Integer>>();
 
     //get all files that were were on the data node that failed.
@@ -224,40 +226,50 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
     for(Pair<FileMetadata, Integer> pair : filesThatNeedToBeReplicated) {
       FileMetadata metadata = pair.first;
       Integer chunkNum = pair.second;
+      //which nodes have this data?
       Set<SocketAddress> nodesWithData = metadata.getNumChunkToAddr().get(chunkNum);
       byte [] data = null;
+      
+      //1. get the file from the other nodes that have the file
       for(SocketAddress nodeWithDataAddr : nodesWithData) {
         IDataNode nodeWithData = DataNodeFactory.dataNodeFromSocketAddress(nodeWithDataAddr);
         if(nodeWithData == null) continue;
         try {
           data = nodeWithData.getFile(metadata.getFileName(), chunkNum);
-          break;
+          if(data != null) break;
         } catch (RemoteException e) {
           LOG.warn("Failed to communicate with data node", e);
         } catch (IOException e) {
           LOG.warn("Failed to read file from data node", e);
         }
       }
+      
       if(data == null) {
+        //failed to get the file from all of the nodes that actually have it
+        //continue with next file that needs to be replicated
         LOG.warn("Failed to replicate data for chunk: " + metadata.getFileName()
             + " " + chunkNum);
         continue;
       }
+      
+      //We got the data! now try to save it on a new node
       for(SocketAddress newDataNodeAddr : dataNodesList) {
         if(!nodesWithData.contains(newDataNodeAddr)) {
+          //now we know that newDataNodeAddr doesn't have the file, so we
+          //can replicate it here
           IDataNode newDataNode = DataNodeFactory.dataNodeFromSocketAddress(newDataNodeAddr);
-          if(newDataNode == null) continue;
+          if(newDataNode == null) continue; //try with the next node
           try {
             newDataNode.saveFile(metadata.getFileName(), chunkNum, data);
             this.metadataLock.writeLock().lock();
             nodesWithData.add(newDataNodeAddr);
             this.metadataLock.writeLock().unlock();
+            break;
           } catch (RemoteException e) {
             LOG.warn("Failed to communicate with data node", e);
           } catch (IOException e) {
             LOG.warn("Failed to read file from data node", e);
           }
-          if(data == null) continue;
         }
       }
     }
