@@ -110,6 +110,9 @@ public class MRReduceRunner implements Runnable {
 	}
 
 	private void aggregate(List<KeyValuePair> kvs) {
+		if (kvs == null) {
+			return;
+		}
 		for (KeyValuePair kv : kvs) {
 			if (aggregator.get(kv.getKey()) == null) {
 				aggregator.put(kv.getKey(), new ArrayList<String>());
