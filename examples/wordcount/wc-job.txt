@@ -4,9 +4,9 @@
 		"bundle-path" : "/Users/Kaver/Courses/CMU/fall14/15640-ds/projects/hw3/src/common/target/common-1.0-SNAPSHOT.jar",
 		"map-class" : "com.ikaver.aagarwal.hw3.common.examples.WordCountMapper",
 		"reduce-class" : "com.ikaver.aagarwal.hw3.common.examples.WordCountReducer",
-		"input-file-path" : "test.txt",
-		"output-file-path" : "wc-out",
+		"input-file-path" : "wc",
+		"output-file-path" : "wc",
 		"num-reducers" : 2,
-		"record-size" : 7
+		"record-size" : 5
 	}
 }
