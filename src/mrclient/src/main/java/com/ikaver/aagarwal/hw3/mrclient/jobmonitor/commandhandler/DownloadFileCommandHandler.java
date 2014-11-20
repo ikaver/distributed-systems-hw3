@@ -17,6 +17,7 @@ public class DownloadFileCommandHandler implements ICommandHandler {
       return false;
     String remoteFilePath = args[1];
     String destinationPath = args[2];
+    System.out.println("Starting download process, please wait...");
     FileDownloader.downloadFile(masterSocketAddr, remoteFilePath, destinationPath);
     return true;
   }
