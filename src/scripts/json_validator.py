@@ -8,16 +8,16 @@ def setup_args():
   parser.add_argument("--json_file", type=str, required=True);
   return parser.parse_args();
 
-def validate_participants(nodes):
-  if len(nodes) < 1:
-    print "Atleast one node must be specified";
+def validate_participants(participants):
+  if len(participants) < 1:
+    print "Atleast one participant must be specified";
     return False;
   
-  for node in nodes:
-    if "ip" not in node:
+  for participant in participants:
+    if "ip" not in participant:
       print "IP should be specified for each participant";
       return False;
-    if "port" not in node or not isinstance(node["port"], int) or node["port"] < 0:
+    if "port" not in participant or not isinstance(participant["port"], int) or participant["port"] < 0:
       print "Port for each participant must be greater than zero.";
       return False;
   return True;
