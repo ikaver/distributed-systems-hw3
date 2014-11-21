@@ -4,3 +4,12 @@ target
 *.classpath
 *.settings
 *.project
+src/scripts/ecdsa-0.11/build
+src/scripts/ecdsa-0.11/ecdsa
+src/scripts/ecdsa/
+src/scripts/paramiko/
+src/scripts/pycrypto-2.6.1/build/
+src/scripts/pycrypto-2.6.1/config.log
+src/scripts/pycrypto-2.6.1/config.status
+src/scripts/pycrypto-2.6.1/src/config.h
+src/scripts/Crypto
