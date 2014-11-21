@@ -39,6 +39,7 @@ public class MRConfigFromJSONCreator {
     fis.read(data);
     fis.close();
     String json = new String(data, "UTF-8");
+    MRConfig.setConfigFileName(jsonFile.getName());
     return setupMRConfigFromJSON(json);
   }
   

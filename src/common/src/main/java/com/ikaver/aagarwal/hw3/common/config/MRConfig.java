@@ -16,6 +16,7 @@ public class MRConfig {
   //general
   private static SocketAddress masterSocketAddress;
   private static Set<SocketAddress> participantNodes;
+  private static String configFileName;
 
   //job manager
   private static int maxWorkerRetriesBeforeCancellingJob;
@@ -47,6 +48,14 @@ public class MRConfig {
 
   public static void setParticipantNodes(Set<SocketAddress> participantNodes) {
     MRConfig.participantNodes = participantNodes;
+  }
+  
+  public static String getConfigFileName() {
+    return configFileName;
+  }
+
+  public static void setConfigFileName(String configFileName) {
+    MRConfig.configFileName = configFileName;
   }
   
   public static int getMaxWorkerRetriesBeforeCancellingJob() {
@@ -118,6 +127,7 @@ public class MRConfig {
   private static boolean isValid() {
     return getMasterSocketAddress() != null
         && getParticipantNodes() != null
+        && getConfigFileName() != null
         && getMaxWorkerRetriesBeforeCancellingJob() > 0
         && getReplicationFactor() > 0
         && getTimeToCheckDataNodesState() > 0

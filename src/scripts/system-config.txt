@@ -1,0 +1,36 @@
+{
+    "config": {
+        "master-host": "ghc34.ghc.andrew.cmu.edu",
+        "master-port": 4917,
+        "participants": [
+            {
+                "ip": "ghc33.ghc.andrew.cmu.edu",
+                "port": 8932
+            },
+            {
+                "ip": "ghc32.ghc.andrew.cmu.edu",
+                "port": 4321
+            },
+            {
+                "ip": "ghc31.ghc.andrew.cmu.edu",
+                "port": 7854
+            },
+            {
+                "ip": "ghc30.ghc.andrew.cmu.edu",
+                "port": 4372
+            },
+            {
+                "ip": "ghc29.ghc.andrew.cmu.edu",
+                "port": 8432
+            }
+        ],
+        "max-retries-before-job-failure": 5,
+        "time-to-check-for-job-state": 3,
+        "time-to-check-for-nodes-state": 4,
+        "time-to-check-for-data-nodes-state": 5,
+        "workers-per-node": 6,
+        "replication-factor": 3,
+        "chunk-size-in-MB": 4,
+        "max-dfs-read-retries": 5
+    }
+}
