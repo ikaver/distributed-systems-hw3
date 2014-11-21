@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
+import com.ikaver.aagarwal.hw3.common.config.MRConfig;
 import com.ikaver.aagarwal.hw3.common.util.SocketUtil;
 import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 
@@ -27,8 +28,7 @@ public class MRMapTaskAttempt {
 			Runtime.getRuntime().exec(
 					"java -jar mrmap-1.0-SNAPSHOT-jar-with-dependencies.jar "
 							+ " -port " + port
-							+ " -masterIP " + masterIP
-							+ " -masterPort " + masterPort );
+							+ " -config " + MRConfig.getConfigFileName());
 			try {
         Thread.sleep(1000);
       } catch (InterruptedException e) {
