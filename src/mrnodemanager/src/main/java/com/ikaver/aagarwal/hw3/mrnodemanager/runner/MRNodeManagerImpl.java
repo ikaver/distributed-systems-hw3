@@ -128,7 +128,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
       String outputPath = completedMapWorkDescriptionToOutputMapping.get(mwd);
       if (outputPath == null) {
     	  LOG.warn("Received an empty file path for a completed mapper. Ideally, this" +
-    	  		"shouldn't be possible.");
+    	  		"shouldn't be possible.	");
     	  return null;
       }
       LOG.info("Got output file path of mapper: " + outputPath);
@@ -261,9 +261,9 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
     		completedMapWorkDescriptionToOutputMapping.put(wd, output);
     	} else {
     		// Master regularly polls the node manager to query if a particular mapper has finished
-    		// working. A mapper hasn't finished working until it has successfully passed
-    		// the output file path to it's node manager.
-    		return WorkerState.RUNNING;
+    		// working. A mapper hasn't successfully finished working until it has 
+    		// successfully passed the output file path to it's node manager.
+    		return WorkerState.FAILED;
     	}
     }
     return mapperState;
