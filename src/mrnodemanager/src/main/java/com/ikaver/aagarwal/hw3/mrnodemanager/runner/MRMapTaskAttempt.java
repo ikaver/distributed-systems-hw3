@@ -17,7 +17,7 @@ public class MRMapTaskAttempt {
 	private static final Logger LOGGER = Logger
 			.getLogger(MRMapTaskAttempt.class);
 	
-	private static final int WAIT_TIME = 100;
+	private static final int WAIT_TIME = 1000;
 
 	/**
 	 * Returns the port at which the remote object for task attempt is bound.
