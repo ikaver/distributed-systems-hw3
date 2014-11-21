@@ -78,6 +78,9 @@ def set_up_args():
 
   parser.add_argument("--compile_local", type=bool, default=False);
   parser.add_argument("--compile_ghc", type=bool, default=False);
+ 
+  # Cleanup remote directories which are created.
+  parser.add_argument("--cleanup", type=bool, default=False);
 
   parser.add_argument("--dfs_base_path", type=str, default='/tmp/ankitaga-ikaveror-mr-dfs/');
   parser.add_argument("--localfs_base_path", type=str, default='/tmp/ankitaga-ikaveror-mr-local');
@@ -120,7 +123,7 @@ def setup(rwd, setupfile, remote, username, password, fileArgs):
   # Change to a new directory and run the shell script.
   cmd = 'cd {0}; sh {1} {2}'.format(rwd, setupfile, fileArgs);
   
-  print "Running command {0} on the remote server{1}.".format(cmd, remote);
+  print "Running command {0} on the remote server: {1}.".format(cmd, remote);
  
   ssh.exec_command(cmd); 
   
@@ -159,10 +162,49 @@ def compile(args):
   print "Executing command {0}".format(cmd);
   os.system(cmd);
 
+def cleanup_remote(remote, dirs, username, password): 
+  ssh = paramiko.SSHClient();
+  ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy());
+  ssh.connect(remote, username=username, password=password);
+  sftp = ssh.open_sftp()
+ 
+  print dirs;
+  print dirs[0]; 
+  for d in dirs:
+    try:
+      lf = sftp.listdir(str(d));
+      for f in lf:
+        try:
+          print "Attempting to remove file: {0} on the remote server: {1}".format(d+f, remote);
+          sftp.remove(d+f)
+        except:
+          print "Error while trying to delete remote file {0}".format(d+f);
+    except:
+      print "Error while trying to list directory: {0} for the remote ip: {1}".format(d, remote);
+    try:
+      print "Attempting to delete the directory: {0} on remote {1}".format(d, remote);
+      sftp.rmdir(d);
+    except:
+      print "Unable to delete remote directory. Check if you are running as owner.";
+
+def cleanup(args, username, password): 
+  slaves = get_ips_from_file(args.slave_ips);
+  master = args.master_ip;
+  dirs = [args.rwd, args.dfs_base_path, args.localfs_base_path];
+  cleanup_remote(master, dirs, username, password);
+  
+  for slave in slaves:
+    cleanup_remote(slave, dirs, username, password);
+
+
 def main():
   args = set_up_args(); 
   [username, password] = get_login_credentials();
   compile(args);
+
+  if(args.cleanup):
+    cleanup(args, username, password);
+    print "Cleaned up any artificats of previous run by the user:{0}".format(username);
 
   if (args.kill_all):
     print "** Terminating the system **";
