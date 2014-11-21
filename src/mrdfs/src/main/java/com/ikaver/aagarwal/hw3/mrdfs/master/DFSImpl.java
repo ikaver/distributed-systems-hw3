@@ -259,10 +259,14 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
           IDataNode newDataNode = DataNodeFactory.dataNodeFromSocketAddress(newDataNodeAddr);
           if(newDataNode == null) continue; //try with the next node
           try {
+            LOG.info("Will try to replicate file " + metadata.getFileName() + " "
+                + chunkNum + " on host: "  + newDataNodeAddr);
             newDataNode.saveFile(metadata.getFileName(), chunkNum, data);
             this.metadataLock.writeLock().lock();
             nodesWithData.add(newDataNodeAddr);
             this.metadataLock.writeLock().unlock();
+            LOG.info("Successfully replicated " + metadata.getFileName() + " "
+                + chunkNum + " on host: "  + newDataNodeAddr);
             break;
           } catch (RemoteException e) {
             LOG.warn("Failed to communicate with data node", e);
