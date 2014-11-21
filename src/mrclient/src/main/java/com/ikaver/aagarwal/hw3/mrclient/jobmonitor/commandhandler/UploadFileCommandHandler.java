@@ -24,6 +24,7 @@ public class UploadFileCommandHandler implements ICommandHandler {
       System.out.println("Record size must be an integer");
       return false;
     }
+    System.out.println("Will start file upload process...");
     FileUploader.uploadFile(masterSocketAddr, inputFilePath, destinationPath, recordSize);
     return true; 
   }

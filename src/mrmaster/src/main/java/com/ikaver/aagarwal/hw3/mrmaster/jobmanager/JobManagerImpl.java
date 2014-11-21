@@ -257,29 +257,8 @@ IOnWorkCompletedHandler {
   public void onAllReducersFinished(RunningJob job) {
     LOG.info(String.format("All reducers finished for job: " + job.getJobID()));
     job.shutdown();
-    for(MapperWorkerInfo workerInfo : job.getMappers()) {
-      SocketAddress nmAddr = workerInfo.getNodeManagerAddress();
-      IMRNodeManager nm = NodeManagerFactory.nodeManagerFromSocketAddress(nmAddr);
-      if(nm != null) {
-        try {
-          nm.terminateWorkers(job.getJobID());
-        } catch (RemoteException e) {
-          LOG.warn("Failed to communicate with NM", e);
-        }
-      }
-    }
-    for(ReducerWorkerInfo workerInfo : job.getReducers()) {
-      SocketAddress nmAddr = workerInfo.getNodeManagerAddress();
-      IMRNodeManager nm = NodeManagerFactory.nodeManagerFromSocketAddress(nmAddr);
-      if(nm != null) {
-        try {
-          nm.terminateWorkers(job.getJobID());
-        } catch (RemoteException e) {
-          LOG.warn("Failed to communicate with NM", e);
-        }
-      }
-    }
     this.jobsState.onJobFinished(job.getJobID(), true);
+    this.terminateWorkersOfJob(job);
   }
   
   public void onMapperNotAssignedFound(RunningJob job, MapperWorkerInfo info) {
@@ -336,12 +315,38 @@ IOnWorkCompletedHandler {
       onReducerNotAssignedFound(job, info);
     }
   }
+  
+  private void terminateWorkersOfJob(RunningJob job) {
+    for(MapperWorkerInfo workerInfo : job.getMappers()) {
+      SocketAddress nmAddr = workerInfo.getNodeManagerAddress();
+      IMRNodeManager nm = NodeManagerFactory.nodeManagerFromSocketAddress(nmAddr);
+      if(nm != null) {
+        try {
+          nm.terminateWorkers(job.getJobID());
+        } catch (RemoteException e) {
+          LOG.warn("Failed to communicate with NM", e);
+        }
+      }
+    }
+    for(ReducerWorkerInfo workerInfo : job.getReducers()) {
+      SocketAddress nmAddr = workerInfo.getNodeManagerAddress();
+      IMRNodeManager nm = NodeManagerFactory.nodeManagerFromSocketAddress(nmAddr);
+      if(nm != null) {
+        try {
+          nm.terminateWorkers(job.getJobID());
+        } catch (RemoteException e) {
+          LOG.warn("Failed to communicate with NM", e);
+        }
+      }
+    }
+  }
 
   private void onJobFailed(RunningJob job) {
     if(this.jobsState.getJob(job.getJobID()) != null) {
       LOG.info("Job: " + job.getJobID() + " failed too many times. It will be terminated.");
       this.jobsState.onJobFinished(job.getJobID(), false);
       job.shutdown();
+      this.terminateWorkersOfJob(job);
     }
     else {
       LOG.info("Already terminated job with ID: " + job.getJobID());
