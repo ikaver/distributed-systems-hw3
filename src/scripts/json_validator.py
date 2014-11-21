@@ -2,6 +2,8 @@ import argparse;
 import json;
 
 CONFIG = "config";
+MASTER_HOST = "master-host";
+PARTICIPANTS = "participants";
 
 def setup_args():
   parser = argparse.ArgumentParser();
@@ -40,7 +42,7 @@ def validate_json(content):
         "chunk-size-in-MB",
         "max-dfs-read-retries"];
 
-  if "master-host" not in d[CONFIG]:
+  if MASTER_HOST not in d[CONFIG]:
     print "Master host should be specified";
     return False;
  

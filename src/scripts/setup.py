@@ -1,9 +1,12 @@
 import argparse;
 import getpass;
+import json;
 import os;
 import paramiko;
 import sys;
 
+# Importing user defined modules.
+import json_validator;
 
 def get_file_name(path):
   return path.split("/")[-1];
@@ -61,19 +64,12 @@ def get_login_credentials():
 def set_up_args():
   parser = argparse.ArgumentParser();
   parser.add_argument("--master_binary_path", type=str);
-  parser.add_argument("--master_ip", type=str);
-  parser.add_argument("--slave_ips", type=str,
-      help='File containing list of IPs for running slave instances, each of which'
-           + ' is separated by a newline character');
   parser.add_argument("--slave_binary_path", type=str);
   parser.add_argument("--mr_map_binary_path", type=str);
   parser.add_argument("--mr_reduce_binary_path", type=str);
 
-  parser.add_argument("--master_port", type=int, default=3001);
-  parser.add_argument("--slave_port", type=int, default=3000);
-  
   parser.add_argument("--kill_all", type=bool, default=False);
-
+  parser.add_argument("--config", type=str, default=str);
   parser.add_argument("--skip_copy", type=bool, default=False);
 
   parser.add_argument("--compile_local", type=bool, default=False);
@@ -88,27 +84,19 @@ def set_up_args():
      + 'the directory into which the files have to be copied.');
   return parser.parse_args();
 
-def get_ips_from_file(filename):
-  ips = [];
-  f = open(filename, 'r');
+def copy_master_binary(args, username, password, js):
+  master = get_master_ip(js);
+  print "Copying binary files to the MR master: {0}".format(master);
+  copy_files(master, username, password, [args.master_binary_path,
+       'run_master.sh', args.config], args.rwd, args.dfs_base_path, args.localfs_base_path);
 
-  for ip in f:
-   ips.append(ip.strip());
-  
-  return ips;
-
-def copy_master_binary(args, username, password):
-  print "Copying binary files to the MR master: {0}".format(args.master_ip);
-  copy_files(args.master_ip, username, password, [args.master_binary_path,
-       'run_master.sh'], args.rwd, args.dfs_base_path, args.localfs_base_path);
-
-def copy_slave_binary(args, username, password):
-  slave_ips = get_ips_from_file(args.slave_ips);
+def copy_slave_binary(args, username, password, js):
+  slave_ips = get_slaves(js);
   for ip in slave_ips:
     ip = ip.strip();
     print "Copying binary files to the MR slaves: {0}".format(ip);
     copy_files(ip, username, password, [args.slave_binary_path,
-        'run_slave.sh', args.mr_map_binary_path, args.mr_reduce_binary_path],
+        'run_slave.sh', args.config, args.mr_map_binary_path, args.mr_reduce_binary_path],
         args.rwd, args.dfs_base_path, args.localfs_base_path);
 
 def setup(rwd, setupfile, remote, username, password, fileArgs):
@@ -137,15 +125,14 @@ def kill(remote, username, password):
   ssh.exec_command(cmd);
   ssh.close();  
 
-def setup_master(args, username, password):
-  csv_list = ','.join(str(ip) for ip in get_ips_from_file(args.slave_ips));
-  script_args= "{0} {1}".format(args.master_port, csv_list);
-  setup(args.rwd, 'run_master.sh', args.master_ip, username, password, script_args);
+def setup_master(args, username, password, js):
+  setup(args.rwd, 'run_master.sh', get_master_ip(js), username, password, args.config);
 
-def setup_slaves(args, username, password):
-  ips = get_ips_from_file(args.slave_ips);
+def setup_slaves(args, username, password, js):
+  ips = get_slaves(js);
   for ip in ips:
-    script_args = "{0} {1} {2}".format(args.slave_port,args.master_ip , args.master_port); 
+    script_args = "{0} {1}".format(args.config, get_port_for_slave(js, ip));
+    print "Arguments" + script_args;
     setup(args.rwd, 'run_slave.sh', ip, username, password, script_args);
  
 def compile(args):
@@ -187,43 +174,66 @@ def cleanup_remote(remote, dirs, username, password):
     except:
       print "Unable to delete remote directory. Check if you are running as owner.";
 
-def cleanup(args, username, password): 
-  slaves = get_ips_from_file(args.slave_ips);
-  master = args.master_ip;
+def cleanup(args, username, password, js): 
+  slaves = get_slaves(js);
+  master = get_master_ip(js);
   dirs = [args.rwd, args.dfs_base_path, args.localfs_base_path];
   cleanup_remote(master, dirs, username, password);
   
   for slave in slaves:
     cleanup_remote(slave, dirs, username, password);
 
+def get_master_ip(json):
+  return json[json_validator.CONFIG][json_validator.MASTER_HOST];
+
+# Returns a list of slaves.
+def get_slaves(js):
+  nodes = js[json_validator.CONFIG][json_validator.PARTICIPANTS];
+  ip = [];
+  for node in nodes:
+    ip.append(node["ip"]);
+  return ip;
+
+def get_port_for_slave(js, ip): 
+  nodes = js[json_validator.CONFIG][json_validator.PARTICIPANTS];
+  print "Trying to locate port for IP {0}".format(ip);
+  for node in nodes:
+    print "Checking against IP: {0}".format(node["ip"]);
+    if node["ip"] == ip:
+      print node["port"];
+      return node["port"];
+  print "Error locating port for the remote slave {0}".format(ip);
 
 def main():
-  args = set_up_args(); 
+  args = set_up_args();
+  if not json_validator.validate_json(json_validator.read_file(args.config)):
+    print "Error validating JSON";
+    return;
+  js = json.loads(json_validator.read_file(args.config));
   [username, password] = get_login_credentials();
   compile(args);
 
   if(args.cleanup):
-    cleanup(args, username, password);
+    cleanup(args, username, password, js);
     print "Cleaned up any artificats of previous run by the user:{0}".format(username);
 
   if (args.kill_all):
     print "** Terminating the system **";
-    kill(args.master_ip, username, password);
-    ips = get_ips_from_file(args.slave_ips);
+    kill(get_master_ip(js), username, password);
+    ips = get_slaves(js);
     for ip in ips:
       kill(ip, username, password);
     print "** System termination successful **";  
   else:
     if not args.skip_copy:
-      copy_master_binary(args, username, password);
-      copy_slave_binary(args, username, password);
+      copy_master_binary(args, username, password, js);
+      copy_slave_binary(args, username, password, js);
       print "** Copied relevant binaries **";
     else:
       print "** Skipping copy step **";
 
-    setup_slaves(args, username, password);
-    setup_master(args, username, password);
+    setup_slaves(args, username, password, js);
+    setup_master(args, username, password, js);
     print "** The system is up and running **";
-
 if __name__ == "__main__":
    main(); 
