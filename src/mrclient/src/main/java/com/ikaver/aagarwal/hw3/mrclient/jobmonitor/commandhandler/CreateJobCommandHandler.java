@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.log4j.Logger;
+import org.json.JSONException;
 
 import com.ikaver.aagarwal.hw3.common.commandhandler.ICommandHandler;
 import com.ikaver.aagarwal.hw3.common.config.JobConfig;
@@ -35,7 +36,10 @@ public class CreateJobCommandHandler implements ICommandHandler {
     } catch (IOException e) {
       LOG.info(e.toString());
       System.out.println("Failed to create job, check your config file");
-    }
+    } catch(JSONException e) {
+      LOG.info(e.toString());
+      System.out.println("Invalid format in job config JSON. Try again.");
+    } 
     
     System.out.println("Submitting job to the MR master...");
     if(job != null) {
