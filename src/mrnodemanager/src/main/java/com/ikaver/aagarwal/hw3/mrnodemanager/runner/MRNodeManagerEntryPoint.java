@@ -11,6 +11,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.ikaver.aagarwal.hw3.common.config.MRConfig;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.IDataNode;
 import com.ikaver.aagarwal.hw3.common.nodemanager.IMRNodeManager;
@@ -22,37 +23,41 @@ import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
  */
 public class MRNodeManagerEntryPoint {
 
-	private static final Logger LOGGER = Logger
-			.getLogger(MRNodeManagerEntryPoint.class);
+  private static final Logger LOG = Logger
+      .getLogger(MRNodeManagerEntryPoint.class);
 
-	public static void main(String args[]) throws RemoteException,
-			MalformedURLException {
+  public static void main(String args[]) throws RemoteException,
+  MalformedURLException {
 
-		MRNodeManagerSettings settings = new MRNodeManagerSettings();
-		int port = -1;
+    MRNodeManagerSettings settings = new MRNodeManagerSettings();
+    JCommander cmd = new JCommander(settings);
+    String configFilePath = null;
+    try {
+      cmd.parse(args);
+      configFilePath = settings.getConfigFilePath();
+    } catch (ParameterException ex) {
+      cmd.usage();
+      System.exit(-1);
+    }
 
-		JCommander cmd = new JCommander(settings);
-		try {
-			cmd.parse(args);
-			port = settings.getPort();
-		} catch (ParameterException ex) {
-			cmd.usage();
-			System.exit(-1);
-		}
+    if(!MRConfig.setupFromConfigFile(configFilePath)) {
+      LOG.error("Failed to read setup file.");
+      System.exit(-1);
+    }
 
-		SocketAddress addr = new SocketAddress(settings.getMasterIP(), settings.getMasterPort());
-		Injector injector = Guice.createInjector(new MRNodeManagerModule(addr));
-		IMRNodeManager manager = injector.getInstance(IMRNodeManager.class);
-		IDataNode dataNode = injector.getInstance(IDataNode.class);
+    SocketAddress masterAddr = MRConfig.getMasterSocketAddress();
+    Injector injector = Guice.createInjector(new MRNodeManagerModule(masterAddr));
+    IMRNodeManager manager = injector.getInstance(IMRNodeManager.class);
+    IDataNode dataNode = injector.getInstance(IDataNode.class);
 
-		LocateRegistry.createRegistry(settings.getPort());
-		Naming.rebind(String.format("//:%d/"
-				+ Definitions.MR_NODE_MANAGER_SERVICE, port), manager);
-		Naming.rebind(
-				String.format("//:%d/" + Definitions.DATA_NODE_SERVICE, port),
-				dataNode);
+    LocateRegistry.createRegistry(settings.getPort());
+    Naming.rebind(String.format("//:%d/"
+        + Definitions.MR_NODE_MANAGER_SERVICE, settings.getPort()), manager);
+    Naming.rebind(
+        String.format("//:%d/" + Definitions.DATA_NODE_SERVICE, settings.getPort()),
+        dataNode);
 
-		LOGGER.info(String.format("MR Task manager is now running at port %d",
-				settings.getPort()));
-	}
+    LOG.info(String.format("MR Task manager is now running at port %d",
+        settings.getPort()));
+  }
 }

@@ -9,6 +9,8 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
+import com.ikaver.aagarwal.hw3.common.config.MRConfig;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
@@ -16,22 +18,36 @@ import com.ikaver.aagarwal.hw3.common.workers.flags.MRWorkerRunnerSettings;
 
 public class MapRunnerEntryPoint {
 	
-	private static final Logger LOGGER = Logger.getLogger(MapRunnerEntryPoint.class);
+	private static final Logger LOG = Logger.getLogger(MapRunnerEntryPoint.class);
 
 	public static void main(String args[]) throws IOException {
 		MRWorkerRunnerSettings settings = new MRWorkerRunnerSettings();
+    JCommander argsParser = new JCommander(settings);
+    String configFilePath = null;
+    try {
+      argsParser.parse(args);
+      configFilePath = settings.getConfigFilePath();
+    } catch (ParameterException ex) {
+      argsParser.usage();
+      System.exit(-1);
+    }
+
+    if(!MRConfig.setupFromConfigFile(configFilePath)) {
+      LOG.error("Failed to read setup file.");
+      System.exit(-1);
+    }
+		
 		JCommander cmd = new JCommander(settings);
 		cmd.parse(args);
 
-		FileAppender appender = new FileAppender(new PatternLayout(PatternLayout.DEFAULT_CONVERSION_PATTERN),
+		FileAppender appender = new FileAppender(
+		    new PatternLayout(PatternLayout.DEFAULT_CONVERSION_PATTERN),
 				logFileForPort(settings.getPort()));
 		Logger.getRootLogger().addAppender(appender);
 
-		// TODO(ankit): Guicify it.
-		SocketAddress masterAddress = new SocketAddress(settings.getMasterIP(),
-				settings.getMasterPort());
+		SocketAddress masterAddress = MRConfig.getMasterSocketAddress();
 		
-		FileUtil.changeFilePermission(logFileForPort(settings.getMasterPort()));
+		FileUtil.changeFilePermission(logFileForPort(settings.getPort()));
 
 		MapInstanceRunner runner = new MapInstanceRunner(masterAddress);
 
@@ -41,7 +57,7 @@ public class MapRunnerEntryPoint {
 				String.format("//:%d/" + Definitions.MR_MAP_RUNNER_SERVICE,
 						settings.getPort()), runner);
 
-		LOGGER.info("Logger is now running on port" + settings.getPort());
+		LOG.info("Logger is now running on port" + settings.getPort());
 	}
 
 	private static String logFileForPort(int port) {

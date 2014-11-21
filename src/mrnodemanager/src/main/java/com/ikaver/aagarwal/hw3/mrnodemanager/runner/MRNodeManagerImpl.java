@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import com.ikaver.aagarwal.hw3.common.config.MRConfig;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.mrmap.IMapInstanceRunner;
 import com.ikaver.aagarwal.hw3.common.mrreduce.IMRReduceInstanceRunner;
@@ -202,7 +203,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
     this.reducersLock.readLock().lock();
     int numReducers = runningReducers.size();
     this.reducersLock.readLock().unlock();
-    int availableSlots = Math.max(0, Definitions.WORKERS_PER_NODE - numMappers - numReducers);
+    int availableSlots = Math.max(0, MRConfig.getWorkersPerNode() - numMappers - numReducers);
     return new NodeState(numMappers, 
         numReducers, 
         availableSlots,

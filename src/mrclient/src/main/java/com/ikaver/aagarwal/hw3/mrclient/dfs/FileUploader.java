@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
 
+import com.ikaver.aagarwal.hw3.common.config.MRConfig;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.DFSFactory;
 import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
@@ -49,8 +50,8 @@ public class FileUploader {
     
     try {
       if(dfs.createFile(destinationPath, recordSize, size)) {
-        int numChunks = FileUtil.numChunksForFile(Definitions.SIZE_OF_CHUNK, recordSize, size);
-        int recordsPerChunk = FileUtil.numRecordsPerChunk(Definitions.SIZE_OF_CHUNK, recordSize);
+        int numChunks = FileUtil.numChunksForFile(MRConfig.getChunkSizeInBytes(), recordSize, size);
+        int recordsPerChunk = FileUtil.numRecordsPerChunk(MRConfig.getChunkSizeInBytes(), recordSize);
         int totalRecords = (int)FileUtil.getTotalRecords(recordSize, size);
         int recordNum = 0;
         

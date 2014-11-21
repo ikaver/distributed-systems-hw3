@@ -10,8 +10,10 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.ikaver.aagarwal.hw3.common.config.MRConfig;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.mrreduce.IMRReduceInstanceRunner;
@@ -23,15 +25,26 @@ import com.ikaver.aagarwal.hw3.common.workers.flags.MRWorkerRunnerSettings;
  */
 public class MRReduceEntryPoint {
 
-	private static final Logger LOGGER = Logger
+	private static final Logger LOG = Logger
 			.getLogger(MRReduceEntryPoint.class);
 
 	public static void main(String args[]) throws IOException {
 
 		MRWorkerRunnerSettings settings = new MRWorkerRunnerSettings();
+    JCommander cmd = new JCommander(settings);
+    String configFilePath = null;
+    try {
+      cmd.parse(args);
+      configFilePath = settings.getConfigFilePath();
+    } catch (ParameterException ex) {
+      cmd.usage();
+      System.exit(-1);
+    }
 
-		JCommander cmd = new JCommander(settings);
-		cmd.parse(args);
+    if(!MRConfig.setupFromConfigFile(configFilePath)) {
+      LOG.error("Failed to read setup file.");
+      System.exit(-1);
+    }
 		
 		FileAppender appender = new FileAppender(new PatternLayout(PatternLayout.DEFAULT_CONVERSION_PATTERN),
 				getLogFileForPort(settings.getPort()));
@@ -40,8 +53,7 @@ public class MRReduceEntryPoint {
 
 		Logger.getRootLogger().addAppender(appender);
 
-		SocketAddress masterAddress = new SocketAddress(settings.getMasterIP(),
-				settings.getMasterPort());
+		SocketAddress masterAddress = MRConfig.getMasterSocketAddress();
 
 		Injector injector = Guice.createInjector(new MRReduceModule(masterAddress));
 
@@ -54,7 +66,7 @@ public class MRReduceEntryPoint {
 				+ Definitions.MR_REDUCE_RUNNER_SERVICE, settings.getPort()),
 				runner);
 
-		LOGGER.info("Logger is now running on port" + settings.getPort());
+		LOG.info("Logger is now running on port" + settings.getPort());
 
 	}
 	

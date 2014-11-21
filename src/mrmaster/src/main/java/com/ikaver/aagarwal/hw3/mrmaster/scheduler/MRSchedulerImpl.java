@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import com.ikaver.aagarwal.hw3.common.config.MRConfig;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.FileMetadata;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
@@ -54,7 +55,7 @@ public class MRSchedulerImpl implements IMRScheduler {
     this.scheduler = Executors.newScheduledThreadPool(1);
     NodeTracker tracker = new NodeTracker(this.nodeInfo, this.allNodes, this.nodeInfoLock);
     scheduler.scheduleAtFixedRate(tracker, 0,
-        Definitions.SCHEDULER_TIME_TO_CHECK_FOR_NODES_STATE, TimeUnit.SECONDS);
+        MRConfig.getTimeToCheckForNodeManagerState(), TimeUnit.SECONDS);
   }
 
   public Set<MapperWorkerInfo> runMappersForWork(Set<MapWorkDescription> work) {
