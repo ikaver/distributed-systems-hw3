@@ -13,29 +13,32 @@ import com.ikaver.aagarwal.hw3.common.util.SocketUtil;
  */
 public class MRReduceTaskAttempt {
 
-	private static final Logger LOGGER = Logger
-			.getLogger(MRReduceTaskAttempt.class);
+  private static final Logger LOGGER = Logger
+      .getLogger(MRReduceTaskAttempt.class);
 
-	/**
-	 * Returns the port at which the remote object for task attempt is bound.
-	 */
-	public static int startReduceTask(String masterIP, int masterPort) {
-		int port = SocketUtil.findFreePort();
+  private static final int WAIT_TIME = 100;
 
-		try {
-			Runtime.getRuntime().exec(
-					"java -jar mrreduce-1.0-SNAPSHOT-jar-with-dependencies.jar "
-							+ " -port " + port
-							+ " -config " + MRConfig.getConfigFileName() );
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				LOGGER.warn("Interrupted", e);
-			}
-		} catch (IOException e) {
-			LOGGER.fatal("Error starting reduce task attempt at port: " + port, e);
-			return -1;
-		}
-		return port;
-	}
+
+  /**
+   * Returns the port at which the remote object for task attempt is bound.
+   */
+  public static int startReduceTask(String masterIP, int masterPort) {
+    int port = SocketUtil.findFreePort();
+
+    try {
+      Runtime.getRuntime().exec(
+          "java -jar mrreduce-1.0-SNAPSHOT-jar-with-dependencies.jar "
+              + " -port " + port
+              + " -config " + MRConfig.getConfigFileName() );
+      try {
+        Thread.sleep(WAIT_TIME);
+      } catch (InterruptedException e) {
+        LOGGER.warn("Interrupted", e);
+      }
+    } catch (IOException e) {
+      LOGGER.fatal("Error starting reduce task attempt at port: " + port, e);
+      return -1;
+    }
+    return port;
+  }
 }
