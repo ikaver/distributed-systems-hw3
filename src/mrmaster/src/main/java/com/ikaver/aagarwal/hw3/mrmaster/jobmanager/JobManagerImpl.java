@@ -17,6 +17,7 @@ import com.google.inject.name.Named;
 import com.ikaver.aagarwal.hw3.common.config.FinishedJob;
 import com.ikaver.aagarwal.hw3.common.config.JobConfig;
 import com.ikaver.aagarwal.hw3.common.config.JobInfoForClient;
+import com.ikaver.aagarwal.hw3.common.config.MRConfig;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.FileMetadata;
 import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
@@ -114,13 +115,13 @@ IOnWorkCompletedHandler {
     LOG.info("Got mapper workers for job: " + mapWorkers.size());
 
     // create the running job
-    int numReducers = Math.min(job.getNumReducers(), Definitions.MAX_NUMBER_OF_REDUCERS);
+    int numReducers = job.getNumReducers();
     ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     RunningJob runningJob = new RunningJob(jobID, job.getJobName(), scheduler, 
         mapWorkers.size(), numReducers, job);
     JobTracker tracker = new JobTracker(runningJob, this, this);
     scheduler.scheduleAtFixedRate(tracker, 0,
-        Definitions.TIME_TO_CHECK_FOR_NODE_MANAGER_STATE, TimeUnit.SECONDS);
+        MRConfig.getTimeToCheckForJobState(), TimeUnit.SECONDS);
     runningJob.getMappers().addAll(mapWorkers);
     jobsState.addJob(runningJob);
     LOG.info("Created job tracker for job with ID: " + runningJob.getJobID());
@@ -315,7 +316,7 @@ IOnWorkCompletedHandler {
         info.getWorkDescription().getChunk().getPartitionID(), job.getJobID(), 
         job.getNumFailures()));
     job.setNumFailures(job.getNumFailures()+1);
-    if(job.getNumFailures() >= Definitions.MAX_WORKER_RETRIES_BEFORE_CANCELLING_JOB) {
+    if(job.getNumFailures() >= MRConfig.getMaxWorkerRetriesBeforeCancellingJob()) {
       this.onJobFailed(job);
     }
     else {
@@ -328,7 +329,7 @@ IOnWorkCompletedHandler {
         info.getWorkDescription().getReducerID(), job.getJobID(), 
         job.getNumFailures()));
     job.setNumFailures(job.getNumFailures()+1);
-    if(job.getNumFailures() >= Definitions.MAX_WORKER_RETRIES_BEFORE_CANCELLING_JOB) {
+    if(job.getNumFailures() >= MRConfig.getMaxWorkerRetriesBeforeCancellingJob()) {
       this.onJobFailed(job);
     }
     else {

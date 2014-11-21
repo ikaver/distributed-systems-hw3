@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import com.ikaver.aagarwal.hw3.common.config.MRConfig;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.DFSFactory;
 import com.ikaver.aagarwal.hw3.common.dfs.FileMetadata;
@@ -155,7 +156,7 @@ public class MapRunner implements Runnable {
   private byte[] fetchData(String inputPath, int chunk) {
     int numTries = 0;
 
-    while (numTries < Definitions.NUM_DFS_READ_RETRIES) {
+    while (numTries < MRConfig.getMaxDFSReadRetries()) {
       numTries++;
       try {
         IDFS dfs = DFSFactory.dfsFromSocketAddress(masterAddress);

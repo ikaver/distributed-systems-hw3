@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import com.ikaver.aagarwal.hw3.common.config.MRConfig;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.FileMetadata;
 import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
@@ -62,7 +63,7 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
     this.nodeTrackerService = Executors.newScheduledThreadPool(1);
     DataNodeTracker tracker = new DataNodeTracker(dataNodes, dataNodesLock, this);
     this.nodeTrackerService.scheduleAtFixedRate(tracker, 0,
-        Definitions.SCHEDULER_TIME_TO_CHECK_FOR_NODES_STATE, TimeUnit.SECONDS);
+        MRConfig.getTimeToCheckDataNodesState(), TimeUnit.SECONDS);
   }
 
   public FileMetadata getMetadata(String file) throws RemoteException {
@@ -86,7 +87,7 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
       LOG.warn(filePath +  " already exists");
     }
     else {
-      int numChunks = FileUtil.numChunksForFile(Definitions.SIZE_OF_CHUNK,
+      int numChunks = FileUtil.numChunksForFile(MRConfig.getChunkSizeInBytes(),
           recordSize, totalFileSize);
       Map<Integer, Set<SocketAddress>> numChunkToAddr 
       = new HashMap<Integer, Set<SocketAddress>>();

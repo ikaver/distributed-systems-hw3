@@ -10,6 +10,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
+import com.ikaver.aagarwal.hw3.common.config.MRConfig;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.FileMetadata;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
@@ -59,7 +60,7 @@ public class MRMasterModule extends AbstractModule {
       .toInstance(dataNodes);
     bind(Integer.class)
       .annotatedWith(Names.named(Definitions.DFS_REPLICATION_FACTOR_ANNOTATION))
-      .toInstance(Definitions.REPLICATION_FACTOR);
+      .toInstance(MRConfig.getReplicationFactor());
 
     
     //Job manager setup

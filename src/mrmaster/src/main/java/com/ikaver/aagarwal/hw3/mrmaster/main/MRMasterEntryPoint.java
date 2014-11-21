@@ -4,9 +4,7 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.util.HashSet;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 
@@ -14,6 +12,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.ikaver.aagarwal.hw3.common.config.MRConfig;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
@@ -27,15 +26,21 @@ public class MRMasterEntryPoint {
 	public static void main(String[] args) {
 		MRMasterSettings settings = new MRMasterSettings();
 		JCommander argsParser = new JCommander(settings);
-		int port = -1;
+		String configFilePath = null;
 		try {
 			argsParser.parse(args);
-			port = settings.getPort();
+			configFilePath = settings.getConfigFilePath();
 		} catch (ParameterException ex) {
 			argsParser.usage();
 			System.exit(-1);
 		}
 
+		if(!MRConfig.setupFromConfigFile(configFilePath)) {
+		  LOG.error("Failed to read setup file.");
+		  System.exit(-1);
+		}
+		int port = MRConfig.getMasterSocketAddress().getPort();
+		
 		// Create RMI Registry
 		try {
 			LocateRegistry.createRegistry(port);
@@ -44,7 +49,7 @@ public class MRMasterEntryPoint {
 			LOG.warn("RMI was already running...");
 		}
 
-		Set<SocketAddress> nodes = getNodes(settings.getSlaves());
+		Set<SocketAddress> nodes = MRConfig.getParticipantNodes();
 
 		Injector injector = Guice.createInjector(new MRMasterModule(nodes));
 		IJobManager jobManager = injector.getInstance(IJobManager.class);
@@ -61,19 +66,6 @@ public class MRMasterEntryPoint {
 		} catch (MalformedURLException e) {
 			LOG.fatal("Failed to create master services", e);
 		}
-	}
-
-	private static Set<SocketAddress> getNodes(String slaves) {
-		StringTokenizer tokenizer = new StringTokenizer(slaves, ",");
-		
-		Set<SocketAddress> nodes = new HashSet<SocketAddress>();
-		while (tokenizer.hasMoreTokens()) {
-			SocketAddress address = new SocketAddress(tokenizer.nextToken(),
-					Definitions.NODE_MANAGER_SERVICE_PORT);
-			LOG.info("Adding node with ip address:" + address.getHostname());
-			nodes.add(address);
-		}
-		return nodes;
 	}
 
 }
