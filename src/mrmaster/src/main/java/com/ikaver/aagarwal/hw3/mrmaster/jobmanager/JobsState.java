@@ -40,7 +40,8 @@ public class JobsState {
     RunningJob job = jobIDToJob.get(jobID);
     if(job != null) {
       FinishedJob finishedJob = new FinishedJob(jobID, 
-          job.getJobName(), success);
+          job.getJobName(), success, job.getJobConfig().getOutputFilePath(),
+          job.getAmountOfReducers());
       jobIDToJob.remove(jobID);
       finishedJobs.add(finishedJob);
     }
