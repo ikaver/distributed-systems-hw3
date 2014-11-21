@@ -49,6 +49,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
   // is running.
   private final Map<MapWorkDescription, Integer> mapWorkDescriptionToPortMapping;
   private final Map<ReduceWorkDescription, Integer> reduceWorkDescriptionToPortMapping;
+  private final Map<MapWorkDescription, String> completedMapWorkDescriptionToOutputMapping;
   private final Map<MapWorkDescription, Integer> runningMappers;
   private final Map<ReduceWorkDescription, Integer> runningReducers;
   private final SocketAddress masterAddress;
@@ -66,6 +67,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
     this.reduceWorkDescriptionToPortMapping = new ConcurrentHashMap<ReduceWorkDescription, Integer>();
     this.runningMappers = new ConcurrentHashMap<MapWorkDescription, Integer>();
     this.runningReducers = new ConcurrentHashMap<ReduceWorkDescription, Integer>();
+    this.completedMapWorkDescriptionToOutputMapping = new ConcurrentHashMap<MapWorkDescription, String>();
 
     this.mappersLock = new ReentrantReadWriteLock();
     this.reducersLock = new ReentrantReadWriteLock();
@@ -122,19 +124,8 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
       return null;
     }
 
-    this.mappersLock.readLock().lock();
-    Integer portObj = mapWorkDescriptionToPortMapping.get(mwd);
-    this.mappersLock.readLock().unlock();
-
-    if(portObj == null) {
-      LOG.warn("Mapper " + mwd + " is not running on this node!");
-      return null;
-    }
-    int port = portObj.intValue();
-    IMapInstanceRunner mapper = MRMapFactory.mapInstanceFromPort(port);
-
     try {
-      String outputPath = mapper.getMapOutputFilePath();
+      String outputPath = completedMapWorkDescriptionToOutputMapping.get(mwd);
       LOG.info("Got output file path of mapper: " + outputPath);
       ObjectInputStream os = new ObjectInputStream(new FileInputStream(
           new File(outputPath)));
@@ -211,6 +202,9 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
   }
 
   public WorkerState getMapperState(MapWorkDescription wd) {
+	if (completedMapWorkDescriptionToOutputMapping.get(wd) != null) {
+		return WorkerState.FINISHED;
+	}
     mappersLock.readLock().lock();
     Integer portOfMapper = mapWorkDescriptionToPortMapping.get(wd);
     mappersLock.readLock().unlock();
@@ -248,6 +242,24 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
       } catch (RemoteException e) {
         LOG.error("Remote exception while trying to kill a failed mapper.");
       }
+    }
+    
+    if (mapperState == WorkerState.FINISHED) {
+    	String output = null;
+    	try {
+    		output = mapper.getMapOutputFilePath();
+    	} catch(RemoteException exception) {
+    		LOG.warn("Error while trying to fetch the mapper state of a finished worker.");
+    	}
+    	
+    	if (output != null) {
+    		completedMapWorkDescriptionToOutputMapping.put(wd, output);
+    	} else {
+    		// Master regularly polls the node manager to query if a particular mapper has finished
+    		// working. A mapper hasn't finished working until it has successfully passed
+    		// the output file path to it's node manager.
+    		return WorkerState.RUNNING;
+    	}
     }
     return mapperState;
   }
