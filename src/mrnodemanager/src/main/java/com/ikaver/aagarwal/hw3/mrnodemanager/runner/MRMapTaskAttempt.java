@@ -16,6 +16,8 @@ public class MRMapTaskAttempt {
 
 	private static final Logger LOGGER = Logger
 			.getLogger(MRMapTaskAttempt.class);
+	
+	private static final int WAIT_TIME = 100;
 
 	/**
 	 * Returns the port at which the remote object for task attempt is bound.
@@ -30,7 +32,7 @@ public class MRMapTaskAttempt {
 							+ " -port " + port
 							+ " -config " + MRConfig.getConfigFileName());
 			try {
-        Thread.sleep(1000);
+        Thread.sleep(WAIT_TIME);
       } catch (InterruptedException e) {
         LOGGER.warn("Interrupted", e);
       }

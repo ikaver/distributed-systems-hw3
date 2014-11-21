@@ -86,16 +86,14 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
     if(this.filePathToMetadata.containsKey(filePath)) {
       LOG.warn(filePath +  " already exists");
     }
-    else {
-      int numChunks = FileUtil.numChunksForFile(MRConfig.getChunkSizeInBytes(),
-          recordSize, totalFileSize);
-      Map<Integer, Set<SocketAddress>> numChunkToAddr 
-      = new HashMap<Integer, Set<SocketAddress>>();
-      FileMetadata metadata = new FileMetadata(filePath, numChunks, 
-          numChunkToAddr, recordSize, totalFileSize);
-      this.filePathToMetadata.put(filePath, metadata);
-      success = true;
-    }
+    int numChunks = FileUtil.numChunksForFile(MRConfig.getChunkSizeInBytes(),
+        recordSize, totalFileSize);
+    Map<Integer, Set<SocketAddress>> numChunkToAddr 
+    = new HashMap<Integer, Set<SocketAddress>>();
+    FileMetadata metadata = new FileMetadata(filePath, numChunks, 
+        numChunkToAddr, recordSize, totalFileSize);
+    this.filePathToMetadata.put(filePath, metadata);
+    success = true;
     this.metadataLock.writeLock().unlock();
     return success;
   }
@@ -117,7 +115,7 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
     this.metadataLock.readLock().lock();
     FileMetadata metadata = this.filePathToMetadata.get(filePath);
     this.metadataLock.readLock().unlock();
-    
+
     Set<SocketAddress> dataNodesAddr = metadata.getNumChunkToAddr().get(numChunk);
     SocketAddress addr = getRandomDataNode(dataNodesAddr);
     IDataNode datanode = DataNodeFactory
@@ -134,14 +132,14 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
     }
     return data;
   }
-  
+
   private SocketAddress getRandomDataNode(Set<SocketAddress> dataNodes) {
     if(dataNodes == null || dataNodes.size() == 0) return null;
     List<SocketAddress> list = new ArrayList<SocketAddress>(dataNodes);
     Collections.shuffle(list);
     return list.get(0);
   } 
-  
+
   /**
    * Writes the new file with path filePath and contents file.
    * Assumes that you currently have the write lock.
@@ -230,7 +228,7 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
       //which nodes have this data?
       Set<SocketAddress> nodesWithData = metadata.getNumChunkToAddr().get(chunkNum);
       byte [] data = null;
-      
+
       //1. get the file from the other nodes that have the file
       for(SocketAddress nodeWithDataAddr : nodesWithData) {
         IDataNode nodeWithData = DataNodeFactory.dataNodeFromSocketAddress(nodeWithDataAddr);
@@ -244,7 +242,7 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
           LOG.warn("Failed to read file from data node", e);
         }
       }
-      
+
       if(data == null) {
         //failed to get the file from all of the nodes that actually have it
         //continue with next file that needs to be replicated
@@ -252,7 +250,7 @@ public class DFSImpl extends UnicastRemoteObject implements IDFS, IOnDataNodeFai
             + " " + chunkNum);
         continue;
       }
-      
+
       //We got the data! now try to save it on a new node
       for(SocketAddress newDataNodeAddr : dataNodesList) {
         if(!nodesWithData.contains(newDataNodeAddr)) {
