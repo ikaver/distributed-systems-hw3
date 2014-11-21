@@ -128,7 +128,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
       String outputPath = completedMapWorkDescriptionToOutputMapping.get(mwd);
       if (outputPath == null) {
     	  LOG.warn("Received an empty file path for a completed mapper. Ideally, this" +
-    	  		"shouldn't be possible.	");
+    	  		"shouldn't be possible.");
     	  return null;
       }
       LOG.info("Got output file path of mapper: " + outputPath);
