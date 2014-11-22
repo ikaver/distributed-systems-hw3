@@ -158,6 +158,12 @@ def cleanup_remote(remote, dirs, username, password):
   print dirs;
   print dirs[0]; 
   for d in dirs:
+# TODO(ankit): Remove this ugly hack. Why is this hack being added in the first place? The default
+# value of one of the base directories doesn't have a "/". Fixing a default value shouldn't be hard
+# but I am skeptical of any last minute changes.
+    if not d.endswith("/"):
+      d = d + "/";
+
     try:
       lf = sftp.listdir(str(d));
       for f in lf:
