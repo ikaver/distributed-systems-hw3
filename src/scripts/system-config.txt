@@ -24,7 +24,7 @@
                 "port": 8432
             }
         ],
-        "max-retries-before-job-failure": 5,
+        "max-retries-before-job-failure": 20,
         "time-to-check-for-job-state": 3,
         "time-to-check-for-nodes-state": 4,
         "time-to-check-for-data-nodes-state": 5,
