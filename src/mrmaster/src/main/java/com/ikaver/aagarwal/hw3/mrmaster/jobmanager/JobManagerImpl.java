@@ -247,7 +247,8 @@ IOnWorkCompletedHandler {
     Set<ReducerWorkerInfo> reduceWorkers = scheduler
         .runReducersForWork(reducers);
     for(ReducerWorkerInfo workerInfo : reduceWorkers) {
-      LOG.info(String.format("Got reducer address for job %d: %s", job.getJobID(), 
+      LOG.info(String.format("Got reducer address for job (%d, %d): %s", job.getJobID(), 
+          workerInfo.getWorkDescription().getReducerID(),
           workerInfo.getNodeManagerAddress()));
     }
     job.getReducers().addAll(reduceWorkers);
@@ -291,6 +292,7 @@ IOnWorkCompletedHandler {
    */
 
   public void onMapperFailed(RunningJob job, MapperWorkerInfo info) {
+    if(this.jobsState.getJob(job.getJobID()) == null) return;
     LOG.info(String.format("Mapper with ID %d for job %d failed. Num failures: %d", 
         info.getWorkDescription().getChunk().getPartitionID(), job.getJobID(), 
         job.getNumFailures()));
@@ -304,6 +306,7 @@ IOnWorkCompletedHandler {
   }
 
   public void onReducerFailed(RunningJob job, ReducerWorkerInfo info) {
+    if(this.jobsState.getJob(job.getJobID()) == null) return;
     LOG.info(String.format("Reducer with ID %d for job %d failed. Num failures: %d", 
         info.getWorkDescription().getReducerID(), job.getJobID(), 
         job.getNumFailures()));

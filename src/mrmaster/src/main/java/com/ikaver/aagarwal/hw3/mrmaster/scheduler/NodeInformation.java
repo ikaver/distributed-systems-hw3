@@ -25,5 +25,14 @@ public class NodeInformation {
   public int getAvailableSlots() {
     return availableSlots;
   } 
+  
+  public void setAvailableSlots(int slots) {
+    if(slots > 0) {
+      this.availableSlots = slots;
+    }
+    else {
+      this.availableSlots = 0;
+    }
+  }
 
 }

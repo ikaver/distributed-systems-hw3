@@ -8,11 +8,11 @@ import java.io.ObjectInputStream;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -63,11 +63,11 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
           throws RemoteException {
     super();
     this.masterAddress = masterAddress;
-    this.mapWorkDescriptionToPortMapping = new ConcurrentHashMap<MapWorkDescription, Integer>();
-    this.reduceWorkDescriptionToPortMapping = new ConcurrentHashMap<ReduceWorkDescription, Integer>();
-    this.runningMappers = new ConcurrentHashMap<MapWorkDescription, Integer>();
-    this.runningReducers = new ConcurrentHashMap<ReduceWorkDescription, Integer>();
-    this.completedMapWorkDescriptionToOutputMapping = new ConcurrentHashMap<MapWorkDescription, String>();
+    this.mapWorkDescriptionToPortMapping = new HashMap<MapWorkDescription, Integer>();
+    this.reduceWorkDescriptionToPortMapping = new HashMap<ReduceWorkDescription, Integer>();
+    this.runningMappers = new HashMap<MapWorkDescription, Integer>();
+    this.runningReducers = new HashMap<ReduceWorkDescription, Integer>();
+    this.completedMapWorkDescriptionToOutputMapping = new HashMap<MapWorkDescription, String>();
 
     this.mappersLock = new ReentrantReadWriteLock();
     this.reducersLock = new ReentrantReadWriteLock();
@@ -85,7 +85,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
   public boolean doMap(MapWorkDescription input) {
 
     int port = MRMapTaskAttempt.startMapTask(input, masterAddress.getHostname(),
-    		masterAddress.getPort());
+        masterAddress.getPort());
 
     if (port == -1) {
       LOG.warn("error starting work instance");
@@ -117,8 +117,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
 
   public List<KeyValuePair> dataForJob(MapWorkDescription mwd, ReduceWorkDescription rwd) {
     LOG.info("Getting data for job: " + rwd + " " + mwd);
-    WorkerState state = getMapperState(mwd);
-    if (state != WorkerState.FINISHED) {
+    if (!this.completedMapWorkDescriptionToOutputMapping.containsKey(mwd)) {
       LOG.error("Trying to fetch state from a worker which either has failed,"
           + "or doesn't exist or is yet to complete it's task");
       return null;
@@ -127,9 +126,9 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
     try {
       String outputPath = completedMapWorkDescriptionToOutputMapping.get(mwd);
       if (outputPath == null) {
-    	  LOG.warn("Received an empty file path for a completed mapper. Ideally, this" +
-    	  		"shouldn't be possible.");
-    	  return null;
+        LOG.warn("Received an empty file path for a completed mapper. Ideally, this" +
+            "shouldn't be possible.");
+        return null;
       }
       LOG.info("Got output file path of mapper: " + outputPath);
       ObjectInputStream os = new ObjectInputStream(new FileInputStream(
@@ -144,7 +143,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
         }
       }
       LOG.info("For reducer: " + rwd.getReducerID() + " mapper output list size is " + result.size());
-      
+
       return result;
     } catch (FileNotFoundException e) {
       LOG.error("The local file specified by the mapper doesn't exist.");
@@ -207,9 +206,12 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
   }
 
   public WorkerState getMapperState(MapWorkDescription wd) {
-	if (completedMapWorkDescriptionToOutputMapping.get(wd) != null) {
-		return WorkerState.FINISHED;
-	}
+    mappersLock.readLock().lock();
+    boolean containsMapper = completedMapWorkDescriptionToOutputMapping.containsKey(wd);
+    mappersLock.readLock().unlock();
+    if (containsMapper) {
+      return WorkerState.FINISHED;
+    }
     mappersLock.readLock().lock();
     Integer portOfMapper = mapWorkDescriptionToPortMapping.get(wd);
     mappersLock.readLock().unlock();
@@ -229,6 +231,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
         LOG.warn(String.format("Mapper %s failed (remote exception)",wd));
       }
     }
+
     if(mapperState == WorkerState.FAILED || mapperState == WorkerState.FINISHED) {
       mappersLock.writeLock().lock();
       this.removeMapper(wd);
@@ -248,23 +251,28 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
         LOG.error("Remote exception while trying to kill a failed mapper.");
       }
     }
-    
+
     if (mapperState == WorkerState.FINISHED) {
-    	String output = null;
-    	try {
-    		output = mapper.getMapOutputFilePath();
-    	} catch(RemoteException exception) {
-    		LOG.warn("Error while trying to fetch the mapper state of a finished worker.");
-    	}
-    	
-    	if (output != null) {
-    		completedMapWorkDescriptionToOutputMapping.put(wd, output);
-    	} else {
-    		// Master regularly polls the node manager to query if a particular mapper has finished
-    		// working. A mapper hasn't successfully finished working until it has 
-    		// successfully passed the output file path to it's node manager.
-    		return WorkerState.FAILED;
-    	}
+      LOG.info("Got FINISHED from mapper " + wd.getJobID() + " " + wd.getChunk().getPartitionID());
+      String output = null;
+      try {
+        output = mapper.getMapOutputFilePath();
+      } catch(RemoteException exception) {
+        LOG.warn("Error while trying to fetch the mapper state of a finished worker.");
+      }
+      
+      if (output != null) {
+        LOG.info("Got output from mapper " + wd.getJobID() + " " + wd.getChunk().getPartitionID());
+        this.mappersLock.writeLock().lock();
+        completedMapWorkDescriptionToOutputMapping.put(wd, output);
+        this.mappersLock.writeLock().unlock();
+      } else {
+         LOG.info("Got output NULL from mapper " + wd.getJobID() + " " + wd.getChunk().getPartitionID());
+        // Master regularly polls the node manager to query if a particular mapper has finished
+        // working. A mapper hasn't successfully finished working until it has 
+        // successfully passed the output file path to it's node manager.
+        return WorkerState.FAILED;
+      }
     }
     return mapperState;
   }
@@ -289,6 +297,11 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
         LOG.warn(String.format("Reducer %s failed (remote exception)",wd));
       }
     }
+    else {
+      LOG.warn("MR Reduce factory returned NULL. Reducer " + wd.getJobID() 
+          + ", " + wd.getReducerID() + " failed.");
+    }
+    
     if(reducerState == WorkerState.FAILED || reducerState == WorkerState.FINISHED) {
       reducersLock.writeLock().lock();
       this.removeReducer(wd);
@@ -326,7 +339,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
                 removeMapper(mapperWork);
                 success = true;
               } catch (RemoteException e) {
-                LOG.warn("Failed communicating with mapper", e);
+                LOG.debug("Failed communicating with mapper", e);
               }
             }
           }
@@ -353,7 +366,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
                 removeReducer(reducerWork);
                 success = true;
               } catch (RemoteException e) {
-                LOG.warn("Failed communicating with reducer", e);
+                LOG.debug("Failed communicating with reducer", e);
               }
             }
           }
@@ -381,7 +394,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
               mapper.die();
               removeMapper(mapperWork);
             } catch (RemoteException e) {
-              LOG.warn("Failed communicating with mapper", e);
+              LOG.debug("Failed communicating with mapper", e);
             }
           }
         }
@@ -405,7 +418,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
               reducer.die();
               removeReducer(reducerWork);
             } catch (RemoteException e) {
-              LOG.warn("Failed communicating with reducer", e);
+              LOG.debug("Failed communicating with reducer", e);
             }
           }
         }

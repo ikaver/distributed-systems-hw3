@@ -42,8 +42,7 @@ public class MRReduceRunner implements Runnable {
 	}
 
 	public void run() {
-		// TODO Auto-generated method stub
-		setState(WorkerState.RUNNING);
+	  LOGGER.info("Starting reducer work...");
 
 		List<MapWorkDescription> mwds = rwd.getMappers();
 		List<SocketAddress> mapperAddresses = rwd.getMapperAddresses();
@@ -81,6 +80,7 @@ public class MRReduceRunner implements Runnable {
 			try {
 				reducer.reduce(collector, key, aggregator.get(key));
 			} catch (Exception e) {
+			  LOGGER.warn("Reducer failed! ", e);
 				setState(WorkerState.FAILED);
 				return;
 			}
@@ -98,9 +98,11 @@ public class MRReduceRunner implements Runnable {
 				+ "is " + data.length);
 
 		try {
+		  LOGGER.info("Saving reducer file on DFS...");
 			dfs.createFile(getReducerPartitionName(rwd), data.length,
 					data.length);
 			dfs.saveFile(getReducerPartitionName(rwd), 0, data);
+			LOGGER.info("Saved file on DFS. Finished.");
 			setState(WorkerState.FINISHED);
 			return;
 		} catch (RemoteException e) {
