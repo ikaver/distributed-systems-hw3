@@ -10,6 +10,10 @@ public class MapWorkState {
 
 	private String outputPath;
 	private WorkerState state;
+	
+	public MapWorkState() {
+	  this.state = WorkerState.RUNNING;
+	}
 
 	public String getOutputPath() {
 		return outputPath;

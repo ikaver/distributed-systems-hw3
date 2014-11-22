@@ -50,7 +50,7 @@ public class MRSchedulerImpl implements IMRScheduler {
     this.nodeInfoLock = availableNodesLock;
     this.dfs = dfs;
     this.allNodes = allNodes;
-    
+
     //Start node tracker service (keeps track of node performance).
     this.scheduler = Executors.newScheduledThreadPool(1);
     NodeTracker tracker = new NodeTracker(this.nodeInfo, this.allNodes, this.nodeInfoLock);
@@ -76,7 +76,11 @@ public class MRSchedulerImpl implements IMRScheduler {
                 workToDo,
                 worker.sa,
                 WorkerState.RUNNING
-            );
+                );
+            this.nodeInfoLock.writeLock().lock();
+            NodeInformation nodeInfo = this.nodeInfo.get(worker.sa);
+            if(nodeInfo != null) nodeInfo.setAvailableSlots(nodeInfo.getAvailableSlots()-1);
+            this.nodeInfoLock.writeLock().unlock();
             info.add(workerInfo);
           }
           else {
@@ -91,9 +95,9 @@ public class MRSchedulerImpl implements IMRScheduler {
       else {
         info.add(new MapperWorkerInfo(
             workToDo, null, WorkerState.WORKER_NOT_ASSIGNED
-        ));
+            ));
       }
-      
+
     }
     return info;
   }
@@ -124,6 +128,10 @@ public class MRSchedulerImpl implements IMRScheduler {
                 worker.sa,
                 WorkerState.RUNNING
                 );
+            this.nodeInfoLock.writeLock().lock();
+            NodeInformation nodeInfo = this.nodeInfo.get(worker.sa);
+            if(nodeInfo != null) nodeInfo.setAvailableSlots(nodeInfo.getAvailableSlots()-1);
+            this.nodeInfoLock.writeLock().unlock();
             info.add(workerInfo);
           }
           else {
@@ -179,11 +187,11 @@ public class MRSchedulerImpl implements IMRScheduler {
       //get nodes that actually have chunk locally
       Set<SocketAddress> nodeManagersForChunk 
       = metadata.getNumChunkToAddr().get(work.getChunk().getPartitionID());
-      
+
       for(SocketAddress addr : nodeManagersForChunk) {
         LOG.info("NM has the data: " + addr);
       }
-      
+
       this.nodeInfoLock.readLock().lock();
       //get intersection of available nodes and nodes that have chunk.
       nodeManagersForChunk.retainAll(this.nodeInfo.keySet());
@@ -191,7 +199,7 @@ public class MRSchedulerImpl implements IMRScheduler {
       SocketAddress selectedNode = selectNodeFromSet(nodeManagersForChunk);
       LOG.info("Selected node for work: " + work + " is: " + selectedNode);
       this.nodeInfoLock.readLock().unlock();
-      
+
       IMRNodeManager nm = NodeManagerFactory.nodeManagerFromSocketAddress(selectedNode);
       if(nm != null)
         return new NodeManagerWithSocketAddress(nm, selectedNode);
@@ -242,7 +250,7 @@ public class MRSchedulerImpl implements IMRScheduler {
     List<SocketAddress> nmList = new ArrayList<SocketAddress>(this.nodeInfo.keySet());
     this.nodeInfoLock.readLock().unlock();
     Collections.shuffle(nmList);
-    
+
     this.nodeInfoLock.readLock().lock();
     SocketAddress randomAddr = null;
     for(int i = 0; i < nmList.size(); ++i) {

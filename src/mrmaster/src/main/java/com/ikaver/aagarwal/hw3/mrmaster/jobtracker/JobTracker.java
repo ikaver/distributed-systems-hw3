@@ -13,7 +13,7 @@ import com.ikaver.aagarwal.hw3.mrmaster.scheduler.MapperWorkerInfo;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.ReducerWorkerInfo;
 
 public class JobTracker implements Runnable {
-  
+
   private static final Logger LOG = Logger.getLogger(JobTracker.class);
 
   private RunningJob job;
@@ -56,9 +56,11 @@ public class JobTracker implements Runnable {
             WorkerState state = nm.getMapperState(info.getWorkDescription());
             info.setState(state);
             if(info.getState() == null) info.setState(WorkerState.FAILED);
-           // LOG.info("Got state " + info.getState() + " from mapper " 
-           // + info.getNodeManagerAddress() + " " 
-           //     + info.getWorkDescription().getChunk().getPartitionID());
+            if(info.getState() == null || info.getState() == WorkerState.FAILED) {
+              LOG.info("Got state " + state + " from mapper " 
+                  + info.getNodeManagerAddress() + " " 
+                  + info.getWorkDescription().getChunk().getPartitionID());
+            }
           } catch (RemoteException e) {
             info.setState(WorkerState.FAILED);
             LOG.warn("Failed to get nm state", e);
@@ -87,7 +89,7 @@ public class JobTracker implements Runnable {
   public void queryReducers() {
     for(ReducerWorkerInfo info : job.getReducers()) {
       if(info.getState() == WorkerState.WORKER_NOT_ASSIGNED) {
-        this.onWorkerFailedHandler.onReducerFailed(job, info);
+        this.onWorkerFailedHandler.onReducerNotAssignedFound(job, info);
       }
       else if(info.getState() == WorkerState.RUNNING) {
         IMRNodeManager nm = NodeManagerFactory.nodeManagerFromSocketAddress(info.getNodeManagerAddress());
@@ -99,6 +101,11 @@ public class JobTracker implements Runnable {
             WorkerState state = nm.getReducerState(info.getWorkDescription());
             info.setState(state);
             if(info.getState() == null) info.setState(WorkerState.FAILED);
+            if(state == null || state == WorkerState.FAILED) {
+              LOG.info("Got state " + state + " from reducer " 
+                  + info.getNodeManagerAddress() + " " 
+                  + info.getWorkDescription().getReducerID());
+            }
           } catch (RemoteException e) {
             info.setState(WorkerState.FAILED);
             LOG.warn("Failed to get nm state", e);
@@ -122,7 +129,7 @@ public class JobTracker implements Runnable {
       this.notifiedReducersCompleted = true;
     }
   }
-  
+
 }
 
 
