@@ -2,6 +2,9 @@ package com.ikaver.aagarwal.hw3.common.config;
 
 import java.io.Serializable;
 
+/**
+ * Describes a job that finished executing.
+ */
 public class FinishedJob implements Serializable {
 
   private static final long serialVersionUID = 8329718442147537881L;

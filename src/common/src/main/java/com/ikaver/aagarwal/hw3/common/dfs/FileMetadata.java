@@ -6,6 +6,11 @@ import java.util.Set;
 
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 
+/**
+ * Describes the metadata of a file stored on the DFS. More importantly, it 
+ * holds the socket address of all of the nodes that have stored chunks of the
+ * file.
+ */
 public class FileMetadata implements Serializable {
   
   private static final long serialVersionUID = 7914506954246518081L;

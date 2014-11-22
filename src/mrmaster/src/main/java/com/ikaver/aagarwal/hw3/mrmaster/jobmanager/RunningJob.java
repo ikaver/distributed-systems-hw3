@@ -9,6 +9,9 @@ import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.MapperWorkerInfo;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.ReducerWorkerInfo;
 
+/**
+ * Describes a job that is currently executing on the MR system.
+ */
 public class RunningJob {
   
   private int jobID;

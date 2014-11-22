@@ -2,6 +2,9 @@ package com.ikaver.aagarwal.hw3.common.util;
 
 import java.io.Serializable;
 
+/**
+ * Describes a generic socket address (host, port).
+ */
 public class SocketAddress implements Serializable {
   
   private static final long serialVersionUID = 5627039049875852720L;

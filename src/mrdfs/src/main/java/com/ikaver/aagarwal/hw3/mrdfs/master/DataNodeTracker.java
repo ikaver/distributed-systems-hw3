@@ -9,6 +9,11 @@ import com.ikaver.aagarwal.hw3.common.dfs.IDataNode;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.mrdfs.datanode.DataNodeFactory;
 
+/**
+ * Describes an object that keeps track of all of the data nodes currently 
+ * running on the system. In case a data node fails, the master node is notified
+ * immediately.
+ */
 public class DataNodeTracker implements Runnable {
   
   private Set<SocketAddress> dataNodes;

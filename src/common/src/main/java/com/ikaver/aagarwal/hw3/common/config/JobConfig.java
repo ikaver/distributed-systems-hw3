@@ -2,6 +2,9 @@ package com.ikaver.aagarwal.hw3.common.config;
 
 import java.io.Serializable;
 
+/**
+ * Describes a job configuration given by the client.
+ */
 public class JobConfig implements Serializable {
   
   private static final long serialVersionUID = 7232089871060033956L;

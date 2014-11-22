@@ -14,6 +14,9 @@ import org.json.JSONObject;
 
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 
+/**
+ * Initializes the MRConfig parameters from the given JSON file.
+ */
 public class MRConfigFromJSONCreator {
   
   private static final Logger LOG = Logger.getLogger(MRConfigFromJSONCreator.class);

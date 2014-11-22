@@ -12,6 +12,10 @@ import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.IDataNode;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 
+/**
+ * Helper class that returns a (remote) reference to a data node given a 
+ * socket address
+ */
 public class DataNodeFactory {
   
   private static final Logger LOG = LogManager.getLogger(DataNodeFactory.class);

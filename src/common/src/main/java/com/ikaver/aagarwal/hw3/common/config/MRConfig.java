@@ -9,6 +9,9 @@ import org.apache.log4j.Logger;
 
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 
+/**
+ * Holds the configuration parameters of the MR system. 
+ */
 public class MRConfig {
   
   public static final Logger LOG = Logger.getLogger(MRConfig.class);

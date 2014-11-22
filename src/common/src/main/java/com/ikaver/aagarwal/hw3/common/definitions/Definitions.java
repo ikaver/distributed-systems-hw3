@@ -1,5 +1,8 @@
 package com.ikaver.aagarwal.hw3.common.definitions;
 
+/**
+ * General definitions of the system. Constants.
+ */
 public class Definitions {
 
   //services

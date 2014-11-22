@@ -11,6 +11,9 @@ import org.apache.log4j.Logger;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 
+/**
+ * Helper factory that returns a (remote) reference to the DFS master object.
+ */
 public class DFSFactory {
   
   private static final Logger LOG = LogManager.getLogger(DFSFactory.class);

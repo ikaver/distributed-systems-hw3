@@ -8,12 +8,14 @@ import java.rmi.RemoteException;
 import org.apache.log4j.Logger;
 
 import com.ikaver.aagarwal.hw3.common.config.MRConfig;
-import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.DFSFactory;
 import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 
+/**
+ * File uploader for the client. Uploads files to the DFS.
+ */
 public class FileUploader {
   
   private static final Logger LOG = Logger.getLogger(FileUploader.class);

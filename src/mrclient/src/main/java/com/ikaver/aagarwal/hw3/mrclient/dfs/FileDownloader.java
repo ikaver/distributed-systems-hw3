@@ -11,6 +11,10 @@ import com.ikaver.aagarwal.hw3.common.dfs.FileMetadata;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 
+/**
+ * File downloader for the client. Downloads from the DFS and stores them 
+ * on the client file system.
+ */
 public class FileDownloader {
   
  private static final Logger LOG = Logger.getLogger(FileDownloader.class);
