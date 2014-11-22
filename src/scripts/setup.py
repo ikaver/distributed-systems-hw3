@@ -69,7 +69,7 @@ def set_up_args():
   parser.add_argument("--mr_reduce_binary_path", type=str);
 
   parser.add_argument("--kill_all", type=bool, default=False);
-  parser.add_argument("--config", type=str, default=str);
+  parser.add_argument("--config", type=str, required=True);
   parser.add_argument("--skip_copy", type=bool, default=False);
 
   parser.add_argument("--compile_local", type=bool, default=False);
