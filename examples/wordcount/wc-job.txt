@@ -7,6 +7,6 @@
 		"input-file-path" : "wc",
 		"output-file-path" : "wc",
 		"num-reducers" : 2,
-		"record-size" : 4
+		"record-size" : 21
 	}
 }
