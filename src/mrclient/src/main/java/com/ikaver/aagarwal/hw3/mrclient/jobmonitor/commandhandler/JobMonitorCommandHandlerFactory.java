@@ -11,6 +11,9 @@ import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.mrclient.jobmonitor.JobMonitor;
 
+/**
+ * Creates all of the command listeners for the client project.
+ */
 public class JobMonitorCommandHandlerFactory implements ICommandHandlerFactory {
 
   private static final String LIST_JOBS = "list";

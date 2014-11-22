@@ -9,6 +9,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.ikaver.aagarwal.hw3.common.config.FinishedJob;
 
+/**
+ * Holds the state of all of the running jobs. All of its operations are protected
+ * by a lock. 
+ */
 public class JobsState {
 
   private Map<Integer, RunningJob> jobIDToJob;

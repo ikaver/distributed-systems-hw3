@@ -28,6 +28,14 @@ import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.ReduceWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 
+/**
+ * Scheduler implementation.  Listens for requests of the MR Master to schedule
+ *  mapper or reducer jobs. Whenever a new request comes, the scheduler selects 
+ *  the node manager more appropriate to run the job and sends over the job 
+ *  request to him. The scheduler tries to assign the job to node managers 
+ *  that already have the data locally, and that don't have too many jobs 
+ *  running already.
+ */
 @Singleton
 public class MRSchedulerImpl implements IMRScheduler {
 

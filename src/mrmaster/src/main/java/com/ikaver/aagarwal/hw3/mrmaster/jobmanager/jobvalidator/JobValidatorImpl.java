@@ -8,6 +8,9 @@ import com.google.inject.Inject;
 import com.ikaver.aagarwal.hw3.common.config.JobConfig;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 
+/**
+ * Checks if a job config is valid or not.
+ */
 public class JobValidatorImpl implements IJobValidator {
   
   private IDFS dfs;

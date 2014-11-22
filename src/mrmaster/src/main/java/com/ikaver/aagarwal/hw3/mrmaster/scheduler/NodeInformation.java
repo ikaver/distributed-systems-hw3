@@ -2,6 +2,9 @@ package com.ikaver.aagarwal.hw3.mrmaster.scheduler;
 
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 
+/**
+ * Contains the current state of a node manager.
+ */
 public class NodeInformation {
 
   private SocketAddress nodeAddress;

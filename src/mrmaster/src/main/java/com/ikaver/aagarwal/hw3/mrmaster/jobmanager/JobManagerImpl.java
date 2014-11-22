@@ -37,6 +37,10 @@ import com.ikaver.aagarwal.hw3.mrmaster.scheduler.IMRScheduler;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.MapperWorkerInfo;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.ReducerWorkerInfo;
 
+/***
+ * Job Manager class. Object that lives in the master node that is responsible
+ * of managing the MR jobs currently running on the system.
+ */
 public class JobManagerImpl extends UnicastRemoteObject implements IJobManager, IOnWorkerFailedHandler,
 IOnWorkCompletedHandler {
 

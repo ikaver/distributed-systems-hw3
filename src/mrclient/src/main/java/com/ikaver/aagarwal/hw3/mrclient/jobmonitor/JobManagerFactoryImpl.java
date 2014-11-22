@@ -12,6 +12,10 @@ import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.master.IJobManager;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 
+/**
+ * Implementation of the IJobManagerFactory interface. Gets the job manager 
+ * at the given socket address.
+ */
 public class JobManagerFactoryImpl implements IJobManagerFactory {
   
   private static final Logger LOG = LogManager.getLogger(JobManagerFactoryImpl.class);

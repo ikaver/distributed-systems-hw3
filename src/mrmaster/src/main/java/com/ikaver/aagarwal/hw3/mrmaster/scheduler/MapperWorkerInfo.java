@@ -4,6 +4,9 @@ import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 
+/**
+ * Describes a worker that is responsible of a mapper task.
+ */
 public class MapperWorkerInfo {
 
   private MapWorkDescription workDescription;

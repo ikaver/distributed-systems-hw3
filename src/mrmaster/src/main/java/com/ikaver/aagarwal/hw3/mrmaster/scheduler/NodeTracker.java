@@ -13,6 +13,11 @@ import com.ikaver.aagarwal.hw3.common.nodemanager.NodeManagerFactory;
 import com.ikaver.aagarwal.hw3.common.nodemanager.NodeState;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 
+/**
+ * Tracks the state of all of the node managers. Notifies the scheduler of 
+ * crashed node managers, and the amount of work that each of them is currently
+ * handling.
+ */
 public class NodeTracker implements Runnable {
 
   private static final Logger LOG = Logger.getLogger(NodeTracker.class);

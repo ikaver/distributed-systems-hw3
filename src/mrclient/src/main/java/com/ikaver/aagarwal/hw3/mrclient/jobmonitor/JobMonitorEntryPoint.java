@@ -9,6 +9,9 @@ import com.google.inject.Injector;
 import com.ikaver.aagarwal.hw3.common.config.MRConfig;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 
+/**
+ * Entry point for the client job monitor project.
+ */
 public class JobMonitorEntryPoint {
   
   private static final Logger LOG = Logger.getLogger(JobMonitorEntryPoint.class);

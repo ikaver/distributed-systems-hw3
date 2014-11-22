@@ -11,6 +11,13 @@ import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.dfs.IDataNode;
 
+/**
+ *  The data node is a component of the DFS module of the system. 
+ *  The data node simply stores files the the DFS master requests him to store.
+ *  Additionally, it listens for read requests of other nodes. 
+ *  Whenever a read request comes, the data node streams the data to the node 
+ *  that made the request.
+ */
 public class DataNodeImpl extends UnicastRemoteObject implements IDataNode {
 
   protected DataNodeImpl() throws RemoteException {

@@ -12,6 +12,11 @@ import com.ikaver.aagarwal.hw3.mrmaster.jobmanager.RunningJob;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.MapperWorkerInfo;
 import com.ikaver.aagarwal.hw3.mrmaster.scheduler.ReducerWorkerInfo;
 
+/**
+ * Keeps track of the state of all of the mappers and reducers of a job. 
+ * If any of them fails, it notifies its handlers immediately. Also, it notifies
+ * whenever a mapper or reducer finishes their job.
+ */
 public class JobTracker implements Runnable {
 
   private static final Logger LOG = Logger.getLogger(JobTracker.class);

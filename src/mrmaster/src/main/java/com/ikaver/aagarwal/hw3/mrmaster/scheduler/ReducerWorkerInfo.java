@@ -4,6 +4,9 @@ import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.common.workers.ReduceWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 
+/**
+ * Describes a worker that is responsible of a reducer task.
+ */
 public class ReducerWorkerInfo {
   
   private ReduceWorkDescription workDescription;
