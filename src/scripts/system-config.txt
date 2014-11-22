@@ -28,9 +28,9 @@
         "time-to-check-for-job-state": 3,
         "time-to-check-for-nodes-state": 4,
         "time-to-check-for-data-nodes-state": 5,
-        "workers-per-node": 6,
+        "workers-per-node": 5,
         "replication-factor": 3,
-        "chunk-size-in-MB": 1,
+        "chunk-size-in-MB": 64,
         "max-dfs-read-retries": 5
     }
 }
