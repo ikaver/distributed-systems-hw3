@@ -213,6 +213,10 @@ def main():
   [username, password] = get_login_credentials();
   compile(args);
 
+  if not args.rwd.endswith("/"):
+    print "A remote working directory should be specified with a trailing /";
+    return;
+ 
   if(args.cleanup):
     cleanup(args, username, password, js);
     print "Cleaned up any artificats of previous run by the user:{0}".format(username);
