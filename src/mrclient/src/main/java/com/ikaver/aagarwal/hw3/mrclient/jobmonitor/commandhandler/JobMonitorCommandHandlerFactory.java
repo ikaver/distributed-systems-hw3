@@ -21,6 +21,7 @@ public class JobMonitorCommandHandlerFactory implements ICommandHandlerFactory {
   private static final String DOWNLOAD_FILE = "download";
   private static final String LIST_FINISHED_JOBS = "finished";
   private static final String SHUTDOWN = "shutdown";
+  private static final String END_SESSION = "end-session";
 
   private JobMonitor monitor;
   private SocketAddress masterSocketAddress;
@@ -42,6 +43,7 @@ public class JobMonitorCommandHandlerFactory implements ICommandHandlerFactory {
     commandHandlers.put(UPLOAD_FILE, new UploadFileCommandHandler(masterSocketAddress));
     commandHandlers.put(DOWNLOAD_FILE, new DownloadFileCommandHandler(masterSocketAddress));
     commandHandlers.put(SHUTDOWN, new ShutdownCommandHandler(monitor));
+    commandHandlers.put(END_SESSION, new EndClientSystemCommandHandler());
     return commandHandlers;
   }
 
