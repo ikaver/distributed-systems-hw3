@@ -1,6 +1,6 @@
 {
     "config": {
-        "master-host": "ghc34.ghc.andrew.cmu.edu",
+        "master-host": "ghc48.ghc.andrew.cmu.edu",
         "master-port": 4917,
         "participants": [
             {
@@ -30,7 +30,7 @@
         "time-to-check-for-data-nodes-state": 5,
         "workers-per-node": 6,
         "replication-factor": 3,
-        "chunk-size-in-MB": 32,
+        "chunk-size-in-MB": 1,
         "max-dfs-read-retries": 5
     }
 }
