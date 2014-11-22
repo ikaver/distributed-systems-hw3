@@ -16,7 +16,7 @@ public class MRReduceTaskAttempt {
   private static final Logger LOGGER = Logger
       .getLogger(MRReduceTaskAttempt.class);
 
-  private static final int WAIT_TIME = 1000;
+  private static final int WAIT_TIME = 3000;
 
 
   /**
