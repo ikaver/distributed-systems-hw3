@@ -15,7 +15,7 @@ num_records = options.num_records
 
 # returns a random string of length x.
 def random_string(x):
-  return ''.join(random.choice(string.ascii_uppercase) for i in range(x))
+  return ''.join(random.choice('AB') for i in range(x))
 
 for j in range(0,num_records):
     print random_string(record_size);
