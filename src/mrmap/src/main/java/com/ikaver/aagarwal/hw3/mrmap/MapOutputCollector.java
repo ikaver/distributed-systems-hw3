@@ -15,6 +15,9 @@ import com.ikaver.aagarwal.hw3.common.mrmap.IMapOutputCollector;
 import com.ikaver.aagarwal.hw3.common.objects.KeyValuePair;
 import com.ikaver.aagarwal.hw3.common.util.FileOperationsUtil;
 
+/**
+ * Collects the output of a MapRunner and saves it in the local file system.
+ */
 public class MapOutputCollector implements IMapOutputCollector {
 
 	private final Logger LOG = Logger.getLogger(MapOutputCollector.class);
@@ -30,7 +33,6 @@ public class MapOutputCollector implements IMapOutputCollector {
 		data.add(p);
 	}
 
-	// TODO(ankit): Sort the data before storing.
 	public String flush() {
 		String path = FileOperationsUtil.getRandomStringForLocalFile()
 				+ ".out";
@@ -39,7 +41,7 @@ public class MapOutputCollector implements IMapOutputCollector {
 			ObjectOutputStream os = new ObjectOutputStream(
 					new FileOutputStream(path));
 
-            // Sorting phase.
+      // Sorting phase.
 			Collections.sort(data);
 
 			// Write the data list to the file.

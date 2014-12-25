@@ -24,6 +24,9 @@ import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.ReduceWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 
+/**
+ * Runs a reduce job for a given reduce work description.
+ */
 public class MRReduceRunner implements Runnable {
 
 	private static final Logger LOGGER = Logger.getLogger(MRReduceRunner.class);

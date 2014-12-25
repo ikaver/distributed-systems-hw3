@@ -21,7 +21,8 @@ public class MapRunnerEntryPoint {
 	private static final Logger LOG = Logger.getLogger(MapRunnerEntryPoint.class);
 
 	public static void main(String args[]) throws IOException {
-		MRWorkerRunnerSettings settings = new MRWorkerRunnerSettings();
+		//Parse command line args
+	  MRWorkerRunnerSettings settings = new MRWorkerRunnerSettings();
     JCommander argsParser = new JCommander(settings);
     String configFilePath = null;
     try {
@@ -32,27 +33,23 @@ public class MapRunnerEntryPoint {
       System.exit(-1);
     }
 
+    //Setup config parameters
     if(!MRConfig.setupFromConfigFile(configFilePath)) {
       LOG.error("Failed to read setup file.");
       System.exit(-1);
     }
-		
-		JCommander cmd = new JCommander(settings);
-		cmd.parse(args);
 
+		//Create log file
 		FileAppender appender = new FileAppender(
 		    new PatternLayout(PatternLayout.DEFAULT_CONVERSION_PATTERN),
 				logFileForPort(settings.getPort()));
 		Logger.getRootLogger().addAppender(appender);
-
-		SocketAddress masterAddress = MRConfig.getMasterSocketAddress();
-		
 		FileUtil.changeFilePermission(logFileForPort(settings.getPort()));
 
+		//Create map instance runner, setup RMI service
+    SocketAddress masterAddress = MRConfig.getMasterSocketAddress();
 		MapInstanceRunner runner = new MapInstanceRunner(masterAddress);
-
 		LocateRegistry.createRegistry(settings.getPort());
-
 		Naming.rebind(
 				String.format("//:%d/" + Definitions.MR_MAP_RUNNER_SERVICE,
 						settings.getPort()), runner);

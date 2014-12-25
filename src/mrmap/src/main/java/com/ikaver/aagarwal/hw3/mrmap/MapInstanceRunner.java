@@ -10,6 +10,10 @@ import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 
+/**
+ * Creates a map runner instance on a separate thread. Responds to node manager
+ * for state queries.
+ */
 public class MapInstanceRunner extends UnicastRemoteObject implements
 		IMapInstanceRunner {
 
@@ -31,7 +35,7 @@ public class MapInstanceRunner extends UnicastRemoteObject implements
 	 * needs to act.
 	 */
 	public void runMapInstance(MapWorkDescription input) {
-		LOGGER.info("Received " + input.getJobID() + " " + 
+	  LOGGER.info("MapInstanceRunner got job: " + input.getJobID() + " " + 
 	         input.getChunk().getInputFilePath());
 		this.runner = new MapRunner(input, masterAddress);
 		this.mapRunnerThread = new Thread(runner);

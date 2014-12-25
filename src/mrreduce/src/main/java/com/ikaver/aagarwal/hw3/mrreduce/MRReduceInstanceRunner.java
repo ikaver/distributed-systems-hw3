@@ -14,6 +14,10 @@ import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.common.workers.ReduceWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 
+/**
+ * Creates a reduce runner instance on a separate thread. Responds to node manager
+ * for state queries.
+ */
 @Singleton
 public class MRReduceInstanceRunner extends UnicastRemoteObject implements
 		IMRReduceInstanceRunner {

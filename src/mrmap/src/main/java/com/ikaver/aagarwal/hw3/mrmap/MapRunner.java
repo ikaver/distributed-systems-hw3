@@ -17,7 +17,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import com.ikaver.aagarwal.hw3.common.config.MRConfig;
-import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.DFSFactory;
 import com.ikaver.aagarwal.hw3.common.dfs.FileMetadata;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
@@ -30,6 +29,9 @@ import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 import com.ikaver.aagarwal.hw3.mrdfs.datanode.DataNodeFactory;
 
+/**
+ * Runs a map job for a given map work description.
+ */
 public class MapRunner implements Runnable {
 
   private static final Logger LOGGER = Logger.getLogger(MapRunner.class);

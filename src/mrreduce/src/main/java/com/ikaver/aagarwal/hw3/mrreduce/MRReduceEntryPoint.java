@@ -1,7 +1,6 @@
 package com.ikaver.aagarwal.hw3.mrreduce;
 
 import java.io.IOException;
-import java.io.ObjectInputStream.GetField;
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
 
@@ -29,7 +28,7 @@ public class MRReduceEntryPoint {
 			.getLogger(MRReduceEntryPoint.class);
 
 	public static void main(String args[]) throws IOException {
-
+	  //Read command line args
 		MRWorkerRunnerSettings settings = new MRWorkerRunnerSettings();
     JCommander cmd = new JCommander(settings);
     String configFilePath = null;
@@ -41,33 +40,30 @@ public class MRReduceEntryPoint {
       System.exit(-1);
     }
 
+    //Setup config parameters
     if(!MRConfig.setupFromConfigFile(configFilePath)) {
       LOG.error("Failed to read setup file.");
       System.exit(-1);
     }
 		
+    //Create log file
 		FileAppender appender = new FileAppender(new PatternLayout(PatternLayout.DEFAULT_CONVERSION_PATTERN),
 				getLogFileForPort(settings.getPort()));
-
 		FileUtil.changeFilePermission(getLogFileForPort(settings.getPort()));
-
 		Logger.getRootLogger().addAppender(appender);
 
+		
+    //Create reduce instance runner, setup RMI service
 		SocketAddress masterAddress = MRConfig.getMasterSocketAddress();
-
 		Injector injector = Guice.createInjector(new MRReduceModule(masterAddress));
-
 		IMRReduceInstanceRunner runner =
 				injector.getInstance(IMRReduceInstanceRunner.class);
-
 		LocateRegistry.createRegistry(settings.getPort());
-
 		Naming.rebind(String.format("//:%d/"
 				+ Definitions.MR_REDUCE_RUNNER_SERVICE, settings.getPort()),
 				runner);
-
+		
 		LOG.info("Logger is now running on port" + settings.getPort());
-
 	}
 	
 	public static String getLogFileForPort(int port) {
