@@ -12,14 +12,11 @@ public class JobFromJSONCreator {
   
   private static final String CONFIG_OBJECT = "config";
   private static final String JOB_NAME = "job-name";
-  private static final String MASTER_IP = "master-ip";
-  private static final String MASTER_PORT = "master-port";
   private static final String BUNDLE_PATH = "bundle-path";
   private static final String MAP_CLASS_NAME = "map-class";
   private static final String REDUCE_CLASS_NAME = "reduce-class";
   private static final String INPUT_FILE_PATH = "input-file-path";
   private static final String OUTPUT_FILE_PATH = "output-file-path";
-  private static final String NUM_MAPPERS = "num-mappers";
   private static final String NUM_REDUCERS = "num-reducers";
   private static final String RECORD_SIZE = "record-size";
 

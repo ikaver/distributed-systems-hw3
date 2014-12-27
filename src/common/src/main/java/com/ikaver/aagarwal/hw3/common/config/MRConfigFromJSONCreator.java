@@ -8,7 +8,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -18,9 +17,7 @@ import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
  * Initializes the MRConfig parameters from the given JSON file.
  */
 public class MRConfigFromJSONCreator {
-  
-  private static final Logger LOG = Logger.getLogger(MRConfigFromJSONCreator.class);
-    
+      
   private static final String CONFIG_OBJECT = "config";
   private static final String MASTER_IP = "master-host";
   private static final String MASTER_PORT = "master-port";

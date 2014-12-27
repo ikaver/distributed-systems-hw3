@@ -5,9 +5,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import com.ikaver.aagarwal.hw3.common.objects.KeyValuePair;
-import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
-import com.ikaver.aagarwal.hw3.common.workers.MapperChunk;
 import com.ikaver.aagarwal.hw3.common.workers.ReduceWorkDescription;
 import com.ikaver.aagarwal.hw3.common.workers.WorkerState;
 
