@@ -17,6 +17,7 @@ public class JobMonitorEntryPoint {
   private static final Logger LOG = Logger.getLogger(JobMonitorEntryPoint.class);
 
   public static void main(String [] args) {
+    //Get command line args
     JobMonitorSettings settings = new JobMonitorSettings();
     JCommander argsParser = new JCommander(settings);
     String configFilePath = null;
@@ -28,11 +29,13 @@ public class JobMonitorEntryPoint {
       System.exit(-1);
     }
 
+    //Setup configuration
     if(!MRConfig.setupFromConfigFile(configFilePath)) {
       LOG.error("Failed to read setup file.");
       System.exit(-1);
     }
         
+    //Create job monitor
     SocketAddress masterAddr = MRConfig.getMasterSocketAddress();
     Injector injector = Guice.createInjector(new JobMonitorModule(masterAddr));
     JobMonitorController controller = injector.getInstance(JobMonitorController.class);
