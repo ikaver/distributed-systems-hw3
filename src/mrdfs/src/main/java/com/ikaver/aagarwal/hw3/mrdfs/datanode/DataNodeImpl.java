@@ -10,6 +10,7 @@ import java.rmi.server.UnicastRemoteObject;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.dfs.IDataNode;
+import com.ikaver.aagarwal.hw3.common.util.LocalFSOperationsUtil;
 
 /**
  *  The data node is a component of the DFS module of the system. 
@@ -44,7 +45,7 @@ public class DataNodeImpl extends UnicastRemoteObject implements IDataNode {
     FileOutputStream fos = new FileOutputStream(file);
     fos.write(data);
     fos.close();    
-    FileUtil.changeFilePermission(filePathForFile);
+    LocalFSOperationsUtil.changeFilePermission(filePathForFile);
   }
   
   public boolean alive() {

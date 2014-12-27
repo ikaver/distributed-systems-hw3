@@ -50,7 +50,7 @@ public class MapOutputCollector implements IMapOutputCollector {
 			os.flush();
 			os.close();
 
-			FileUtil.changeFilePermission(path);
+			LocalFSOperationsUtil.changeFilePermission(path);
 			// Clear the data node since there are no more entries to be
 			// written.
 			data.clear();

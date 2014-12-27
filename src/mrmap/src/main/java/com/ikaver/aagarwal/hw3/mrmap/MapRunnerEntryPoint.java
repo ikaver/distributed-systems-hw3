@@ -13,6 +13,7 @@ import com.beust.jcommander.ParameterException;
 import com.ikaver.aagarwal.hw3.common.config.MRConfig;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
+import com.ikaver.aagarwal.hw3.common.util.LocalFSOperationsUtil;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.common.workers.flags.MRWorkerRunnerSettings;
 
@@ -44,7 +45,7 @@ public class MapRunnerEntryPoint {
 		    new PatternLayout(PatternLayout.DEFAULT_CONVERSION_PATTERN),
 				logFileForPort(settings.getPort()));
 		Logger.getRootLogger().addAppender(appender);
-		FileUtil.changeFilePermission(logFileForPort(settings.getPort()));
+		LocalFSOperationsUtil.changeFilePermission(logFileForPort(settings.getPort()));
 
 		//Create map instance runner, setup RMI service
     SocketAddress masterAddress = MRConfig.getMasterSocketAddress();

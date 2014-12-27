@@ -16,6 +16,7 @@ import com.ikaver.aagarwal.hw3.common.config.MRConfig;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.mrreduce.IMRReduceInstanceRunner;
+import com.ikaver.aagarwal.hw3.common.util.LocalFSOperationsUtil;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.common.workers.flags.MRWorkerRunnerSettings;
 
@@ -49,7 +50,7 @@ public class MRReduceEntryPoint {
     //Create log file
 		FileAppender appender = new FileAppender(new PatternLayout(PatternLayout.DEFAULT_CONVERSION_PATTERN),
 				getLogFileForPort(settings.getPort()));
-		FileUtil.changeFilePermission(getLogFileForPort(settings.getPort()));
+		LocalFSOperationsUtil.changeFilePermission(getLogFileForPort(settings.getPort()));
 		Logger.getRootLogger().addAppender(appender);
 
 		
