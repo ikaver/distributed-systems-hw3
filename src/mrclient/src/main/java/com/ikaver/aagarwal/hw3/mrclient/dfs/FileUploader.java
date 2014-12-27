@@ -87,6 +87,13 @@ public class FileUploader {
       LOG.warn("Failed to read file " + file, e);
       return false;
     }
+    finally {
+      try {
+        fis.close();
+      } catch (IOException e) {
+        LOG.warn("Failed to close file " + file, e);
+      }
+    }
     return true;
   }
 
