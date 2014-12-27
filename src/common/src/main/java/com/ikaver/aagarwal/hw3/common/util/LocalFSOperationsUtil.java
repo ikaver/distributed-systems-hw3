@@ -9,10 +9,9 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
-import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 
 /**
- * Util class for dealing with local file system.
+ * Util class for dealing with local file system operations.
  */
 public class LocalFSOperationsUtil {
 

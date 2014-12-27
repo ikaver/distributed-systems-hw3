@@ -12,7 +12,6 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import com.ikaver.aagarwal.hw3.common.config.MRConfig;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
-import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.util.LocalFSOperationsUtil;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.common.workers.flags.MRWorkerRunnerSettings;

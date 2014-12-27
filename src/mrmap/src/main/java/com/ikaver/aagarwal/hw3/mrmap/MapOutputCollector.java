@@ -10,7 +10,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.mrmap.IMapOutputCollector;
 import com.ikaver.aagarwal.hw3.common.objects.KeyValuePair;
 import com.ikaver.aagarwal.hw3.common.util.LocalFSOperationsUtil;

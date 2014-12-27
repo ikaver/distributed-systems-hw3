@@ -14,7 +14,6 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.ikaver.aagarwal.hw3.common.config.MRConfig;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
-import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.mrreduce.IMRReduceInstanceRunner;
 import com.ikaver.aagarwal.hw3.common.util.LocalFSOperationsUtil;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
