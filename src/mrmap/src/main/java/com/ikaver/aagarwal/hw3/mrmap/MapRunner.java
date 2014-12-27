@@ -74,8 +74,7 @@ public class MapRunner implements Runnable {
     try {
       fis = new FileInputStream(new File(localfp));
     } catch (FileNotFoundException e) {
-      LOGGER.fatal("Mapper was expecting" + localfp
-          + " to be accessible.");
+      LOGGER.fatal("Mapper was expecting" + localfp + " to be accessible.");
       mapWorkState.setState(WorkerState.FAILED);
       return;
     }
@@ -109,11 +108,18 @@ public class MapRunner implements Runnable {
         LOGGER.info("Mapper finished.");
         mapWorkState.setState(WorkerState.FINISHED);
       }
-
+      
     } catch (IOException e) {
       mapWorkState.setState(WorkerState.FAILED);
       LOGGER.fatal("error reading data from the local file system. Check"
           + "that the file is accessible.");
+    }
+    finally {
+      try {
+        fis.close();
+      } catch (IOException e) {
+        LOGGER.warn("Failed to close input stream", e);
+      }
     }
   }
 
