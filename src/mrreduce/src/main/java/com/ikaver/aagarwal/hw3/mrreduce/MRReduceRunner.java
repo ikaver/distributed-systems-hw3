@@ -17,7 +17,7 @@ import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.nodemanager.IMRNodeManager;
 import com.ikaver.aagarwal.hw3.common.nodemanager.NodeManagerFactory;
 import com.ikaver.aagarwal.hw3.common.objects.KeyValuePair;
-import com.ikaver.aagarwal.hw3.common.util.FileOperationsUtil;
+import com.ikaver.aagarwal.hw3.common.util.LocalFSOperationsUtil;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.common.workers.IReducer;
 import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
@@ -130,7 +130,7 @@ public class MRReduceRunner implements Runnable {
 
 	private IReducer getReducerClass(ReduceWorkDescription input) {
 		IReducer reducer = null;
-		String jarPath = FileOperationsUtil.storeLocalFile(input.getJarFile(),
+		String jarPath = LocalFSOperationsUtil.storeLocalFile(input.getJarFile(),
 				".jar");
 		try {
 			File file = new File(jarPath);

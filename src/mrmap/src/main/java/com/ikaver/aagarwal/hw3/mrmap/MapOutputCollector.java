@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 import com.ikaver.aagarwal.hw3.common.mrmap.IMapOutputCollector;
 import com.ikaver.aagarwal.hw3.common.objects.KeyValuePair;
-import com.ikaver.aagarwal.hw3.common.util.FileOperationsUtil;
+import com.ikaver.aagarwal.hw3.common.util.LocalFSOperationsUtil;
 
 /**
  * Collects the output of a MapRunner and saves it in the local file system.
@@ -34,7 +34,7 @@ public class MapOutputCollector implements IMapOutputCollector {
 	}
 
 	public String flush() {
-		String path = FileOperationsUtil.getRandomStringForLocalFile()
+		String path = LocalFSOperationsUtil.getRandomStringForLocalFile()
 				+ ".out";
 
 		try {
@@ -49,6 +49,7 @@ public class MapOutputCollector implements IMapOutputCollector {
 
 			os.flush();
 			os.close();
+
 			FileUtil.changeFilePermission(path);
 			// Clear the data node since there are no more entries to be
 			// written.

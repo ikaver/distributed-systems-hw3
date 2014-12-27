@@ -22,7 +22,7 @@ import com.ikaver.aagarwal.hw3.common.dfs.FileMetadata;
 import com.ikaver.aagarwal.hw3.common.dfs.IDFS;
 import com.ikaver.aagarwal.hw3.common.dfs.IDataNode;
 import com.ikaver.aagarwal.hw3.common.mrcollector.ICollector;
-import com.ikaver.aagarwal.hw3.common.util.FileOperationsUtil;
+import com.ikaver.aagarwal.hw3.common.util.LocalFSOperationsUtil;
 import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
 import com.ikaver.aagarwal.hw3.common.workers.IMapper;
 import com.ikaver.aagarwal.hw3.common.workers.MapWorkDescription;
@@ -66,7 +66,7 @@ public class MapRunner implements Runnable {
       return;
     }
 
-    String localfp = FileOperationsUtil.storeLocalFile(data, ".input");
+    String localfp = LocalFSOperationsUtil.storeLocalFile(data, ".input");
     IMapper mapper = getMapperClass(input);
 
     FileInputStream fis;
@@ -198,7 +198,7 @@ public class MapRunner implements Runnable {
 
   private IMapper getMapperClass(MapWorkDescription input) {
     IMapper mapper = null;
-    String jarPath = FileOperationsUtil.storeLocalFile(input.getJarFile(),
+    String jarPath = LocalFSOperationsUtil.storeLocalFile(input.getJarFile(),
         ".jar");
     try {
       File file = new File(jarPath);

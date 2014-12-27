@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
 import com.ikaver.aagarwal.hw3.common.definitions.Definitions;
 import com.ikaver.aagarwal.hw3.common.dfs.FileUtil;
 
-public class FileOperationsUtil {
+public class LocalFSOperationsUtil {
 
-	private static final Logger LOG = Logger.getLogger(FileOperationsUtil.class);
+	private static final Logger LOG = Logger.getLogger(LocalFSOperationsUtil.class);
  
 	public static String storeLocalFile(byte[] data, String extension) {
-		String localfp = FileOperationsUtil.getRandomStringForLocalFile();
+		String localfp = LocalFSOperationsUtil.getRandomStringForLocalFile();
 		try {
 			FileOutputStream os;
 			os = new FileOutputStream(new File(localfp));
