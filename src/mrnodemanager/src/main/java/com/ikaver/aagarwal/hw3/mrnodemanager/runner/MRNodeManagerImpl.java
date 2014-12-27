@@ -136,6 +136,7 @@ public class MRNodeManagerImpl extends UnicastRemoteObject implements IMRNodeMan
 
       List<KeyValuePair> result = new ArrayList<KeyValuePair>();
       List<KeyValuePair> list = (List<KeyValuePair>) os.readObject();
+      os.close();
 
       for (KeyValuePair kv : list) {
         if ((Math.abs(kv.getKey().hashCode()) % rwd.getNumReducers()) == rwd.getReducerID()) {
