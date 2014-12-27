@@ -17,50 +17,55 @@ import com.ikaver.aagarwal.hw3.common.util.SocketAddress;
  */
 public class FileDownloader {
   
- private static final Logger LOG = Logger.getLogger(FileDownloader.class);
-  
-  public static boolean downloadFile(SocketAddress dfsAddr, String filePath, String destinationPath) {
+  public enum DownloadFileResult {
+    SUCCESS,
+    DFS_COMM_FAILURE,
+    FAILED_TO_OPEN_FILE,
+    FAILED_TO_WRITE_FILE,
+    FAILED_TO_FIND_FILE_IN_DFS
+  }
+
+  private static final Logger LOG = Logger.getLogger(FileDownloader.class);
+
+  public static DownloadFileResult downloadFile(SocketAddress dfsAddr, String filePath, String destinationPath) {
     IDFS dfs = DFSFactory.dfsFromSocketAddress(dfsAddr);
     if(dfs == null) {
-      System.out.println("Failed to communicate with DFS");
-      return false;
+      return DownloadFileResult.DFS_COMM_FAILURE;
     }
-    
+
     FileOutputStream fos = null;
+    DownloadFileResult result = DownloadFileResult.SUCCESS;
     try {
       fos = new FileOutputStream(destinationPath);
     } catch (IOException e) {
-      System.out.println("Failed to open file " + destinationPath);
       LOG.warn("Failed to open file " + destinationPath, e);
-      return false;
+      return DownloadFileResult.FAILED_TO_OPEN_FILE;
     }
-    
+
     try {
       FileMetadata metadata = dfs.getMetadata(filePath);
       if(metadata != null) {
         byte [] data = dfs.getFile(filePath, 0);
         if(data != null) {
           fos.write(data);
-          fos.close();
-          System.out.println("File downloaded successfully!");
+          result = DownloadFileResult.SUCCESS;
         }
         else {
-          System.out.println("Failed to find file " + filePath + " in DFS");
+          result = DownloadFileResult.FAILED_TO_FIND_FILE_IN_DFS;
         }
       }
       else {
-        System.out.println("Couldn't find file in DFS: " + filePath);
+        result = DownloadFileResult.FAILED_TO_FIND_FILE_IN_DFS;
       }
+      if(fos != null) fos.close();
     } catch (RemoteException e) {
-      System.out.println("Failed to communicate with DFS");
       LOG.warn("Failed to communicate to DFS", e);
-      return false;
+      result = DownloadFileResult.DFS_COMM_FAILURE;
     } catch (IOException e) {
-      System.out.println("Failed to write file " + destinationPath);
       LOG.warn("Failed to write file " + destinationPath, e);
-      return false;
+      result =  DownloadFileResult.FAILED_TO_WRITE_FILE;
     }
-    return true;
+    return result;
   }
 
 }
