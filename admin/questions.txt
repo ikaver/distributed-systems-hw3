@@ -1,4 +1,0 @@
-- How do we get the mapper/reducers implementations to the master and slave nodes?
-
-- Where does sorting happen? Do mappers sort their output for reducers to merge, or do reducers receive unsorted input?
-
